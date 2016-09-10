@@ -54,6 +54,10 @@ set(${PROJECT_NAME}_sources
   "src/main/java/org/ros2/rcljava/exception/InvalidRCLJAVAImplementation.java"
   "src/main/java/org/ros2/rcljava/exception/NoImplementationAvailableException.java"
   "src/main/java/org/ros2/rcljava/exception/NotInitializedException.java"
+
+  "src/test/java/org/ros2/rcljava/test/NodeTest.java"
+  "src/test/java/org/ros2/rcljava/test/RCLJavaTest.java"
+  "src/test/java/org/ros2/rcljava/test/RmwTest.java"
 )
 
 ### Macro ###
@@ -133,20 +137,20 @@ add_jar("${PROJECT_NAME}_jar"
 
 set(TEST_COMMAND ${Java_JAVA_EXECUTABLE} ${JVMARGS} -classpath ${JUNIT_JAR}:${CMAKE_INSTALL_PREFIX}/share/${PROJECT_NAME}/java/${PROJECT_NAME}.jar -Djava.library.path=${CMAKE_INSTALL_PREFIX}/lib/ org.junit.runner.JUnitCore)
 
-#add_test(
+# add_test(
 #    NAME RmwTest
 #    COMMAND ${TEST_COMMAND} org.ros2.rcljava.test.RmwTest
-#)
+# )
 
 add_test(
     NAME RCLJavaTest
     COMMAND ${TEST_COMMAND} org.ros2.rcljava.test.RCLJavaTest
 )
 
-#add_test(
+# add_test(
 #    NAME NodeTest
 #    COMMAND ${TEST_COMMAND} org.ros2.rcljava.test.NodeTest
-#)
+# )
 
 ## loop for all RMW target.
 call_for_each_rmw_implementation(target)
