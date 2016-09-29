@@ -1,4 +1,4 @@
-/* Copyright 2016 Esteve Fernandez <esteve@apache.org>
+/* Copyright 2016 Open Source Robotics Foundation, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -12,13 +12,22 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.ros2.rcljava;
+package org.ros2.rcljava.exception;
 
 /**
+ * Raised when the rcljava implementation is accessed before RclJava().
+ * 
+ * @author Mickael Gaillard
  *
- *
- * @author Esteve Fernandez <esteve@apache.org>
  */
-public interface Consumer<T> {
-    void accept(T t);
+public class NotInitializedException extends Exception {
+
+    /**
+     * Constructor.
+     * 
+     * @param cause
+     */
+    public NotInitializedException(Throwable cause) {
+        super("RclJava() has not been called", cause);
+    }
 }

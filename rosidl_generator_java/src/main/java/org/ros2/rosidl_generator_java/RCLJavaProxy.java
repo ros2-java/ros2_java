@@ -41,4 +41,13 @@ public class RCLJavaProxy {
         }
     }
 
+    public static synchronized void loadLibrary(String name) {
+        try {
+            Class c = Class.forName("org.ros2.rcljava.RCLJava");
+            Method m = c.getDeclaredMethod("loadLibrary", String.class);
+            Object o = m.invoke(null, name);
+        } catch(Exception e) {
+            // TODO(esteve): handle exception
+        }
+    }
 }

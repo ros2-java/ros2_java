@@ -1,4 +1,4 @@
-/* Copyright 2016 Esteve Fernandez <esteve@apache.org>
+/* Copyright 2016 Open Source Robotics Foundation, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,11 +14,23 @@
  */
 package org.ros2.rcljava;
 
+import org.ros2.rcljava.exception.NoImplementationAvailableException;
+
 /**
+ * Not define in ROS2.
  *
- *
- * @author Esteve Fernandez <esteve@apache.org>
+ * @author Mickael Gaillard
  */
-public interface Consumer<T> {
-    void accept(T t);
+public class Log {
+
+    public Log() { }
+
+    public void fatal(Exception e) {
+        throw new NoImplementationAvailableException(e);
+    }
+
+    public void info(String string) {
+        throw new NoImplementationAvailableException(new Exception(string));
+    }
+
 }

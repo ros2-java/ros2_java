@@ -84,12 +84,12 @@ endforeach()
 
 set(target_dependencies
   "${rosidl_generator_java_BIN}"
-  ${rosidl_generator_java_GENERATOR_FILES}
+  "${rosidl_generator_java_GENERATOR_FILES}"
   "${rosidl_generator_java_TEMPLATE_DIR}/msg_support.entry_point.cpp.template"
   "${rosidl_generator_java_TEMPLATE_DIR}/msg.java.template"
   "${rosidl_generator_java_TEMPLATE_DIR}/srv.java.template"
-  ${rosidl_generate_interfaces_IDL_FILES}
-  ${_dependency_files})
+  "${rosidl_generate_interfaces_IDL_FILES}"
+  "${_dependency_files}")
 foreach(dep ${target_dependencies})
   if(NOT EXISTS "${dep}")
     message(FATAL_ERROR "Target dependency '${dep}' does not exist")
