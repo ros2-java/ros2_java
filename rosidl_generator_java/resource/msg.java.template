@@ -12,12 +12,7 @@ import @(field.type.pkg_name).msg.@(field.type.type);
 
 public class @(type_name) {
    static {
-        try {
-            System.loadLibrary("@(spec.base_type.pkg_name)_@(type_name)_s__" + RCLJavaProxy.getTypesupportIdentifier());
-        } catch (UnsatisfiedLinkError e) {
-            System.err.println("Native code library failed to load.\n" + e);
-            System.exit(1);
-        }
+        RCLJavaProxy.loadLibrary("@(spec.base_type.pkg_name)_@(type_name)_s__" + RCLJavaProxy.getTypesupportIdentifier());
     }
 
     public static native long getFromJavaConverter();

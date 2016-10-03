@@ -15,49 +15,105 @@
 package org.ros2.rcljava;
 
 import java.lang.ref.WeakReference;
-
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Logger;
 
+/**
+ * <h1>Node ROS2.</h1>
+ * <p></p>
+ * @author Esteve Fernandez <esteve@apache.org>
+ * @author Mickael Gaillard <mick.gaillard@gmail.com>
+ */
 public class Node {
-   static {
-        try {
-            System.loadLibrary("rcljavaNode__" + RCLJava.getRMWIdentifier());
-        } catch (UnsatisfiedLinkError e) {
-            System.err.println("Native code library failed to load.\n" + e);
-            System.exit(1);
-        }
+    private static Logger logger = Logger.getLogger(RCLJava.LOG_NAME);
+
+    static {
+        RCLJava.loadLibrary("rcljavaNode__" + RCLJava.getRMWIdentifier());
     }
 
-    private long nodeHandle;
-    private List<Subscription> subscriptions = new ArrayList<Subscription>();
+    /** Node handler */
+    private final long nodeHandle;
 
-    public Node(long nodeHandle) {
-        this.nodeHandle = nodeHandle;
-    }
+    /** List of subscriptions */
+    private final List<Subscription<?>> subscriptions;
 
+    // Native call.
     private static native <T> long nativeCreatePublisherHandle(
-        long nodeHandle, Class<T> cls, String topic);
+            long nodeHandle, Class<T> cls, String topic);
 
     private static native <T> long nativeCreateSubscriptionHandle(
-        long nodeHandle, Class<T> cls, String topic);
+            long nodeHandle, Class<T> cls, String topic);
 
-    public <T> Publisher<T> createPublisher(Class<T> cls, String topic) {
-        long publisherHandle = nativeCreatePublisherHandle(this.nodeHandle, cls, topic);
-        Publisher<T> publisher = new Publisher<T>(this.nodeHandle, publisherHandle);
-        RCLJava.publisherReferences.add(new WeakReference<Publisher>(publisher));
+    /**
+     * Constructor of Node.
+     * @param nodeHandle Handler to the node.
+     */
+    public Node(long nodeHandle) {
+        this.nodeHandle = nodeHandle;
+        this.subscriptions = new ArrayList<Subscription<?>>();
+    }
+
+    /**
+     * <h1>Create a new publisher.</h1>
+     *
+     * @param <T> Message definition.
+     * @param message Message class.
+     * @param topic Topic to publish.
+     * @param qos QOS profile.
+     * @return Publisher instance.
+     */
+    public <T> Publisher<T> createPublisher(Class<T> message, String topic,  QoSProfile qos) {
+        logger.fine("Create Publisher : " + topic);
+        long publisherHandle = Node.nativeCreatePublisherHandle(this.nodeHandle, message, topic);
+
+        Publisher<T> publisher = new Publisher<T>(this.nodeHandle, publisherHandle, message, topic, qos);
+        RCLJava.publisherReferences.add(new WeakReference<Publisher<?>>(publisher));
+
         return publisher;
     }
 
-    public <T> Subscription<T> createSubscription(Class<T> cls, String topic, Consumer<T> callback) {
-        long subscriptionHandle = nativeCreateSubscriptionHandle(this.nodeHandle, cls, topic);
+    /**
+     * <h1>Create a new Subscriber with callback.</h1>
+     *
+     * @param <T> Message definition.
+     * @param message Message Class
+     * @param topic Topic to subscribe.
+     * @param callback Function to call on recieve.
+     * @param qos QOS profile.
+     * @return
+     */
+    public <T> Subscription<T> createSubscription(
+            Class<T> message,
+            String topic,
+            Consumer<T> callback,
+            QoSProfile qos) {
+        logger.fine("Create Subscription : " + topic);
+        long subscriptionHandle = Node.nativeCreateSubscriptionHandle(this.nodeHandle, message, topic);
 
-        Subscription<T> subscription = new Subscription<T>(this.nodeHandle, subscriptionHandle, cls, topic, callback);
+        Subscription<T> subscription = new Subscription<T>(
+                this.nodeHandle,
+                subscriptionHandle,
+                message,
+                topic,
+                callback,
+                qos);
         this.subscriptions.add(subscription);
         return subscription;
     }
 
-    public List<Subscription> getSubscriptions() {
+    /**
+     * Get list of Subscriptions.
+     * @return ArrayList of Subscriptions
+     */
+    public List<Subscription<?>> getSubscriptions() {
         return this.subscriptions;
+    }
+
+    /**
+     * Release all Publisher ressource.
+     */
+    public void dispose() {
+        //TODO Implement on JNI
     }
 }

@@ -135,7 +135,7 @@ def get_builtin_java_type(type_, use_primitives=True):
         return 'byte' if use_primitives else 'Byte'
 
     if type_ == 'char':
-        return 'char' if use_primitives else 'Char'
+        return 'char' if use_primitives else 'Character'
 
     if type_ == 'float32':
         return 'float' if use_primitives else 'Float'

@@ -14,31 +14,78 @@
  */
 package org.ros2.rcljava;
 
+/**
+ * <h1>Subscrition of node.</h1>
+ * <p></p>
+ * @param <T> Message Type.
+ * @author Esteve Fernandez <esteve@apache.org>
+ * @author Mickael Gaillard <mick.gaillard@gmail.com>
+ */
 public class Subscription<T> {
 
-    private long nodeHandle;
-    private long subscriptionHandle;
-    private Class<T> msgType;
-    private String topic;
-    private Consumer<T> callback;
+    /** Node Handler. */
+    private final long nodeHandle;
 
-    public Subscription(long nodeHandle, long subscriptionHandle, Class<T> msgType, String topic, Consumer<T> callback) {
+    /** Subsciption Hander. */
+    private final long subscriptionHandle;
+
+    /** Message Type. */
+    private final Class<T> messageType;
+
+    /** Topic subscribed. */
+    private final String topic;
+
+    /** Callback. */
+    private final Consumer<T> callback;
+
+    /** Quality of Service profil. */
+    private final QoSProfile qosProfile;
+
+    // Native call.
+    private static native void nativeDispose(long nodeHandle, long publisherHandle);
+
+    public Subscription(long nodeHandle, long subscriptionHandle, Class<T> messageType, String topic, Consumer<T> callback, QoSProfile qosProfile) {
         this.nodeHandle = nodeHandle;
         this.subscriptionHandle = subscriptionHandle;
-        this.msgType = msgType;
+        this.messageType = messageType;
         this.topic = topic;
         this.callback = callback;
+        this.qosProfile = qosProfile;
     }
 
+    /**
+     * Get Callback.
+     * @return
+     */
     public Consumer<T> getCallback() {
-        return callback;
-    }
-
-    public Class<T> getMsgType() {
-        return msgType;
+        return this.callback;
     }
 
     public long getSubscriptionHandle() {
-        return subscriptionHandle;
+        return this.subscriptionHandle;
+    }
+
+    /**
+     * Get message type.
+     * @return
+     */
+    public Class<T> getMsgType() {
+        return this.messageType;
+    }
+
+    /**
+     * Get topic name.
+     * @return
+     */
+    public String getTopic() {
+        return this.topic;
+    }
+
+    /**
+     * Release all Publisher ressource.
+     */
+    public void dispose() {
+        //TODO implement to JNI
+        // Subscription.nativeDispose(this.nodeHandle, this.subscriptionHandle);
     }
 }
