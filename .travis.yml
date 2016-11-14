@@ -26,4 +26,4 @@ before_install:
 - docker run -u "$UID" -it --rm -v `pwd`:`pwd` -w `pwd` esteve/ros2-ubuntu-xenial-travisci:java sh -c ". ament_ws/install_isolated/local_setup.sh && cd /home/travis/build/ros2_java_ws && ament build --symlink-install --isolated"
 
 script:
-- cd /home/travis/build && docker run -u "$UID" -it --rm -v `pwd`:`pwd` -w `pwd` esteve/ros2-ubuntu-xenial-travisci:java sh -c ". ament_ws/install_isolated/local_setup.sh && cd /home/travis/build/ros2_java_ws && ament test --isolated --only-packages ament_build_type_gradle ament_cmake_export_jars rcljava rcljava_common rosidl_generator_java"
+- cd /home/travis/build && docker run -u "$UID" -it --rm -v `pwd`:`pwd` -w `pwd` esteve/ros2-ubuntu-xenial-travisci:java sh -c ". ament_ws/install_isolated/local_setup.sh && cd /home/travis/build/ros2_java_ws && ament test --isolated --only-packages ament_cmake_export_jars rcljava rcljava_common rosidl_generator_java"
