@@ -7,22 +7,36 @@ services:
 
 before_install:
 - docker login -e="$DOCKER_EMAIL" -u="$DOCKER_USERNAME" -p="$DOCKER_PASSWORD"
-- docker pull esteve/ros2-ubuntu-xenial-travisci:java
+- docker pull theosakamg7/ros2java:latest
 - cd /home/travis/build
 - mkdir -p ament_ws/src
 - cd /home/travis/build/ament_ws
-- docker run -u "$UID" -it --rm -v `pwd`:`pwd` -w `pwd` esteve/ros2-ubuntu-xenial-travisci:java sh -c "/usr/bin/wget https://raw.githubusercontent.com/esteve/ament_java/master/ament_java.repos"
-- docker run -u "$UID" -it --rm -v `pwd`:`pwd` -w `pwd` esteve/ros2-ubuntu-xenial-travisci:java sh -c "/usr/bin/vcs import src < ament_java.repos"
-- docker run -u "$UID" -it --rm -v `pwd`:`pwd` -w `pwd` esteve/ros2-ubuntu-xenial-travisci:java sh -c "src/ament/ament_tools/scripts/ament.py build --symlink-install --isolated"
+- docker run -u "$UID" -it --rm -v `pwd`:`pwd` -w `pwd` theosakamg7/ros2java:latest sh -c "/usr/bin/wget https://gist.githubusercontent.com/Theosakamg/e6084cfafa6b7ea690104424cef970a2/raw/ament_java.repos"
+- docker run -u "$UID" -it --rm -v `pwd`:`pwd` -w `pwd` theosakamg7/ros2java:latest sh -c "/usr/bin/vcs import src < ament_java.repos"
+- docker run -u "$UID" -it --rm -v `pwd`:`pwd` -w `pwd` theosakamg7/ros2java:latest sh -c "src/ament/ament_tools/scripts/ament.py build --symlink-install --isolated"
 - cd /home/travis/build
 - mkdir -p ros2_java_ws/src
 - cd /home/travis/build/ros2_java_ws
-- docker run -u "$UID" -it --rm -v `pwd`:`pwd` -w `pwd` esteve/ros2-ubuntu-xenial-travisci:java sh -c "/usr/bin/wget https://raw.githubusercontent.com/esteve/ros2_java/master/ros2_java_desktop.repos"
-- docker run -u "$UID" -it --rm -v `pwd`:`pwd` -w `pwd` esteve/ros2-ubuntu-xenial-travisci:java sh -c "/usr/bin/vcs import src < ros2_java_desktop.repos"
+- docker run -u "$UID" -it --rm -v `pwd`:`pwd` -w `pwd` theosakamg7/ros2java:latest sh -c "/usr/bin/wget https://gist.githubusercontent.com/Theosakamg/d9259bbc708c5145255fbdeb25e65e19/raw/ros2_java_desktop.repos"
+- docker run -u "$UID" -it --rm -v `pwd`:`pwd` -w `pwd` theosakamg7/ros2java:latest sh -c "/usr/bin/vcs import src < ros2_java_desktop.repos"
 - rm -rf /home/travis/build/ros2_java_ws/src/ros2_java/ros2_java
-- ln -s /home/travis/build/esteve/ros2_java /home/travis/build/ros2_java_ws/src/ros2_java/ros2_java
+- ln -s /home/travis/build/ros2java-alfred/ros2_java
+ /home/travis/build/ros2_java_ws/src/ros2_java/ros2_java
+- cd /home/travis/build/ros2_java_ws/src/ros2/rosidl_typesupport
+- patch -p1 < ../../ros2_java/ros2_java/rosidl_ros2_java.diff
 - cd /home/travis/build
-- docker run -u "$UID" -it --rm -v `pwd`:`pwd` -w `pwd` esteve/ros2-ubuntu-xenial-travisci:java sh -c ". ament_ws/install_isolated/local_setup.sh && cd /home/travis/build/ros2_java_ws && ament build --symlink-install --isolated"
+- docker run -u "$UID" -it --rm -v `pwd`:`pwd` -w `pwd` theosakamg7/ros2java:latest sh -c ". ament_ws/install_isolated/local_setup.sh && cd /home/travis/build/ros2_java_ws && ament build --symlink-install --isolated"
 
 script:
-- cd /home/travis/build && docker run -u "$UID" -it --rm -v `pwd`:`pwd` -w `pwd` esteve/ros2-ubuntu-xenial-travisci:java sh -c ". ament_ws/install_isolated/local_setup.sh && cd /home/travis/build/ros2_java_ws && ament test --isolated --only-packages ament_cmake_export_jars rcljava rcljava_common rosidl_generator_java"
+- cd /home/travis/build && docker run -u "$UID" -it --rm -v `pwd`:`pwd` -w `pwd` theosakamg7/ros2java:latest sh -c ". ament_ws/install_isolated/local_setup.sh && cd /home/travis/build/ros2_java_ws && ament test --isolated --only-packages ament_cmake_export_jars rcljava rcljava_common rosidl_generator_java"
+
+after_success:
+  - coveralls
+
+notifications:
+  webhooks:
+    urls:
+      - https://webhooks.gitter.im/e/4aac82b42245203edceb
+    on_success: change  # options: [always|never|change] default: always
+    on_failure: always  # options: [always|never|change] default: always
+    on_start: never     # options: [always|never|change] default: always

@@ -95,13 +95,13 @@ endforeach()
 
 set(target_dependencies
   "${rosidl_generator_java_BIN}"
-  ${rosidl_generator_java_GENERATOR_FILES}
+  "${rosidl_generator_java_GENERATOR_FILES}"
   "${rosidl_generator_java_TEMPLATE_DIR}/msg_support.entry_point.cpp.template"
   "${rosidl_generator_java_TEMPLATE_DIR}/srv_support.entry_point.cpp.template"
   "${rosidl_generator_java_TEMPLATE_DIR}/msg.java.template"
   "${rosidl_generator_java_TEMPLATE_DIR}/srv.java.template"
-  ${rosidl_generate_interfaces_IDL_FILES}
-  ${_dependency_files})
+  "${rosidl_generate_interfaces_IDL_FILES}"
+  "${_dependency_files}")
 foreach(dep ${target_dependencies})
   if(NOT EXISTS "${dep}")
     message(FATAL_ERROR "Target dependency '${dep}' does not exist")
@@ -298,6 +298,10 @@ if(NOT rosidl_generate_interfaces_SKIP_INSTALL)
     list(GET _generated_msg_java_files 0 _msg_file)
     get_filename_component(_msg_package_dir "${_msg_file}" DIRECTORY)
     get_filename_component(_msg_package_dir "${_msg_package_dir}" DIRECTORY)
+
+    ament_java_install_package(${PROJECT_NAME})
+#    install_jar("${PROJECT_NAME}_jar" "share/${PROJECT_NAME}/java")
+#    ament_export_jars("share/${PROJECT_NAME}/java/${PROJECT_NAME}.jar")
 
     install_jar("${PROJECT_NAME}_messages_jar" "share/${PROJECT_NAME}/java")
     ament_export_jars("share/${PROJECT_NAME}/java/${PROJECT_NAME}_messages.jar")

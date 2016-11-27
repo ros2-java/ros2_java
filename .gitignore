@@ -52,6 +52,7 @@ coverage.xml
 
 # Sphinx documentation
 docs/_build/
+doc/
 
 # PyBuilder
 target/
@@ -83,3 +84,9 @@ gradle-app.setting
 
 # # Work around https://youtrack.jetbrains.com/issue/IDEA-116898
 # gradle/wrapper/gradle-wrapper.properties
+
+# Eclipse 
+*.launch
+.project
+.cproject
+.pydevproject

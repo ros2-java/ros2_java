@@ -1,4 +1,5 @@
 /* Copyright 2016 Esteve Fernandez <esteve@apache.org>
+ * Copyright 2016 Mickael Gaillard <mick.gaillard@gmail.com>
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,6 +15,6 @@
  */
 
 /**
- * An API for using ROS2 with Java.
+ * An API for using ROS2 with Java (aka rcljava).
  */
 package org.ros2.rcljava;

@@ -12,16 +12,21 @@
 
   <buildtool_export_depend>rosidl_cmake</buildtool_export_depend>
 
+  <build_depend>rmw_implementation_cmake</build_depend>
+  <build_depend>rosidl_generator_java</build_depend>
+  <build_depend>rcljava_common</build_depend>
+  <build_depend>rcl</build_depend>
+  <build_depend>rmw</build_depend>
+  <build_depend>std_msgs</build_depend>
+
   <exec_depend>rmw_implementation</exec_depend>
   <exec_depend>rmw_implementation_cmake</exec_depend>
   <exec_depend>rosidl_generator_c</exec_depend>
+  <exec_depend>rosidl_generator_java</exec_depend>
   <exec_depend>rosidl_parser</exec_depend>
-
-  <build_depend>rmw_implementation_cmake</build_depend>
-  <build_depend>rcl</build_depend>
-  <build_depend>rmw</build_depend>
-
+  <exec_depend>rcljava_common</exec_depend>
   <exec_depend>rcl</exec_depend>
+  <exec_depend>std_msgs</exec_depend>
 
   <test_depend>ament_lint_auto</test_depend>
   <test_depend>ament_lint_common</test_depend>

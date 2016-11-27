@@ -1,0 +1,24 @@
+diff --git a/rosidl_default_generators/CMakeLists.txt b/rosidl_default_generators/CMakeLists.txt
+index d6fda02..886eab6 100644
+--- a/rosidl_default_generators/CMakeLists.txt
++++ b/rosidl_default_generators/CMakeLists.txt
+@@ -8,6 +8,7 @@ ament_export_dependencies(rosidl_cmake)
+ 
+ ament_export_dependencies(rosidl_generator_c)
+ ament_export_dependencies(rosidl_generator_cpp)
++ament_export_dependencies(rosidl_generator_java)
+ ament_export_dependencies(rosidl_generator_py)
+ 
+ if(BUILD_TESTING)
+diff --git a/rosidl_default_generators/package.xml b/rosidl_default_generators/package.xml
+index 31b481d..b33263f 100644
+--- a/rosidl_default_generators/package.xml
++++ b/rosidl_default_generators/package.xml
+@@ -13,6 +13,7 @@
+ 
+   <buildtool_export_depend>rosidl_generator_c</buildtool_export_depend>
+   <buildtool_export_depend>rosidl_generator_cpp</buildtool_export_depend>
++  <buildtool_export_depend>rosidl_generator_java</buildtool_export_depend>
+   <buildtool_export_depend>rosidl_generator_py</buildtool_export_depend>
+ 
+   <buildtool_export_depend>rosidl_typesupport_introspection_c</buildtool_export_depend>

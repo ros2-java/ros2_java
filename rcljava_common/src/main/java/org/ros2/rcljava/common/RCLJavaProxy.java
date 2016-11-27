@@ -12,7 +12,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package org.ros2.rcljava.common;
 
 import java.lang.reflect.Method;
@@ -23,40 +22,51 @@ import java.lang.reflect.Method;
  * This prevents a circular dependency between generated messages and rcljava.
  */
 public final class RCLJavaProxy {
-  /**
-   * Private constructor so this cannot be instantiated.
-   */
-  private RCLJavaProxy() { }
+    /**
+     * Private constructor so this cannot be instantiated.
+     */
+    private RCLJavaProxy() { }
 
-  /**
-   * @return a pointer to the underlying typesupport via reflection.
-   */
-  public static synchronized String getTypesupportIdentifier() {
-    try {
-      Class cls = Class.forName("org.ros2.rcljava.RCLJava");
-      Method meth = cls.getDeclaredMethod(
-          "getTypesupportIdentifier", (Class<?>[]) null);
-      Object obj = meth.invoke(null, (Class<?>[]) null);
-      return (String) obj;
-    } catch (Exception exc) {
-      // Just return null if we can't find the typesupport identifier
-      return null;
+    /**
+       * @return a pointer to the underlying typesupport via reflection.
+       */
+    public static synchronized String getTypesupportIdentifier() {
+        try {
+            Class cls = Class.forName("org.ros2.rcljava.RCLJava");
+            Method meth = cls.getDeclaredMethod("getTypesupportIdentifier", (Class<?> []) null);
+            Object obj = meth.invoke(null);
+            return (String) obj;
+        } catch(Exception e) {
+            // Just return null if we can't find the typesupport identifier
+            return null;
+        }
     }
-  }
 
-  /**
-   * @return a pointer to the underlying typesupport via reflection.
-   */
-  public static synchronized String getRMWIdentifier() {
-    try {
-      Class cls = Class.forName("org.ros2.rcljava.RCLJava");
-      Method meth = cls.getDeclaredMethod(
-          "getRMWIdentifier", (Class<?>[]) null);
-      Object obj = meth.invoke(null, (Class<?>[]) null);
-      return (String) obj;
-    } catch (Exception exc) {
-      // Just return null if we can't find the RMW identifier
-      return null;
+    /**
+     * @return a pointer to the underlying typesupport via reflection.
+     */
+    public static synchronized String getRMWIdentifier() {
+        try {
+            Class cls = Class.forName("org.ros2.rcljava.RCLJava");
+            Method meth = cls.getDeclaredMethod("getRMWIdentifier", (Class<?> []) null);
+            Object obj = meth.invoke(null);
+            return (String) obj;
+        } catch(Exception e) {
+            // Just return null if we can't find the RMW identifier
+            return null;
+        }
     }
-  }
+
+    /**
+     * @return a pointer to the underlying load native library via reflection.
+     */
+    public static synchronized void loadLibrary(String name) {
+        try {
+            Class cls = Class.forName("org.ros2.rcljava.RCLJava");
+            Method meth = cls.getDeclaredMethod("loadLibrary", String.class);
+            Object obj = meth.invoke(null, name);
+        } catch(Exception e) {
+            // TODO(esteve): handle exception
+        }
+    }
 }

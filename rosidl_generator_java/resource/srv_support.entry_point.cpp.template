@@ -1,8 +1,25 @@
+// generated from rosidl_generator_java/resource/srv_support_entry_point.cpp.template
+// generated code does not contain a copyright notice
+
+@##########################################################################
+@# EmPy template for generating <srv> files for Java
+@# Context:
+@#  - spec (rosidl_parser.MessageSpecification)
+@#    Parsed specification of the .msg file
+@#  - module_name (string)
+@#  - jni_package_name (string)
+@#  - subfolder (string)
+@#    The subfolder / subnamespace of the message
+@#    Either 'msg' or 'srv'
+@##########################################################################
+@
+// INCLUDES
 #include <jni.h>
 
 #include <rosidl_generator_c/service_type_support.h>
 #include <@(spec.pkg_name)/@(subfolder)/@(module_name).h>
 
+// JNI HEADER
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -19,10 +36,11 @@ JNIEXPORT jlong JNICALL Java_@(jni_package_name)_@(subfolder)_@(jni_type_name)_g
 }
 #endif
 
+// INTERNAL FUNCTION
+
 JNIEXPORT jlong JNICALL Java_@(jni_package_name)_@(subfolder)_@(jni_type_name)_getServiceTypeSupport
   (JNIEnv *, jclass)
 {
-  const rosidl_service_type_support_t * ts = ROSIDL_GET_TYPE_SUPPORT(
-    @(spec.pkg_name), @(subfolder), @(spec.srv_name));
+  const rosidl_service_type_support_t * ts = ROSIDL_GET_TYPE_SUPPORT(@(spec.pkg_name), @(subfolder), @(spec.srv_name));
   return reinterpret_cast<jlong>(ts);
 }

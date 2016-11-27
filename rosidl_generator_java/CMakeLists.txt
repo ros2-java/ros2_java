@@ -27,6 +27,8 @@ include(JavaExtra)
 
 set(CMAKE_JAVA_COMPILE_FLAGS "-source" "1.6" "-target" "1.6")
 
+set(rosidl_generator_java_DIR "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
+
 if(BUILD_TESTING)
   find_package(ament_lint_auto REQUIRED)
   ament_lint_auto_find_test_dependencies()
@@ -55,8 +57,6 @@ if(BUILD_TESTING)
 
   include(cmake/register_java.cmake)
   include(cmake/rosidl_generator_java_get_typesupports.cmake)
-
-  set(rosidl_generator_java_DIR "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 
   rosidl_generator_java_extras(
     "${CMAKE_CURRENT_SOURCE_DIR}/bin/rosidl_generator_java"
@@ -107,5 +107,7 @@ install(
 ament_package(
   CONFIG_EXTRAS "cmake/rosidl_generator_java_get_typesupports.cmake"
     "cmake/register_java.cmake"
+    "cmake/ament_java_install_package.cmake"
     "rosidl_generator_java-extras.cmake.in"
+    "ament_cmake_package_templates-extras.cmake"
 )

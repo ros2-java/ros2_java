@@ -90,10 +90,12 @@ def generate_java(generator_arguments_file, typesupport_impl, typesupport_impls)
                     'convert_lower_case_underscore_to_camel_case':
                     convert_lower_case_underscore_to_camel_case,
                     'get_builtin_java_type': get_builtin_java_type,
-                    'module_name': module_name, 'package_name': package_name,
+                    'module_name': module_name,
+                    'package_name': package_name,
                     'jni_package_name': jni_package_name,
+                    'spec': spec,
+                    'subfolder': subfolder,
                     'jni_type_name': jni_type_name,
-                    'spec': spec, 'subfolder': subfolder,
                     'typesupport_impl': type_support_impl_by_filename.get(generated_filename, ''),
                     'typesupport_impls': typesupport_impls,
                     'type_name': type_name,
@@ -220,3 +222,10 @@ def get_java_type(type_, use_primitives=True):
         return type_.type
 
     return get_builtin_java_type(type_.type, use_primitives=use_primitives)
+
+
+def convert_lower_case_underscore_to_camel_case(value):
+    components = value.split('_')
+    # We capitalize the first letter of each component except the first one
+    # with the 'title' method and join them together.
+    return components[0] + "".join(x.title() for x in components[1:])

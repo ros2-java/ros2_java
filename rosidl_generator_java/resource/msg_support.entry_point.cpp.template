@@ -1,31 +1,115 @@
+@{
+def internalMsg(type):
+    return '{}__{}'.format(type.pkg_name, convert_camel_case_to_lower_case_underscore(type.type));
+
+# Define use type for JNI
+has_array  = 0;
+has_bool   = 0;
+has_byte   = 0;
+has_char   = 0;
+has_short  = 0;
+has_int    = 0;
+has_long   = 0;
+has_float  = 0;
+has_double = 0;
+has_string = 0;
+use_types  = [];
+
+for field in spec.fields:
+    # Check primitive type
+    if field.type.is_primitive_type():
+        if field.type.type == 'bool' : has_bool = 1;
+        if field.type.type in ['byte', 'int8', 'uint8'] : has_byte = 1;
+        if field.type.type == 'char': has_char = 1;
+        if field.type.type in ['int16', 'uint16'] : has_short = 1;
+        if field.type.type in ['int32', 'uint32'] : has_int = 1;
+        if field.type.type in ['int64', 'uint64'] : has_long = 1;
+        if field.type.type == 'float32' : has_float = 1;
+        if field.type.type == 'float64' : has_double = 1;
+        if field.type.type == 'string' : has_string = 1;
+    else:
+        # Make disctinc list of message
+        use_types.append(field.type);
+    # Check if array
+    if field.type.is_array: has_array = 1;
+
+# Remove duplicate Type
+seen = set()
+unique = []
+for item in use_types:
+    if item.type not in seen:
+        unique.append(item)
+        seen.add(item.type)
+
+use_types = unique;
+
+msg_typename = '%s__%s__%s' % (spec.base_type.pkg_name, subfolder, spec.base_type.type);
+
+}@
+// generated from rosidl_generator_java/resource/msg_support_entry_point.cpp.template
+// generated code does not contain a copyright notice
+
+@######################################################################################################################
+@# EmPy template for generating <msg> files for Java
+@# Context:
+@#  - spec (rosidl_parser.MessageSpecification)
+@#    Parsed specification of the .msg file
+@#  - module_name (string)
+@#  - jni_package_name (string)
+@#  - subfolder (string)
+@#    The subfolder / subnamespace of the message
+@#    Either 'msg' or 'srv'
+@######################################################################################################################
+@
+@
+@######################################################################################################################
+@# Include
+@######################################################################################################################
+// INCLUDES
 #include <jni.h>
 #include <stdio.h>
 #include <cassert>
 #include <cstdint>
 #include <string>
 
-#include <@(spec.base_type.pkg_name)/@(subfolder)/@(module_name).h>
-#include <rosidl_generator_c/message_type_support.h>
-
-#include <rosidl_generator_c/string.h>
-#include <rosidl_generator_c/string_functions.h>
-
-#include <rosidl_generator_c/primitives_array.h>
-#include <rosidl_generator_c/primitives_array_functions.h>
-
 #include <rcljava_common/exceptions.h>
 #include <rcljava_common/signatures.h>
 
-@[for field in spec.fields]@
-@[    if not field.type.is_primitive_type()]@
-#include <@(field.type.pkg_name)/msg/@(convert_camel_case_to_lower_case_underscore(field.type.type)).h>
-#include <@(field.type.pkg_name)/msg/@(convert_camel_case_to_lower_case_underscore(field.type.type))__functions.h>
-@[    end if]@
-@[end for]@
+#include <@(spec.base_type.pkg_name)/@(subfolder)/@(module_name).h>
+#include <rosidl_generator_c/message_type_support.h>
 
+@[if has_string]@
+@
+#include <rosidl_generator_c/string.h>
+#include <rosidl_generator_c/string_functions.h>
+
+@[end if]@
+@
+@[if has_array]@
+@
+#include <rosidl_generator_c/primitives_array.h>
+#include <rosidl_generator_c/primitives_array_functions.h>
+
+@[end if]@
+@
+@#### Include internal function
+@[for type in use_types]@
+@
+#include <@(type.pkg_name)/msg/@(convert_camel_case_to_lower_case_underscore(type.type)).h>
+#include <@(type.pkg_name)/msg/@(convert_camel_case_to_lower_case_underscore(type.type))__functions.h>
+
+@[end for]@
+@#### End Include internal function
+@
+@######################################################################################################################
+@# Jni Header
+@######################################################################################################################
+@
+// JNI HEADER
 #ifdef __cplusplus
 extern "C" {
 #endif
+
 /*
  * Class:     @(jni_package_name)_@(subfolder)_@(type_name)
  * Method:    getFromJavaConverter
@@ -54,387 +138,725 @@ JNIEXPORT jlong JNICALL Java_@(jni_package_name)_@(subfolder)_@(jni_type_name)_g
 }
 #endif
 
-@{
-msg_typename = '%s__%s__%s' % (spec.base_type.pkg_name, subfolder, spec.base_type.type)
-}@
-
+// INTERNAL FUNCTION
 static_assert(sizeof(jlong) >= sizeof(intptr_t), "jlong must be able to store pointers");
 
 static JavaVM* g_vm = nullptr;
 
+@######################################################################################################################
+@# Cache declared
+@######################################################################################################################
+@
+// JNI CACHE MESSAGE
+static jclass    jmessage_class;
+static jmethodID jmessage_constructor;
+
+// JNI CACHE FIELDS
+@[for field in spec.fields]@
+static jfieldID  jmessage_field_@(field.name)_fid;
+@[end for]@
+
+// JNI CACHE JAVA TYPES
+@[if has_array]@
+static jclass    global_jlist_class;
+static jmethodID global_jlist_init_mid;
+static jmethodID global_jlist_add_mid;
+static jmethodID global_jlist_get_mid;
+static jmethodID global_jlist_size_mid;
+
+@[end if]@
+@
+@[if has_bool]@
+static jclass    global_jbool_class;
+static jmethodID global_jbool_value_mid;
+static jmethodID global_jbool_init_mid;
+
+@[end if]@
+@
+@[if has_byte]@
+static jclass    global_jbyte_class;
+static jmethodID global_jbyte_value_mid;
+static jmethodID global_jbyte_init_mid;
+
+@[end if]@
+@
+@[if has_char]@
+static jclass    global_jchar_class;
+static jmethodID global_jchar_value_mid;
+static jmethodID global_jchar_init_mid;
+
+@[end if]@
+@
+@[if has_short]@
+static jclass    global_jshort_class;
+static jmethodID global_jshort_value_mid;
+static jmethodID global_jshort_init_mid;
+
+@[end if]@
+@
+@[if has_int]@
+static jclass    global_jint_class;
+static jmethodID global_jint_value_mid;
+static jmethodID global_jint_init_mid;
+
+@[end if]@
+@
+@[if has_long]@
+static jclass    global_jlong_class;
+static jmethodID global_jlong_value_mid;
+static jmethodID global_jlong_init_mid;
+
+@[end if]@
+@
+@[if has_float]@
+static jclass    global_jfloat_class;
+static jmethodID global_jfloat_value_mid;
+static jmethodID global_jfloat_init_mid;
+
+@[end if]@
+@
+@[if has_double]@
+static jclass    global_jdouble_class;
+static jmethodID global_jdouble_value_mid;
+static jmethodID global_jdouble_init_mid;
+
+@[end if]@
+@
+@[if has_string]@
+//static jclass    global_jstring_class;
+//static jmethodID global_jstring_value_mid;
+//static jmethodID global_jstring_init_mid;
+
+@[end if]@
+@
+@[for type in use_types]@
+static jclass    global_@(internalMsg(type))_class;
+static jmethodID global_@(internalMsg(type))_to_java_converter_mid;
+static jmethodID global_@(internalMsg(type))_from_java_converter_mid;
+
+@[end for]@
+
+@######################################################################################################################
+@# Convert from Java function
+@######################################################################################################################
+/**
+ * Convert Java message to Native message.
+ */
 @(msg_typename) * @(spec.base_type.pkg_name)_@(type_name)__convert_from_java(jobject _jmessage_obj, @(msg_typename) * ros_message)
 {
+  // Initialize environment.
   JNIEnv *env = nullptr;
   // TODO(esteve): check return status
   assert(g_vm != nullptr);
   g_vm->GetEnv((void**)&env, JNI_VERSION_1_6);
   assert(env != nullptr);
 
-  if (ros_message == nullptr)
-  {
+  // Initialize ROS Native message.
+  if (ros_message == nullptr) {
     ros_message = @(msg_typename)__create();
+    assert(ros_message != nullptr);
   }
-  auto _jmessage_class = env->GetObjectClass(_jmessage_obj);
+@
+@## Loop on fields
 @[for field in spec.fields]@
-@[    if field.type.is_array]
-  auto _jfield_@(field.name)_fid = env->GetFieldID(_jmessage_class, "@(field.name)", "Ljava/util/List;");
-  jclass _jlist_@(field.name)_class = env->FindClass("java/util/List");
-  jobject _jlist_@(field.name)_object = env->GetObjectField(_jmessage_obj, _jfield_@(field.name)_fid);
 
+@
+@#### Field is one/multiple
+@[  if field.type.is_array]@
+@#### Field is array (multiple)
+@
+  // Convert @(field.name) collection. (@(field.type))
+  jobject _jlist_@(field.name)_object = env->GetObjectField(_jmessage_obj, jmessage_field_@(field.name)_fid);
   if (_jlist_@(field.name)_object != nullptr) {
-    jmethodID _jlist_@(field.name)_get_mid = env->GetMethodID(_jlist_@(field.name)_class, "get", "(I)Ljava/lang/Object;");
-@[        if field.type.array_size is None or field.type.is_upper_bound]@
-    jmethodID _jlist_@(field.name)_size_mid = env->GetMethodID(_jlist_@(field.name)_class, "size", "()I");
-    jint _jlist_@(field.name)_size = env->CallIntMethod(_jlist_@(field.name)_object, _jlist_@(field.name)_size_mid);
-@[            if field.type.type == 'string']@
+@
+@###### Field size
+@[    if field.type.array_size is None or field.type.is_upper_bound]@
+@###### Field is dynamic size
+@
+    jint _jlist_@(field.name)_size = env->CallIntMethod(_jlist_@(field.name)_object, global_jlist_size_mid);
+@
+@######## Field size from Type
+@[      if field.type.type == 'string']@
+@######## Field is String array
+@
     if (!rosidl_generator_c__String__Array__init(&(ros_message->@(field.name)), _jlist_@(field.name)_size)) {
       rcljava_throw_exception(env, "java/lang/IllegalStateException", "unable to create String__Array ros_message");
     }
-@[            else]@
-@[                if field.type.is_primitive_type()]@
+@
+@[      elif field.type.is_primitive_type()]@
+@######## Field is Primitive array
+@
     if (!rosidl_generator_c__@(field.type.type)__Array__init(&(ros_message->@(field.name)), _jlist_@(field.name)_size)) {
       rcljava_throw_exception(env, "java/lang/IllegalStateException", "unable to create @(field.type.type)__Array ros_message");
     }
-@[                else]@
+@
+@[      else]@
+@######## Field is Object array
+@
     if (!@(field.type.pkg_name)__msg__@(field.type.type)__Array__init(&(ros_message->@(field.name)), _jlist_@(field.name)_size)) {
       rcljava_throw_exception(env, "java/lang/IllegalStateException", "unable to create @(field.type.type)__Array ros_message");
     }
+@
+@[      end if]@
+@######## End Field size from Type
 
-@[                end if]@
-@[            end if]@
     auto _dest_@(field.name) = ros_message->@(field.name).data;
-@[        else]@
+@
+@[    else]@
+@###### Field is static size
+@
     jint _jlist_@(field.name)_size = @(field.type.array_size);
 
     auto _dest_@(field.name) = ros_message->@(field.name);
-@[        end if]@
-
+@
+@[    end if]@
+@###### End Field size
+@
     for(jint i=0; i < _jlist_@(field.name)_size; ++i) {
-        auto element = env->CallObjectMethod(_jlist_@(field.name)_object, _jlist_@(field.name)_get_mid, i);
-@[        if field.type.is_primitive_type()]@
-@[            if field.type.type == 'bool']@
-        jclass _jfield_@(field.name)_class = env->FindClass("java/lang/Boolean");
-        jmethodID _jfield_@(field.name)_mid = env->GetMethodID(
-          _jfield_@(field.name)_class, "booleanValue", "()Z");
-        jboolean _jfield_@(field.name)_value = env->CallBooleanMethod(element, _jfield_@(field.name)_mid);
-        _dest_@(field.name)[i] = _jfield_@(field.name)_value;
-@[            elif field.type.type in ['byte', 'int8', 'uint8']]@
-        jclass _jfield_@(field.name)_class = env->FindClass("java/lang/Byte");
-        jmethodID _jfield_@(field.name)_mid = env->GetMethodID(
-          _jfield_@(field.name)_class, "byteValue", "()B");
-        jbyte _jfield_@(field.name)_value = env->CallByteMethod(element, _jfield_@(field.name)_mid);
-        _dest_@(field.name)[i] = _jfield_@(field.name)_value;
-@[            elif field.type.type == 'char']@
-        jclass _jfield_@(field.name)_class = env->FindClass("java/lang/Character");
-        jmethodID _jfield_@(field.name)_mid = env->GetMethodID(
-          _jfield_@(field.name)_class, "charValue", "()C");
-        jchar _jfield_@(field.name)_value = env->CallCharMethod(element, _jfield_@(field.name)_mid);
-        _dest_@(field.name)[i] = _jfield_@(field.name)_value;
-@[            elif field.type.type in ['int16', 'uint16']]@
-        jclass _jfield_@(field.name)_class = env->FindClass("java/lang/Short");
-        jmethodID _jfield_@(field.name)_mid = env->GetMethodID(
-          _jfield_@(field.name)_class, "shortValue", "()S");
-        jshort _jfield_@(field.name)_value = env->CallShortMethod(element, _jfield_@(field.name)_mid);
-        _dest_@(field.name)[i] = _jfield_@(field.name)_value;
-@[            elif field.type.type in ['int32', 'uint32']]@
-        jclass _jfield_@(field.name)_class = env->FindClass("java/lang/Integer");
-        jmethodID _jfield_@(field.name)_mid = env->GetMethodID(
-          _jfield_@(field.name)_class, "intValue", "()I");
-        jint _jfield_@(field.name)_value = env->CallIntMethod(element, _jfield_@(field.name)_mid);
-        _dest_@(field.name)[i] = _jfield_@(field.name)_value;
-@[            elif field.type.type in ['int64', 'uint64']]@
-        jclass _jfield_@(field.name)_class = env->FindClass("java/lang/Long");
-        jmethodID _jfield_@(field.name)_mid = env->GetMethodID(
-          _jfield_@(field.name)_class, "longValue", "()J");
-        jlong _jfield_@(field.name)_value = env->CallLongMethod(element, _jfield_@(field.name)_mid);
-        _dest_@(field.name)[i] = _jfield_@(field.name)_value;
-@[            elif field.type.type == 'float32']@
-        jclass _jfield_@(field.name)_class = env->FindClass("java/lang/Float");
-        jmethodID _jfield_@(field.name)_mid = env->GetMethodID(
-          _jfield_@(field.name)_class, "floatValue", "()F");
-        jfloat _jfield_@(field.name)_value = env->CallFloatMethod(element, _jfield_@(field.name)_mid);
-        _dest_@(field.name)[i] = _jfield_@(field.name)_value;
-@[            elif field.type.type == 'float64']@
-        jclass _jfield_@(field.name)_class = env->FindClass("java/lang/Double");
-        jmethodID _jfield_@(field.name)_mid = env->GetMethodID(
-          _jfield_@(field.name)_class, "doubleValue", "()D");
-        jdouble _jfield_@(field.name)_value = env->CallDoubleMethod(element, _jfield_@(field.name)_mid);
-        _dest_@(field.name)[i] = _jfield_@(field.name)_value;
-@[            elif field.type.type == 'string']@
-        jstring _jfield_@(field.name)_value = static_cast<jstring>(element);
-        if (_jfield_@(field.name)_value != nullptr) {
-            const char * _str@(field.name) = env->GetStringUTFChars(_jfield_@(field.name)_value, 0);
-            rosidl_generator_c__String__assign(
-              &_dest_@(field.name)[i], _str@(field.name));
-            env->ReleaseStringUTFChars(_jfield_@(field.name)_value, _str@(field.name));
+        jobject element = env->CallObjectMethod(_jlist_@(field.name)_object, global_jlist_get_mid, i);
+@
+@###### Load field array
+@[    if field.type.is_primitive_type()]@
+@###### Load field Primitive array
+@[      if field.type.type == 'bool']@
+        _dest_@(field.name)[i] = env->CallBooleanMethod(element, global_jbool_value_mid);
+@[      elif field.type.type in ['byte', 'int8', 'uint8']]@
+        _dest_@(field.name)[i] = env->CallByteMethod(element, global_jbyte_value_mid);
+@[      elif field.type.type == 'char']@
+        _dest_@(field.name)[i] = env->CallCharMethod(element, global_jchar_value_mid);
+@[      elif field.type.type in ['int16', 'uint16']]@
+        _dest_@(field.name)[i] = env->CallShortMethod(element, global_jshort_value_mid);
+@[      elif field.type.type in ['int32', 'uint32']]@
+        _dest_@(field.name)[i] = env->CallIntMethod(element, global_jint_value_mid);
+@[      elif field.type.type in ['int64', 'uint64']]@
+        _dest_@(field.name)[i] = env->CallLongMethod(element, global_jlong_value_mid);
+@[      elif field.type.type == 'float32']@
+        _dest_@(field.name)[i] = env->CallFloatMethod(element, global_jfloat_value_mid);
+@[      elif field.type.type == 'float64']@
+        _dest_@(field.name)[i] = env->CallDoubleMethod(element, global_jdouble_value_mid);
+@[      elif field.type.type == 'string']@
+@
+        jstring _jvalue_@(field.name) = static_cast<jstring>(element);
+        if (_jvalue_@(field.name) != nullptr) {
+          const char * _str_@(field.name) = env->GetStringUTFChars(_jvalue_@(field.name), 0);
+          rosidl_generator_c__String__assign(&_dest_@(field.name)[i], _str_@(field.name));
+          env->ReleaseStringUTFChars(_jvalue_@(field.name), _str_@(field.name));
         }
-@[            end if]@
-@[        else]@
-
-        jclass _jfield_@(field.name)_class = env->FindClass("@(field.type.pkg_name)/msg/@(get_java_type(field.type))");
-        assert(_jfield_@(field.name)_class != nullptr);
-
-        jmethodID _jfield_@(field.name)_from_java_converter_mid = env->GetStaticMethodID(
-          _jfield_@(field.name)_class, "getFromJavaConverter", "()J");
-        jlong _jfield_@(field.name)_from_java_converter_ptr = env->CallStaticLongMethod(
-          _jfield_@(field.name)_class, _jfield_@(field.name)_from_java_converter_mid);
-
+@[      end if]@
+@
+@[    else]@
+@###### Load field object array
+@
+        jlong _jfield_@(field.name)_from_java_converter_ptr = env->CallStaticLongMethod(global_@(internalMsg(field.type))_class, global_@(internalMsg(field.type))_from_java_converter_mid);
         using _convert_from_java_signature_@(field.name) = @(field.type.pkg_name)__msg__@(get_java_type(field.type)) * (*)(jobject, @(field.type.pkg_name)__msg__@(get_java_type(field.type)) *);
-
-        _convert_from_java_signature_@(field.name) convert_from_java_@(field.name) =
-          reinterpret_cast<_convert_from_java_signature_@(field.name)>(_jfield_@(field.name)_from_java_converter_ptr);
-
+        _convert_from_java_signature_@(field.name) convert_from_java_@(field.name) = reinterpret_cast<_convert_from_java_signature_@(field.name)>(_jfield_@(field.name)_from_java_converter_ptr);
         _dest_@(field.name)[i] = *convert_from_java_@(field.name)(element, nullptr);
-@[        end if]@
+@
+@[    end if]@
+@###### Load field array
+@
+        env->DeleteLocalRef(element);
     }
   }
-@[    else]@
-@[        if field.type.type == 'string']@
-  auto _jfield_@(field.name)_fid = env->GetFieldID(_jmessage_class, "@(field.name)", "Ljava/lang/String;");
-  jstring _jvalue@(field.name) = static_cast<jstring>(env->GetObjectField(_jmessage_obj, _jfield_@(field.name)_fid));
-  if (_jvalue@(field.name) != nullptr) {
-    const char * _str@(field.name) = env->GetStringUTFChars(_jvalue@(field.name), 0);
-    rosidl_generator_c__String__assign(
-      &ros_message->@(field.name), _str@(field.name));
-    env->ReleaseStringUTFChars(_jvalue@(field.name), _str@(field.name));
+@
+@[  else]@
+@#### Field is not array (one)
+@
+  // Convert @(field.name) field. (@(field.type))
+@
+@###### Load field
+@[    if field.type.type == 'string']@
+  jstring _jvalue_@(field.name) = static_cast<jstring>(env->GetObjectField(_jmessage_obj, jmessage_field_@(field.name)_fid));
+  if (_jvalue_@(field.name) != nullptr) {
+    const char * _str_@(field.name) = env->GetStringUTFChars(_jvalue_@(field.name), 0);
+    rosidl_generator_c__String__assign(&ros_message->@(field.name), _str_@(field.name));
+    env->ReleaseStringUTFChars(_jvalue_@(field.name), _str_@(field.name));
   }
-@[        elif field.type.type == 'bool']@
-  auto _jfield_@(field.name)_fid = env->GetFieldID(_jmessage_class, "@(field.name)", "Z");
-  ros_message->@(field.name) = env->GetBooleanField(_jmessage_obj, _jfield_@(field.name)_fid);
-@[        elif field.type.type in ['byte', 'int8', 'uint8']]@
-  auto _jfield_@(field.name)_fid = env->GetFieldID(_jmessage_class, "@(field.name)", "B");
-  ros_message->@(field.name) = env->GetByteField(_jmessage_obj, _jfield_@(field.name)_fid);
-@[        elif field.type.type == 'char']@
-  auto _jfield_@(field.name)_fid = env->GetFieldID(_jmessage_class, "@(field.name)", "C");
-  ros_message->@(field.name) = env->GetCharField(_jmessage_obj, _jfield_@(field.name)_fid);
-@[        elif field.type.type in ['int16', 'uint16']]@
-  auto _jfield_@(field.name)_fid = env->GetFieldID(_jmessage_class, "@(field.name)", "S");
-  ros_message->@(field.name) = env->GetShortField(_jmessage_obj, _jfield_@(field.name)_fid);
-@[        elif field.type.type in ['int32', 'uint32']]@
-  auto _jfield_@(field.name)_fid = env->GetFieldID(_jmessage_class, "@(field.name)", "I");
-  ros_message->@(field.name) = env->GetIntField(_jmessage_obj, _jfield_@(field.name)_fid);
-@[        elif field.type.type in ['int64', 'uint64']]@
-  auto _jfield_@(field.name)_fid = env->GetFieldID(_jmessage_class, "@(field.name)", "J");
-  ros_message->@(field.name) = env->GetLongField(_jmessage_obj, _jfield_@(field.name)_fid);
-@[        elif field.type.type == 'float32']@
-  auto _jfield_@(field.name)_fid = env->GetFieldID(_jmessage_class, "@(field.name)", "F");
-  ros_message->@(field.name) = env->GetFloatField(_jmessage_obj, _jfield_@(field.name)_fid);
-@[        elif field.type.type == 'float64']@
-  auto _jfield_@(field.name)_fid = env->GetFieldID(_jmessage_class, "@(field.name)", "D");
-  ros_message->@(field.name) = env->GetDoubleField(_jmessage_obj, _jfield_@(field.name)_fid);
-@[        else]@
-  auto _jfield_@(field.name)_fid = env->GetFieldID(
-    _jmessage_class, "@(field.name)", "L@(field.type.pkg_name)/msg/@(get_java_type(field.type));");
-  assert(_jfield_@(field.name)_fid != nullptr);
-
-  jobject _jfield_@(field.name)_obj = env->GetObjectField(_jmessage_obj, _jfield_@(field.name)_fid);
-
+@[    elif field.type.type == 'bool']@
+  ros_message->@(field.name) = env->GetBooleanField(_jmessage_obj, jmessage_field_@(field.name)_fid);
+@[    elif field.type.type in ['byte', 'int8', 'uint8']]@
+  ros_message->@(field.name) = env->GetByteField(_jmessage_obj, jmessage_field_@(field.name)_fid);
+@[    elif field.type.type == 'char']@
+  ros_message->@(field.name) = env->GetCharField(_jmessage_obj, jmessage_field_@(field.name)_fid);
+@[    elif field.type.type in ['int16', 'uint16']]@
+  ros_message->@(field.name) = env->GetShortField(_jmessage_obj, jmessage_field_@(field.name)_fid);
+@[    elif field.type.type in ['int32', 'uint32']]@
+  ros_message->@(field.name) = env->GetIntField(_jmessage_obj, jmessage_field_@(field.name)_fid);
+@[    elif field.type.type in ['int64', 'uint64']]@
+  ros_message->@(field.name) = env->GetLongField(_jmessage_obj, jmessage_field_@(field.name)_fid);
+@[    elif field.type.type == 'float32']@
+  ros_message->@(field.name) = env->GetFloatField(_jmessage_obj, jmessage_field_@(field.name)_fid);
+@[    elif field.type.type == 'float64']@
+  ros_message->@(field.name) = env->GetDoubleField(_jmessage_obj, jmessage_field_@(field.name)_fid);
+@[    else]@
+@
+  jobject _jfield_@(field.name)_obj = env->GetObjectField(_jmessage_obj, jmessage_field_@(field.name)_fid);
   if (_jfield_@(field.name)_obj != nullptr) {
-    auto _jfield_@(field.name)_class = env->FindClass(
-      "@(field.type.pkg_name)/msg/@(get_java_type(field.type))");
-    assert(_jfield_@(field.name)_class != nullptr);
 
-    jmethodID _jfield_@(field.name)_from_java_converter_mid = env->GetStaticMethodID(
-      _jfield_@(field.name)_class, "getFromJavaConverter", "()J");
-    jlong _jfield_@(field.name)_from_java_converter_ptr = env->CallStaticLongMethod(
-      _jfield_@(field.name)_class, _jfield_@(field.name)_from_java_converter_mid);
-
+    jlong _jfield_@(field.name)_from_java_converter_ptr = env->CallStaticLongMethod(global_@(internalMsg(field.type))_class, global_@(internalMsg(field.type))_from_java_converter_mid);
     using _convert_from_java_signature_@(field.name) = @(field.type.pkg_name)__msg__@(get_java_type(field.type)) * (*)(jobject, @(field.type.pkg_name)__msg__@(get_java_type(field.type)) *);
-
-    _convert_from_java_signature_@(field.name) convert_from_java_@(field.name) =
-      reinterpret_cast<_convert_from_java_signature_@(field.name)>(_jfield_@(field.name)_from_java_converter_ptr);
-
+    _convert_from_java_signature_@(field.name) convert_from_java_@(field.name) = reinterpret_cast<_convert_from_java_signature_@(field.name)>(_jfield_@(field.name)_from_java_converter_ptr);
     ros_message->@(field.name) = *convert_from_java_@(field.name)(_jfield_@(field.name)_obj, nullptr);
   }
-@[        end if]@
+  env->DeleteLocalRef(_jfield_@(field.name)_obj);
 @[    end if]@
+@###### End Load field
+@
+@[  end if]@
+@#### End Field is one/multiple
+@
 @[end for]@
+@## End Loop on fields
+
+  // Check and return ROS Native message.
   assert(ros_message != nullptr);
   return ros_message;
 }
 
+
+@######################################################################################################################
+@# Convert to Java function
+@######################################################################################################################
+/**
+ * Convert Native message to Java message.
+ */
 jobject @(spec.base_type.pkg_name)_@(type_name)__convert_to_java(@(msg_typename) * _ros_message, jobject _jmessage_obj)
 {
+  // Initialize environment.
   JNIEnv *env = nullptr;
   // TODO(esteve): check return status
   assert(g_vm != nullptr);
   g_vm->GetEnv((void**)&env, JNI_VERSION_1_6);
   assert(env != nullptr);
 
-  jclass _jmessage_class = env->FindClass("@(spec.base_type.pkg_name)/@(subfolder)/@(spec.base_type.type)");
-  if (_jmessage_obj == nullptr)
-  {
-    jmethodID _jmessage_constructor = env->GetMethodID(_jmessage_class, "<init>", "()V");
-    _jmessage_obj = env->NewObject(_jmessage_class, _jmessage_constructor);
+  // Initialize ROS Java message.
+  if (_jmessage_obj == nullptr) {
+    _jmessage_obj = env->NewObject(jmessage_class, jmessage_constructor);
+    assert(_jmessage_obj != nullptr);
   }
+@## Loop on fields
 @[for field in spec.fields]@
-@[    if field.type.is_array]@
-@[        if field.type.is_primitive_type()]@
-  auto _jfield_@(field.name)_fid = env->GetFieldID(_jmessage_class, "@(field.name)", "Ljava/util/List;");
-  jclass _jarray_list_@(field.name)_class = env->FindClass("java/util/ArrayList");
-  jmethodID _jarray_list_@(field.name)_init_mid = env->GetMethodID(_jarray_list_@(field.name)_class, "<init>", "()V");
-  jobject _jarray_list_@(field.name)_obj = env->NewObject(_jarray_list_@(field.name)_class, _jarray_list_@(field.name)_init_mid);
-@[            if field.type.array_size and not field.type.is_upper_bound]@
-  for(size_t i = 0; i < @(field.type.array_size); ++i) {
-    auto _ros_@(field.name)_element = _ros_message->@(field.name)[i];
-@[            else]@
-  for(size_t i = 0; i < _ros_message->@(field.name).size; ++i) {
-    auto _ros_@(field.name)_element = _ros_message->@(field.name).data[i];
-@[            end if]@
-@[                if field.type.type == 'string']@
-    jobject _jlist_@(field.name)_element = nullptr;
-    if (_ros_@(field.name)_element.data != nullptr) {
-      _jlist_@(field.name)_element = env->NewStringUTF(_ros_@(field.name)_element.data);
-    }
-@[                else]@
-@[                    if field.type.type == 'bool']@
-    jclass _jfield_@(field.name)_class = env->FindClass("java/lang/Boolean");
-    jmethodID _jlist_@(field.name)_init_mid = env->GetMethodID(_jfield_@(field.name)_class, "<init>", "(Z)V");
-    jobject _jlist_@(field.name)_element = env->NewObject(_jfield_@(field.name)_class, _jlist_@(field.name)_init_mid, _ros_@(field.name)_element);
-@[                    elif field.type.type in ['byte', 'int8', 'uint8']]@
-    jclass _jfield_@(field.name)_class = env->FindClass("java/lang/Byte");
-    jmethodID _jlist_@(field.name)_init_mid = env->GetMethodID(_jfield_@(field.name)_class, "<init>", "(B)V");
-    jobject _jlist_@(field.name)_element = env->NewObject(_jfield_@(field.name)_class, _jlist_@(field.name)_init_mid, static_cast<jbyte>(_ros_@(field.name)_element));
-@[                    elif field.type.type == 'char']@
-    jclass _jfield_@(field.name)_class = env->FindClass("java/lang/Character");
-    jmethodID _jlist_@(field.name)_init_mid = env->GetMethodID(_jfield_@(field.name)_class, "<init>", "(C)V");
-    jobject _jlist_@(field.name)_element = env->NewObject(_jfield_@(field.name)_class, _jlist_@(field.name)_init_mid, _ros_@(field.name)_element);
-@[                    elif field.type.type in ['int16', 'uint16']]@
-    jclass _jfield_@(field.name)_class = env->FindClass("java/lang/Short");
-    jmethodID _jlist_@(field.name)_init_mid = env->GetMethodID(_jfield_@(field.name)_class, "<init>", "(S)V");
-    jobject _jlist_@(field.name)_element = env->NewObject(_jfield_@(field.name)_class, _jlist_@(field.name)_init_mid, _ros_@(field.name)_element);
-@[                    elif field.type.type in ['int32', 'uint32']]@
-    jclass _jfield_@(field.name)_class = env->FindClass("java/lang/Integer");
-    jmethodID _jlist_@(field.name)_init_mid = env->GetMethodID(_jfield_@(field.name)_class, "<init>", "(I)V");
-    jobject _jlist_@(field.name)_element = env->NewObject(_jfield_@(field.name)_class, _jlist_@(field.name)_init_mid, _ros_@(field.name)_element);
-@[                    elif field.type.type in ['int64', 'uint64']]@
-    jclass _jfield_@(field.name)_class = env->FindClass("java/lang/Long");
-    jmethodID _jlist_@(field.name)_init_mid = env->GetMethodID(_jfield_@(field.name)_class, "<init>", "(J)V");
-    jobject _jlist_@(field.name)_element = env->NewObject(_jfield_@(field.name)_class, _jlist_@(field.name)_init_mid, _ros_@(field.name)_element);
-@[                    elif field.type.type == 'float32']@
-    jclass _jfield_@(field.name)_class = env->FindClass("java/lang/Float");
-    jmethodID _jlist_@(field.name)_init_mid = env->GetMethodID(_jfield_@(field.name)_class, "<init>", "(F)V");
-    jobject _jlist_@(field.name)_element = env->NewObject(_jfield_@(field.name)_class, _jlist_@(field.name)_init_mid, _ros_@(field.name)_element);
-@[                    elif field.type.type == 'float64']@
-    jclass _jfield_@(field.name)_class = env->FindClass("java/lang/Double");
-    jmethodID _jlist_@(field.name)_init_mid = env->GetMethodID(_jfield_@(field.name)_class, "<init>", "(D)V");
-    jobject _jlist_@(field.name)_element = env->NewObject(_jfield_@(field.name)_class, _jlist_@(field.name)_init_mid, _ros_@(field.name)_element);
-@[                    end if]@
-@[                end if]@
-    // TODO(esteve): replace ArrayList with a jobjectArray to initialize the array beforehand
-    jmethodID _jlist_@(field.name)_add_mid = env->GetMethodID(_jarray_list_@(field.name)_class, "add", "(Ljava/lang/Object;)Z");
-    if (_jlist_@(field.name)_element != nullptr) {
-      jboolean _jlist_@(field.name)_add_result = env->CallBooleanMethod(_jarray_list_@(field.name)_obj, _jlist_@(field.name)_add_mid, _jlist_@(field.name)_element);
-      assert(_jlist_@(field.name)_add_result);
-    }
-  }
 
-  env->SetObjectField(_jmessage_obj, _jfield_@(field.name)_fid, _jarray_list_@(field.name)_obj);
-@[        else]@
-
-  auto _jfield_@(field.name)_fid = env->GetFieldID(_jmessage_class, "@(field.name)", "Ljava/util/List;");
-  jclass _jarray_list_@(field.name)_class = env->FindClass("java/util/ArrayList");
-  jmethodID _jarray_list_@(field.name)_init_mid = env->GetMethodID(_jarray_list_@(field.name)_class, "<init>", "()V");
-  jobject _jarray_list_@(field.name)_obj = env->NewObject(_jarray_list_@(field.name)_class, _jarray_list_@(field.name)_init_mid);
-
-  jclass _jfield_@(field.name)_class = env->FindClass("@(field.type.pkg_name)/msg/@(get_java_type(field.type))");
-  assert(_jfield_@(field.name)_class != nullptr);
-
-  jmethodID _jfield_@(field.name)_to_java_converter_mid = env->GetStaticMethodID(
-    _jfield_@(field.name)_class, "getToJavaConverter", "()J");
-  jlong _jfield_@(field.name)_to_java_converter_ptr = env->CallStaticLongMethod(
-    _jfield_@(field.name)_class, _jfield_@(field.name)_to_java_converter_mid);
-
-  using _convert_to_java_signature_@(field.name) = jobject (*)(@(field.type.pkg_name)__msg__@(get_java_type(field.type)) *, jobject);
-
-  _convert_to_java_signature_@(field.name) convert_to_java_@(field.name) =
-    reinterpret_cast<_convert_to_java_signature_@(field.name)>(_jfield_@(field.name)_to_java_converter_ptr);
-
-@[          if field.type.array_size and not field.type.is_upper_bound]@
-  for(size_t i = 0; i < @(field.type.array_size); ++i) {
-  jobject _jlist_@(field.name)_element = convert_to_java_@(field.name)(&(_ros_message->@(field.name)[i]), nullptr);
-@[          else]@
-  for(size_t i = 0; i < _ros_message->@(field.name).size; ++i) {
-  jobject _jlist_@(field.name)_element = convert_to_java_@(field.name)(&(_ros_message->@(field.name).data[i]), nullptr);
-@[          end if]@
-    // TODO(esteve): replace ArrayList with a jobjectArray to initialize the array beforehand
-    jmethodID _jlist_@(field.name)_add_mid = env->GetMethodID(_jarray_list_@(field.name)_class, "add", "(Ljava/lang/Object;)Z");
-    if (_jlist_@(field.name)_element != nullptr) {
-      jboolean _jlist_@(field.name)_add_result = env->CallBooleanMethod(_jarray_list_@(field.name)_obj, _jlist_@(field.name)_add_mid, _jlist_@(field.name)_element);
-      assert(_jlist_@(field.name)_add_result);
-    }
-
-  }
-
-  env->SetObjectField(_jmessage_obj, _jfield_@(field.name)_fid, _jarray_list_@(field.name)_obj);
-@[        end if]@
+@#### Field is one/multiple
+@[  if field.type.is_array]@
+@#### Field is array (multiple)
+@
+  // Convert @(field.name) collection. (@(field.type))
+@
+@###### Field size
+@[    if field.type.array_size is None or field.type.is_upper_bound]@
+@###### Field is dynamic size
+  jint _jlist_@(field.name)_size = _ros_message->@(field.name).size;
+@
 @[    else]@
-@[        if field.type.type == 'string']@
-  auto _jfield_@(field.name)_fid = env->GetFieldID(_jmessage_class, "@(field.name)", "Ljava/lang/String;");
-  if (_ros_message->@(field.name).data != nullptr) {
-      env->SetObjectField(_jmessage_obj, _jfield_@(field.name)_fid, env->NewStringUTF(_ros_message->@(field.name).data));
+@###### Field is static size
+@
+  jint _jlist_@(field.name)_size = @(field.type.array_size);
+@
+@[    end if]@
+@###### End Field size
+@
+  jobject _jarray_list_@(field.name)_obj = env->NewObject(global_jlist_class, global_jlist_init_mid);
+  for(jint i = 0; i < _jlist_@(field.name)_size; ++i) {
+@
+@[    if field.type.array_size is None or field.type.is_upper_bound]@
+@#### Field is String array ####
+@[      if field.type.type == 'string']@
+    jobject _jlist_@(field.name)_element = nullptr;
+    if (_ros_message->@(field.name).data[i].data != nullptr) {
+      _jlist_@(field.name)_element = env->NewStringUTF(_ros_message->@(field.name).data[i].data);
+    }
+@[      elif field.type.type == 'bool']@
+    jobject _jlist_@(field.name)_element = env->NewObject(global_jbool_class, global_jbool_init_mid, _ros_message->@(field.name).data[i]);
+@[      elif field.type.type in ['byte', 'int8', 'uint8']]@
+    jobject _jlist_@(field.name)_element = env->NewObject(global_jbyte_class, global_jbyte_init_mid, static_cast<jbyte>(_ros_message->@(field.name).data[i]));
+@[      elif field.type.type == 'char']@
+    jobject _jlist_@(field.name)_element = env->NewObject(global_jchar_class, global_jchar_init_mid, _ros_message->@(field.name).data[i]);
+@[      elif field.type.type in ['int16', 'uint16']]@
+    jobject _jlist_@(field.name)_element = env->NewObject(global_jshort_class, global_jshort_init_mid, _ros_message->@(field.name).data[i]);
+@[      elif field.type.type in ['int32', 'uint32']]@
+    jobject _jlist_@(field.name)_element = env->NewObject(global_jint_class, global_jint_init_mid, _ros_message->@(field.name).data[i]);
+@[      elif field.type.type in ['int64', 'uint64']]@
+    jobject _jlist_@(field.name)_element = env->NewObject(global_jlong_class, global_jlong_init_mid, _ros_message->@(field.name).data[i]);
+@[      elif field.type.type == 'float32']@
+    jobject _jlist_@(field.name)_element = env->NewObject(global_jfloat_class, global_jfloat_init_mid, _ros_message->@(field.name).data[i]);
+@[      elif field.type.type == 'float64']@
+    jobject _jlist_@(field.name)_element = env->NewObject(global_jdouble_class, global_jdouble_init_mid, _ros_message->@(field.name).data[i]);
+@[      else]@
+@
+    jlong _jfield_@(field.name)_to_java_converter_ptr = env->CallStaticLongMethod(global_@(internalMsg(field.type))_class, global_@(internalMsg(field.type))_to_java_converter_mid);
+    using _convert_to_java_signature_@(field.name) = jobject (*)(@(field.type.pkg_name)__msg__@(get_java_type(field.type)) *, jobject);
+    _convert_to_java_signature_@(field.name) convert_to_java_@(field.name) = reinterpret_cast<_convert_to_java_signature_@(field.name)>(_jfield_@(field.name)_to_java_converter_ptr);
+    jobject _jlist_@(field.name)_element = convert_to_java_@(field.name)(&(_ros_message->@(field.name).data[i]), nullptr);
+@[      end if]@
+@
+@[    else]@
+@###### Field is static size
+@
+@#### Field is String array ####
+@[      if field.type.type == 'string']@
+    jobject _jlist_@(field.name)_element = nullptr;
+    if (_ros_message->@(field.name).data[i].data != nullptr) {
+      _jlist_@(field.name)_element = env->NewStringUTF(_ros_message->@(field.name)[i].data);
+    }
+@[      elif field.type.type == 'bool']@
+    jobject _jlist_@(field.name)_element = env->NewObject(global_jbool_class, global_jbool_init_mid, _ros_message->@(field.name)[i]);
+@[      elif field.type.type in ['byte', 'int8', 'uint8']]@
+    jobject _jlist_@(field.name)_element = env->NewObject(global_jbyte_class, global_jbyte_init_mid, static_cast<jbyte>(_ros_message->@(field.name)[i]));
+@[      elif field.type.type == 'char']@
+    jobject _jlist_@(field.name)_element = env->NewObject(global_jchar_class, global_jchar_init_mid, _ros_message->@(field.name)[i]);
+@[      elif field.type.type in ['int16', 'uint16']]@
+    jobject _jlist_@(field.name)_element = env->NewObject(global_jshort_class, global_jshort_init_mid, _ros_message->@(field.name)[i]);
+@[      elif field.type.type in ['int32', 'uint32']]@
+    jobject _jlist_@(field.name)_element = env->NewObject(global_jint_class, global_jint_init_mid, _ros_message->@(field.name)[i]);
+@[      elif field.type.type in ['int64', 'uint64']]@
+    jobject _jlist_@(field.name)_element = env->NewObject(global_jlong_class, global_jlong_init_mid, _ros_message->@(field.name)[i]);
+@[      elif field.type.type == 'float32']@
+    jobject _jlist_@(field.name)_element = env->NewObject(global_jfloat_class, global_jfloat_init_mid, _ros_message->@(field.name)[i]);
+@[      elif field.type.type == 'float64']@
+    jobject _jlist_@(field.name)_element = env->NewObject(global_jdouble_class, global_jdouble_init_mid, _ros_message->@(field.name)[i]);
+@[      else]@
+@
+    jlong _jfield_@(field.name)_to_java_converter_ptr = env->CallStaticLongMethod(global_@(internalMsg(field.type))_class, global_@(internalMsg(field.type))_to_java_converter_mid);
+    using _convert_to_java_signature_@(field.name) = jobject (*)(@(field.type.pkg_name)__msg__@(get_java_type(field.type)) *, jobject);
+    _convert_to_java_signature_@(field.name) convert_to_java_@(field.name) = reinterpret_cast<_convert_to_java_signature_@(field.name)>(_jfield_@(field.name)_to_java_converter_ptr);
+    jobject _jlist_@(field.name)_element = convert_to_java_@(field.name)(&(_ros_message->@(field.name)[i]), nullptr);
+@[      end if]@
+@[    end if]@
+@
+    // TODO (Theos) check why are not element...
+    if (_jlist_@(field.name)_element != nullptr) {
+      jboolean _jlist_@(field.name)_add_result = env->CallBooleanMethod(_jarray_list_@(field.name)_obj, global_jlist_add_mid, _jlist_@(field.name)_element);
+      assert(_jlist_@(field.name)_add_result);
+    }
   }
+  env->SetObjectField(_jmessage_obj, jmessage_field_@(field.name)_fid, _jarray_list_@(field.name)_obj);
+  env->DeleteLocalRef(_jarray_list_@(field.name)_obj);
+@
+@[  else]@
+@#### Field is not array ####
+@
+  // Convert @(field.name) field. (@(field.type))
+@[        if field.type.type == 'string']@
+@
+  if (_ros_message->@(field.name).data != nullptr) {
+      env->SetObjectField(_jmessage_obj, jmessage_field_@(field.name)_fid, env->NewStringUTF(_ros_message->@(field.name).data));
+  }
+@
 @[        elif field.type.type == 'bool']@
-  auto _jfield_@(field.name)_fid = env->GetFieldID(_jmessage_class, "@(field.name)", "Z");
-  env->SetBooleanField(_jmessage_obj, _jfield_@(field.name)_fid, _ros_message->@(field.name));
+  env->SetBooleanField(_jmessage_obj, jmessage_field_@(field.name)_fid, _ros_message->@(field.name));
 @[        elif field.type.type in ['byte', 'int8', 'uint8']]@
-  auto _jfield_@(field.name)_fid = env->GetFieldID(_jmessage_class, "@(field.name)", "B");
-  env->SetByteField(_jmessage_obj, _jfield_@(field.name)_fid, _ros_message->@(field.name));
+  env->SetByteField(_jmessage_obj, jmessage_field_@(field.name)_fid, _ros_message->@(field.name));
 @[        elif field.type.type == 'char']@
-  auto _jfield_@(field.name)_fid = env->GetFieldID(_jmessage_class, "@(field.name)", "C");
-  env->SetCharField(_jmessage_obj, _jfield_@(field.name)_fid, _ros_message->@(field.name));
+  env->SetCharField(_jmessage_obj, jmessage_field_@(field.name)_fid, _ros_message->@(field.name));
 @[        elif field.type.type in ['int16', 'uint16']]@
-  auto _jfield_@(field.name)_fid = env->GetFieldID(_jmessage_class, "@(field.name)", "S");
-  env->SetShortField(_jmessage_obj, _jfield_@(field.name)_fid, _ros_message->@(field.name));
+  env->SetShortField(_jmessage_obj, jmessage_field_@(field.name)_fid, _ros_message->@(field.name));
 @[        elif field.type.type in ['int32', 'uint32']]@
-  auto _jfield_@(field.name)_fid = env->GetFieldID(_jmessage_class, "@(field.name)", "I");
-  env->SetIntField(_jmessage_obj, _jfield_@(field.name)_fid, _ros_message->@(field.name));
+  env->SetIntField(_jmessage_obj, jmessage_field_@(field.name)_fid, _ros_message->@(field.name));
 @[        elif field.type.type in ['int64', 'uint64']]@
-  auto _jfield_@(field.name)_fid = env->GetFieldID(_jmessage_class, "@(field.name)", "J");
-  env->SetLongField(_jmessage_obj, _jfield_@(field.name)_fid, _ros_message->@(field.name));
+  env->SetLongField(_jmessage_obj, jmessage_field_@(field.name)_fid, _ros_message->@(field.name));
 @[        elif field.type.type == 'float32']@
-  auto _jfield_@(field.name)_fid = env->GetFieldID(_jmessage_class, "@(field.name)", "F");
-  env->SetFloatField(_jmessage_obj, _jfield_@(field.name)_fid, _ros_message->@(field.name));
+  env->SetFloatField(_jmessage_obj, jmessage_field_@(field.name)_fid, _ros_message->@(field.name));
 @[        elif field.type.type == 'float64']@
-  auto _jfield_@(field.name)_fid = env->GetFieldID(_jmessage_class, "@(field.name)", "D");
-  env->SetDoubleField(_jmessage_obj, _jfield_@(field.name)_fid, _ros_message->@(field.name));
+  env->SetDoubleField(_jmessage_obj, jmessage_field_@(field.name)_fid, _ros_message->@(field.name));
 @[        else]@
-  auto _jfield_@(field.name)_fid = env->GetFieldID(
-    _jmessage_class, "@(field.name)", "L@(field.type.pkg_name)/msg/@(get_java_type(field.type));");
-  assert(_jfield_@(field.name)_fid != nullptr);
-
-  auto _jfield_@(field.name)_class = env->FindClass("@(field.type.pkg_name)/msg/@(get_java_type(field.type))");
-  assert(_jfield_@(field.name)_class != nullptr);
-
-  jmethodID _jfield_@(field.name)_to_java_converter_mid = env->GetStaticMethodID(
-    _jfield_@(field.name)_class, "getToJavaConverter", "()J");
-  jlong _jfield_@(field.name)_to_java_converter_ptr = env->CallStaticLongMethod(
-    _jfield_@(field.name)_class, _jfield_@(field.name)_to_java_converter_mid);
-
+@
+  jlong _jfield_@(field.name)_to_java_converter_ptr = env->CallStaticLongMethod(global_@(internalMsg(field.type))_class, global_@(internalMsg(field.type))_to_java_converter_mid);
   using _convert_to_java_signature_@(field.name) = jobject (*)(@(field.type.pkg_name)__msg__@(get_java_type(field.type)) *, jobject);
-
-  _convert_to_java_signature_@(field.name) convert_to_java_@(field.name) =
-    reinterpret_cast<_convert_to_java_signature_@(field.name)>(_jfield_@(field.name)_to_java_converter_ptr);
-
+  _convert_to_java_signature_@(field.name) convert_to_java_@(field.name) = reinterpret_cast<_convert_to_java_signature_@(field.name)>(_jfield_@(field.name)_to_java_converter_ptr);
   jobject _jfield_@(field.name)_obj = convert_to_java_@(field.name)(&(_ros_message->@(field.name)), nullptr);
 
-  env->SetObjectField(_jmessage_obj, _jfield_@(field.name)_fid, _jfield_@(field.name)_obj);
+  env->SetObjectField(_jmessage_obj, jmessage_field_@(field.name)_fid, _jfield_@(field.name)_obj);
+@
 @[        end if]@
-
-@[    end if]@
+@
+@[  end if]@
+@#### End Field is one/multiple
+@
 @[end for]@
+@## End Loop on fields
+
+  // Check and return ROS Native message.
   assert(_jmessage_obj != nullptr);
   return _jmessage_obj;
 }
 
+
+@######################################################################################################################
+@# JNI Loader
+@######################################################################################################################
+// JNI LOADER
 JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM* vm, void*) {
   // Can only call this once
   if(g_vm == nullptr) {
     g_vm = vm;
+
+    JNIEnv* env;
+    if (g_vm->GetEnv(reinterpret_cast<void**>(&env), JNI_VERSION_1_6) != JNI_OK) {
+      return JNI_ERR;
+    } else {
+      //// Add Message Java
+      jclass _jmessage_class = env->FindClass("@(spec.base_type.pkg_name)/@(subfolder)/@(spec.base_type.type)");
+      jmessage_class = reinterpret_cast<jclass> (env->NewGlobalRef(_jmessage_class));
+      env->DeleteLocalRef(_jmessage_class);
+      assert(jmessage_class != nullptr);
+      jmessage_constructor = env->GetMethodID(jmessage_class, "<init>", "()V");
+      assert(jmessage_constructor != nullptr);
+
+      //// Add Fields Java
+@[for field in spec.fields]@
+@
+      // @(field.name) field. (@(field.type))
+@[  if field.type.is_array]@
+      jmessage_field_@(field.name)_fid = env->GetFieldID(jmessage_class, "@(field.name)", "Ljava/util/List;");
+      assert(jmessage_field_@(field.name)_fid != nullptr);
+@[  elif field.type.type == 'bool']@
+      jmessage_field_@(field.name)_fid = env->GetFieldID(jmessage_class, "@(field.name)", "Z");
+@[  elif field.type.type in ['byte', 'int8', 'uint8']]@
+      jmessage_field_@(field.name)_fid = env->GetFieldID(jmessage_class, "@(field.name)", "B");
+@[  elif field.type.type == 'char']@
+      jmessage_field_@(field.name)_fid = env->GetFieldID(jmessage_class, "@(field.name)", "C");
+@[  elif field.type.type in ['int16', 'uint16']]@
+      jmessage_field_@(field.name)_fid = env->GetFieldID(jmessage_class, "@(field.name)", "S");
+@[  elif field.type.type in ['int32', 'uint32']]@
+      jmessage_field_@(field.name)_fid = env->GetFieldID(jmessage_class, "@(field.name)", "I");
+@[  elif field.type.type in ['int64', 'uint64']]@
+      jmessage_field_@(field.name)_fid = env->GetFieldID(jmessage_class, "@(field.name)", "J");
+@[  elif field.type.type == 'float32']@
+      jmessage_field_@(field.name)_fid = env->GetFieldID(jmessage_class, "@(field.name)", "F");
+@[  elif field.type.type == 'float64']@
+      jmessage_field_@(field.name)_fid = env->GetFieldID(jmessage_class, "@(field.name)", "D");
+@[  elif field.type.type == 'string']@
+      jmessage_field_@(field.name)_fid = env->GetFieldID(jmessage_class, "@(field.name)", "Ljava/lang/String;");
+      assert(jmessage_field_@(field.name)_fid != nullptr);
+@[  else]@
+      jmessage_field_@(field.name)_fid = env->GetFieldID(jmessage_class, "@(field.name)", "L@(field.type.pkg_name)/msg/@(get_java_type(field.type));");
+      assert(jmessage_field_@(field.name)_fid != nullptr);
+@[  end if]@
+
+@[end for]@
+@
+      //// Add Array Java Class
+@[if has_array]@
+      jclass _list_class = env->FindClass("java/util/ArrayList");
+      global_jlist_class = (jclass) env->NewGlobalRef(_list_class);
+      env->DeleteLocalRef(_list_class);
+      assert(global_jlist_class != nullptr);
+      global_jlist_init_mid = env->GetMethodID(global_jlist_class, "<init>", "()V");
+      global_jlist_add_mid  = env->GetMethodID(global_jlist_class, "add", "(Ljava/lang/Object;)Z");
+      global_jlist_get_mid  = env->GetMethodID(global_jlist_class, "get", "(I)Ljava/lang/Object;");
+      global_jlist_size_mid = env->GetMethodID(global_jlist_class, "size", "()I");
+
+@[end if]@
+@
+      //// Cache Primitive type class
+@[if has_bool]@
+      // Bool Type
+      jclass _jbool_class = env->FindClass("java/lang/Boolean");
+      global_jbool_class = (jclass) env->NewGlobalRef(_jbool_class);
+      env->DeleteLocalRef(_jbool_class);
+      assert(global_jbool_class != nullptr);
+      global_jbool_init_mid  = env->GetMethodID(global_jbool_class, "<init>", "(Z)V");
+      global_jbool_value_mid = env->GetMethodID(global_jbool_class, "booleanValue", "()Z");
+
+@[end if]@
+@
+@[if has_byte]@
+      // Byte Type
+      jclass _jbyte_class = env->FindClass("java/lang/Byte");
+      global_jbyte_class = (jclass) env->NewGlobalRef(_jbyte_class);
+      env->DeleteLocalRef(_jbyte_class);
+      assert(global_jbyte_class != nullptr);
+      global_jbyte_init_mid  = env->GetMethodID(global_jbyte_class, "<init>", "(B)V");
+      global_jbyte_value_mid = env->GetMethodID(global_jbyte_class, "byteValue", "()B");
+
+@[end if]@
+@
+@[if has_char]@
+      // Char Type
+      jclass _jchar_class = env->FindClass("java/lang/Char");
+      global_jchar_class = (jclass) env->NewGlobalRef(_jchar_class);
+      env->DeleteLocalRef(_jchar_class);
+      assert(global_jchar_class != nullptr);
+      global_jchar_init_mid  = env->GetMethodID(global_jchar_class, "<init>", "(C)V");
+      global_jchar_value_mid = env->GetMethodID(global_jchar_class, "charValue", "()C");
+
+@[end if]@
+@
+@[if has_short]@
+      // Short Type
+      jclass _jshort_class = env->FindClass("java/lang/Short");
+      global_jshort_class = (jclass) env->NewGlobalRef(_jshort_class);
+      env->DeleteLocalRef(_jshort_class);
+      assert(global_jshort_class != nullptr);
+      global_jshort_init_mid  = env->GetMethodID(global_jshort_class, "<init>", "(S)V");
+      global_jshort_value_mid = env->GetMethodID(global_jshort_class, "shortValue", "()S");
+
+@[end if]@
+@
+@[if has_int]@
+      // Integer Type
+      jclass _jint_class = env->FindClass("java/lang/Integer");
+      global_jint_class = (jclass) env->NewGlobalRef(_jint_class);
+      env->DeleteLocalRef(_jint_class);
+      assert(global_jint_class != nullptr);
+      global_jint_init_mid  = env->GetMethodID(global_jint_class, "<init>", "(I)V");
+      global_jint_value_mid = env->GetMethodID(global_jint_class, "intValue", "()I");
+
+@[end if]@
+@
+@[if has_long]@
+      // Long Type
+      jclass _jlong_class = env->FindClass("java/lang/Long");
+      global_jlong_class = (jclass) env->NewGlobalRef(_jlong_class);
+      env->DeleteLocalRef(_jlong_class);
+      assert(global_jlong_class != nullptr);
+      global_jlong_init_mid  = env->GetMethodID(global_jlong_class, "<init>", "(J)V");
+      global_jlong_value_mid = env->GetMethodID(global_jlong_class, "longValue", "()J");
+
+@[end if]@
+@
+@[if has_float]@
+      // Float Type
+      jclass _jfloat_class = env->FindClass("java/lang/Float");
+      global_jfloat_class = (jclass) env->NewGlobalRef(_jfloat_class);
+      env->DeleteLocalRef(_jfloat_class);
+      assert(global_jfloat_class != nullptr);
+      global_jfloat_init_mid  = env->GetMethodID(global_jfloat_class, "<init>", "(F)V");
+      global_jfloat_value_mid = env->GetMethodID(global_jfloat_class, "floatValue", "()F");
+
+@[end if]@
+@
+@[if has_double]@
+      // Double Type
+      jclass _jdouble_class = env->FindClass("java/lang/Double");
+      global_jdouble_class = (jclass) env->NewGlobalRef(_jdouble_class);
+      env->DeleteLocalRef(_jdouble_class);
+      assert(global_jdouble_class != nullptr);
+      global_jdouble_init_mid  = env->GetMethodID(global_jdouble_class, "<init>", "(D)V");
+      global_jdouble_value_mid = env->GetMethodID(global_jdouble_class, "doubleValue", "()D");
+
+@[end if]@
+@
+@[if has_string]@
+//      // String Type
+//      jclass _jstring_class = env->FindClass("java/lang/String");
+//      global_jstring_class = (jclass) env->NewGlobalRef(_jstring_class);
+//      env->DeleteLocalRef(_jstring_class);
+//      assert(global_jstring_class != nullptr);
+//      global_jstring_init_mid  = env->GetMethodID(global_jstring_class, "<init>", "(L)V");
+//      global_jstring_value_mid = env->GetMethodID(global_jstring_class, "stringValue", "()Ljava/lang/String;");
+
+@[end if]@
+@
+      //// Add Sub-Message Java Class
+@[for type in use_types]@
+@
+      // @(type).
+      jclass _@(internalMsg(type))_class = env->FindClass("@(type.pkg_name)/msg/@(get_java_type(type))");
+      assert(_@(internalMsg(type))_class != nullptr);
+      global_@(internalMsg(type))_class = (jclass) env->NewGlobalRef(_@(internalMsg(type))_class);
+      env->DeleteLocalRef(_@(internalMsg(type))_class);
+      assert(global_@(internalMsg(type))_class != nullptr);
+      global_@(internalMsg(type))_to_java_converter_mid = env->GetStaticMethodID(global_@(internalMsg(type))_class, "getToJavaConverter", "()J");
+      global_@(internalMsg(type))_from_java_converter_mid = env->GetStaticMethodID(global_@(internalMsg(type))_class, "getFromJavaConverter", "()J");
+
+@[end for]@
+@
+    }
   }
+
   return JNI_VERSION_1_6;
 }
 
+JNIEXPORT void JNICALL JNI_OnUnload(JavaVM *, void*) {
+  JNIEnv* env;
+  if (g_vm->GetEnv(reinterpret_cast<void**>(&env), JNI_VERSION_1_6) != JNI_OK) {
+    return;
+  } else {
+    // delete global references so the GC can collect them
+    if (jmessage_class != nullptr) {
+      env->DeleteGlobalRef(jmessage_class);
+    }
+
+@[if has_array]@
+    if (global_jlist_class != nullptr) {
+      env->DeleteGlobalRef(global_jlist_class);
+    }
+
+@[end if]@
+@
+@[if has_bool]@
+    if (global_jbool_class != nullptr) {
+      env->DeleteGlobalRef(global_jbool_class);
+    }
+
+@[end if]@
+@
+@[if has_byte]@
+    if (global_jbyte_class != nullptr) {
+      env->DeleteGlobalRef(global_jbyte_class);
+    }
+
+@[end if]@
+@
+@[if has_char]@
+    if (global_jchar_class != nullptr) {
+      env->DeleteGlobalRef(global_jchar_class);
+    }
+
+@[end if]@
+@
+@[if has_short]@
+    if (global_jshort_class != nullptr) {
+      env->DeleteGlobalRef(global_jshort_class);
+    }
+
+@[end if]@
+@
+@[if has_int]@
+    if (global_jint_class != nullptr) {
+      env->DeleteGlobalRef(global_jint_class);
+    }
+
+@[end if]@
+@
+@[if has_long]@
+    if (global_jlong_class != nullptr) {
+      env->DeleteGlobalRef(global_jlong_class);
+    }
+
+@[end if]@
+@
+@[if has_float]@
+    if (global_jfloat_class != nullptr) {
+      env->DeleteGlobalRef(global_jfloat_class);
+    }
+
+@[end if]@
+@
+@[if has_double]@
+    if (global_jdouble_class != nullptr) {
+      env->DeleteGlobalRef(global_jdouble_class);
+    }
+
+@[end if]@
+@
+@[for type in use_types]@
+    if (global_@(internalMsg(type))_class != nullptr) {
+      env->DeleteGlobalRef(global_@(internalMsg(type))_class);
+    }
+
+@[end for]@
+  }
+  return;
+}
+
+
+@######################################################################################################################
+@# JNI body
+@######################################################################################################################
+// JNI BODY
 JNIEXPORT jlong JNICALL Java_@(jni_package_name)_@(subfolder)_@(jni_type_name)_getFromJavaConverter
   (JNIEnv *, jclass)
 {

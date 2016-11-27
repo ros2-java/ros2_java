@@ -27,6 +27,8 @@ set(CMAKE_JAVA_COMPILE_FLAGS "-source" "1.6" "-target" "1.6")
 
 set(${PROJECT_NAME}_java_sources
   "src/main/java/org/ros2/rcljava/common/RCLJavaProxy.java"
+  "src/main/java/org/ros2/rcljava/internal/message/Message.java"
+  "src/main/java/org/ros2/rcljava/internal/service/Service.java"
 )
 
 set(${PROJECT_NAME}_cpp_sources

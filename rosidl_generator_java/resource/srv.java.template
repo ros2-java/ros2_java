@@ -1,31 +1,53 @@
+// generated from rosidl_generator_java/resource/srv.java.template
+// generated code does not contain a copyright notice
+
+@##########################################################################
+@# EmPy template for generating <srv> files Java
+@# Context:
+@#  - spec (rosidl_parser.MessageSpecification)
+@#    Parsed specification of the .msg file
+@#  - module_name (string)
+@#  - jni_package_name (string)
+@#  - subfolder (string)
+@#    The subfolder / subnamespace of the message
+@#    Either 'msg' or 'srv'
+@##########################################################################
+@
 package @(package_name).@(subfolder);
 
+// IMPORTS
 import org.ros2.rcljava.common.RCLJavaProxy;
+import org.ros2.rcljava.internal.message.Message;
+import org.ros2.rcljava.internal.service.Service;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import @(package_name).@(subfolder).@(type_name)_Request;
+import @(package_name).@(subfolder).@(type_name)_Response;
 
-public class @(type_name) {
+/**
+ * Java Service for ROS2(idl) of @(type_name).
+ */
+public class @(type_name) implements Service {
 
-  private static final Logger logger = LoggerFactory.getLogger(@(type_name).class);
-
-  static {
-    java.lang.String typesupportIdentifier = RCLJavaProxy.getTypesupportIdentifier();
-    if (typesupportIdentifier == null) {
-      logger.debug("Typesupport identifier can't be found");
-    } else {
-      try {
-        System.loadLibrary("@(spec.pkg_name)_@(type_name)_s__" + typesupportIdentifier);
-      } catch (UnsatisfiedLinkError ule) {
-        logger.error("Native code library failed to load.\n" + ule);
-        System.exit(1);
-      }
+    /** AutoLoader JNI library. */
+    static {
+        RCLJavaProxy.loadLibrary("@(spec.pkg_name)_@(type_name)_s__" + RCLJavaProxy.getTypesupportIdentifier());
     }
-  }
 
-  public static native long getServiceTypeSupport();
+    // NATIVES
+    public static native long getServiceTypeSupport();
 
-  public static final Class<@(type_name)_Request> RequestType = @(type_name)_Request.class;
+    // INTERNALS COMPONENTS
+    public static final Class<@(type_name)_Request> RequestType = @(type_name)_Request.class;
 
-  public static final Class<@(type_name)_Response> ResponseType = @(type_name)_Response.class;
+    public static final Class<@(type_name)_Response> ResponseType = @(type_name)_Response.class;
+
+    @@Override
+    public Class<? extends Message> getRequestType() {
+        return @(type_name)_Request.class;
+    }
+
+    @@Override
+    public Class<? extends Message> getResponseType() {
+        return @(type_name)_Response.class;
+    }
 }
