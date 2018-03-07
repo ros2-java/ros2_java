@@ -72,7 +72,11 @@ if(${SFL4J_JAR})
 else()
   set(slf4j_version "1.7.21")
   set(slf4j_api_sha256 "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855")
+<<<<<<< HEAD
   set(slf4j_api_url "http://repo1.maven.org/maven2/org/slf4j/slf4j-api/${slf4j_version}/slf4j-api-${slf4j_version}.jar")
+=======
+  set(slf4j_api_url "http://central.maven.org/maven2/org/slf4j/slf4j-api/${slf4j_version}/slf4j-api-${slf4j_version}.jar")
+>>>>>>> 736fb231cbfab8d58a7cf07ca06a7e4d312811e9
   set(slf4j_api_jar_path "${CMAKE_CURRENT_BINARY_DIR}/jars/slf4j-api-${slf4j_version}.jar")
   file(DOWNLOAD ${slf4j_api_url} ${slf4j_api_jar_path} EXPECTED_HASH SHA256=${slf4j_api_sha256})
 
