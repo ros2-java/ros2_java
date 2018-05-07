@@ -65,6 +65,19 @@ Make sure you have Gradle 3.2 (or later) installed. Ubuntu 16.04 ships with Grad
 $ sudo add-apt-repository ppa:cwchien/gradle
 $ sudo apt install -y gradle
 ```
+For OSX, use homebrew command to install gradle:
+
+```
+$ brew install gradle
+```
+
+For OSX users, there some compatibily issues have been reported between gradle 3.x and Java 9. Currently only the combination of Gradle 3.x + Java 8 has been tested successfully. Make sure to use install and use Java 8 for the building process:
+
+```
+$ brew tap caskroom/versions
+$ brew cask install java8
+$ export JAVA_HOME=/Library/Java/JavaVirtualMachines/1.8.0.jdk/Contents/Home
+``` 
 
 The following sections deal with building the `ros2_java` codebase for the desktop Java runtime and for Android.
 
@@ -92,36 +105,56 @@ The Android setup is slightly more complex, you'll need the SDK and NDK installe
 
 Make sure to download at least the SDK for Android Lollipop (or greater), the examples require the API level 21 at least and NDK 14.
 
-You may download the Android NDK from [the official](https://developer.android.com/ndk/downloads/index.html) website, let's assume you've downloaded 15c (the latest stable version as of 2017-11-07) and you unpack it to `~/android_ndk`
+You may download the Android NDK from [the official](https://developer.android.com/ndk/downloads/index.html) website, let's assume you've downloaded 16b (the latest stable version as of 2018-04-28) and you unpack it to `~/android_ndk`
 
 ```
-mkdir -p ~/ros2_android_ws/src
-cd ~/ros2_android_ws
+# define paths
+ROOT_DIR = ${HOME}
+AMENT_WORKSPACE=${ROOT_DIR}/ament_ws
+ROS2_ANDROID_WORKSPACE=${ROOT_DIR}/ros2_android_ws
+
+# pull and build ament
+mkdir -p ${AMENT_WORKSPACE}/src
+cd ${AMENT_WORKSPACE}
+wget https://raw.githubusercontent.com/esteve/ament_java/master/ament_java.repos
+vcs import ${AMENT_WORKSPACE}/src < ament_java.repos
+src/ament/ament_tools/scripts/ament.py build --symlink-install --isolated
+
+# android build configuration
+export PYTHON3_EXEC="$( which python3 )"
+export ANDROID_ABI=armeabi-v7a
+export ANDROID_NATIVE_API_LEVEL=android-21
+export ANDROID_TOOLCHAIN_NAME=arm-linux-androideabi-clang
+
+# pull and build ros2 for android
+mkdir -p ${ROS2_ANDROID_WORKSPACE}/src
+cd ${ROS2_ANDROID_WORKSPACE}
 wget https://raw.githubusercontent.com/esteve/ros2_java/master/ros2_java_android.repos
-vcs import ~/ros2_android_ws/src < ros2_java_android.repos
-cd ~/ros2_android_ws/src/ros2/rosidl
-touch python_cmake_module/AMENT_IGNORE
-touch rosidl_generator_py/AMENT_IGNORE
-cd ~/ros2_android_ws/src/ros2/rosidl_typesupport
+vcs import ${ROS2_ANDROID_WORKSPACE}/src < ros2_java_android.repos
+cd ${ROS2_ANDROID_WORKSPACE}/src/ros2
+touch rosidl/python_cmake_module/AMENT_IGNORE
+touch rosidl/rosidl_generator_py/AMENT_IGNORE
+touch rcl_interfaces/test_msgs/AMENT_IGNORE
+cd ${ROS2_ANDROID_WORKSPACE}/src/ros2/rosidl_typesupport
 patch -p1 < ../../ros2_java/ros2_java/rosidl_typesupport_ros2_android.patch
-cd ~/ros2_android_ws
-. ~/ament_ws/install_isolated/local_setup.sh
+cd ${ROS2_ANDROID_WORKSPACE}
+source ${AMENT_WORKSPACE}/install_isolated/local_setup.sh
 ament build --isolated --cmake-args \
-  -DPYTHON_EXECUTABLE=/usr/bin/python3 \
-  -DCMAKE_TOOLCHAIN_FILE=$HOME/android_ndk/android-ndk-r15c/build/cmake/android.toolchain.cmake \
+  -DPYTHON_EXECUTABLE=${PYTHON3_EXEC} \
+  -DCMAKE_TOOLCHAIN_FILE=$ANDROID_NDK/build/cmake/android.toolchain.cmake \
   -DANDROID_FUNCTION_LEVEL_LINKING=OFF \
-  -DANDROID_NATIVE_API_LEVEL=android-21 \
-  -DANDROID_TOOLCHAIN_NAME=arm-linux-androideabi-clang \
+  -DANDROID_NATIVE_API_LEVEL=${ANDROID_NATIVE_API_LEVEL} \
+  -DANDROID_TOOLCHAIN_NAME=${ANDROID_TOOLCHAIN_NAME} \
   -DANDROID_STL=gnustl_shared \
-  -DANDROID_ABI=armeabi-v7a \
-  -DANDROID_NDK=$HOME/android_ndk/android-ndk-r15c \
+  -DANDROID_ABI=${ANDROID_ABI} \
+  -DANDROID_NDK=${ANDROID_NDK} \
   -DTHIRDPARTY=ON \
   -DCOMPILE_EXAMPLES=OFF \
-  -DCMAKE_FIND_ROOT_PATH="$HOME/ament_ws/install_isolated;$HOME/ros2_android_ws/install_isolated" \
+  -DCMAKE_FIND_ROOT_PATH="$AMENT_WORKSPACE/install_isolated;$ROS2_ANDROID_WORKSPACE/install_isolated" \
   -- \
   --parallel \
   --ament-gradle-args \
-  -Pament.android_stl=gnustl_shared -Pament.android_abi=armeabi-v7a -Pament.android_ndk=$HOME/android_ndk/android-ndk-r15c --
+  -Pament.android_stl=gnustl_shared -Pament.android_abi=$ANDROID_ABI -Pament.android_ndk=$ANDROID_NDK --
 ```
 
 You can find more information about the Android examples at https://github.com/esteve/ros2_android_examples
