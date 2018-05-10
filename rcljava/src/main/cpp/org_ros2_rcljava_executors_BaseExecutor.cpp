@@ -121,7 +121,7 @@ Java_org_ros2_rcljava_executors_BaseExecutor_nativeWaitSetInit(
 }
 
 JNIEXPORT void JNICALL
-Java_org_ros2_rcljava_executors_BaseExecutor_nativeDisposeWaitSet(JNIEnv *, jclass, jlong wait_set_handle)
+Java_org_ros2_rcljava_executors_BaseExecutor_nativeDisposeWaitSet(JNIEnv * env, jclass, jlong wait_set_handle)
 {
   rcl_wait_set_t * wait_set = reinterpret_cast<rcl_wait_set_t *>(wait_set_handle);
 
@@ -129,7 +129,7 @@ Java_org_ros2_rcljava_executors_BaseExecutor_nativeDisposeWaitSet(JNIEnv *, jcla
   if (ret != RCL_RET_OK) {
     std::string msg = "Failed to destroy timer: " + std::string(rcl_get_error_string_safe());
     rcl_reset_error();
-    rcljava_throw_exception(env, "java/lang/IllegalStateException", msg);
+    rcljava_throw_exception(env, ret, msg);
   }
 }
 
