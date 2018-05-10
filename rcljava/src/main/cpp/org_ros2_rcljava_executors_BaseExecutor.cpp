@@ -130,7 +130,7 @@ Java_org_ros2_rcljava_executors_BaseExecutor_nativeDisposeWaitSet(
   if (ret != RCL_RET_OK) {
     std::string msg = "Failed to destroy timer: " + std::string(rcl_get_error_string_safe());
     rcl_reset_error();
-    rcljava_throw_exception(env, ret, msg);
+    rcljava_throw_rclexception(env, ret, msg);
   }
 }
 
