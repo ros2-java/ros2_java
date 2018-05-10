@@ -124,7 +124,13 @@ JNIEXPORT void JNICALL
 Java_org_ros2_rcljava_executors_BaseExecutor_nativeDisposeWaitSet(JNIEnv *, jclass, jlong wait_set_handle)
 {
   rcl_wait_set_t * wait_set = reinterpret_cast<rcl_wait_set_t *>(wait_set_handle);
-  free(wait_set);
+
+  rcl_ret_t ret = rcl_wait_set_fini(wait_set);
+  if (ret != RCL_RET_OK) {
+    std::string msg = "Failed to destroy timer: " + std::string(rcl_get_error_string_safe());
+    rcl_reset_error();
+    rcljava_throw_exception(env, "java/lang/IllegalStateException", msg);
+  }
 }
 
 JNIEXPORT void JNICALL
