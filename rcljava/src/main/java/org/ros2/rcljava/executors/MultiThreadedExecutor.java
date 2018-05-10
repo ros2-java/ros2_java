@@ -79,11 +79,4 @@ public class MultiThreadedExecutor implements Executor {
       }
     }
   }
-
-  public void dispose() {
-    if (baseExecutor != null) {
-      baseExecutor.dispose();
-    }
-  }
-
 }

@@ -64,8 +64,6 @@ public class BaseExecutor {
 
   private List<Map.Entry<Long, Client>> clientHandles = new ArrayList<Map.Entry<Long, Client>>();
 
-  private Long waitSetHandle = null;
-
   protected void addNode(ComposableNode node) {
     this.nodes.add(node);
   }
@@ -205,10 +203,8 @@ public class BaseExecutor {
       return;
     }
 
-    if (waitSetHandle == null) {
-       waitSetHandle = nativeGetZeroInitializedWaitSet();
-       nativeWaitSetInit(waitSetHandle, subscriptionsSize, 0, timersSize, clientsSize, servicesSize);
-    }
+    long waitSetHandle = nativeGetZeroInitializedWaitSet();
+    nativeWaitSetInit(waitSetHandle, subscriptionsSize, 0, timersSize, clientsSize, servicesSize);
 
     nativeWaitSetClearSubscriptions(waitSetHandle);
 
@@ -292,6 +288,8 @@ public class BaseExecutor {
         clientIterator.remove();
       }
     }
+
+    nativeDisposeWaitSet(waitSetHandle);
   }
 
   protected AnyExecutable getNextExecutable() {
@@ -357,13 +355,6 @@ public class BaseExecutor {
 
     if (anyExecutable != null) {
       executeAnyExecutable(anyExecutable);
-    }
-  }
-
-  public void dispose() {
-    if (waitSetHandle != null) {
-      nativeDisposeWaitSet(waitSetHandle);
-      waitSetHandle = null;
     }
   }
 

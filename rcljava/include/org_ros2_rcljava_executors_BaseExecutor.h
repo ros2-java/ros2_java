@@ -43,7 +43,7 @@ JNIEXPORT void JNICALL Java_org_ros2_rcljava_executors_BaseExecutor_nativeWaitSe
  * Signature: (J)V
  */
 JNIEXPORT void JNICALL Java_org_ros2_rcljava_executors_BaseExecutor_nativeDisposeWaitSet(
-  JNIEnv *, jclass, jlong wait_set_handle);
+  JNIEnv *, jclass, jlong);
 
 /*
  * Class:     org_ros2_rcljava_executors_BaseExecutor

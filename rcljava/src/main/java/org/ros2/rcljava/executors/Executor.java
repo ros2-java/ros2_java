@@ -29,6 +29,4 @@ public interface Executor {
   public void addNode(ComposableNode node);
 
   public void removeNode(ComposableNode node);
-
-  public void dispose();
 }
