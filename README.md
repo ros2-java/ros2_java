@@ -47,6 +47,8 @@ The current set of features include:
 Sounds great, how can I try this out?
 -------------------------------------
 
+On Windows? Check out the instructions for [Windows](docs/WindowsSetup.md).
+
 First of all, download the ament repositories in a separate workspace:
 
 ```
