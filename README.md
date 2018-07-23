@@ -64,7 +64,7 @@ src/ament/ament_tools/scripts/ament.py build --symlink-install --isolated
 ```
 
 > Note: On Windows, use `python src/ament/ament_tools/scripts/ament.py build`, as `*.py` scripts must be prefixed with `python`, `--symlink-install` is not supported due to a bug in Python symlinks, and `--isolated` creates paths that are too long.
-> Additionally, you may need to call something like `call "C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\VC\Auxiliary\Build\vcvars64.bat"` if you have not run from a VS 2017 terminal.
+> Additionally, you may need to call `call "C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\VC\Auxiliary\Build\vcvars64.bat"` if you have not run from a VS 2017 terminal.
 
 We need to split the build process between Ament and the rest of `ros2_java` workspace so that the additional build type for Gradle projects is picked up by Ament.
 
@@ -91,7 +91,7 @@ vcs import src < ros2_java_desktop.repos
 ament build --symlink-install --isolated
 ```
 
-> On Windows, if you would like to use OpenSplice, call something like `call "C:\opensplice67\HDE\x86_64.win64\release.bat"` before building.
+> On Windows, if you would like to use OpenSplice, call `call "C:\opensplice67\HDE\x86_64.win64\release.bat"` before building.
 
 Now you can just run a bunch of examples, head over to https://github.com/esteve/ros2_java_examples for more information.
 
