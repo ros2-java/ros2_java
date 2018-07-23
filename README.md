@@ -47,17 +47,24 @@ The current set of features include:
 Sounds great, how can I try this out?
 -------------------------------------
 
-On Windows? Check out the instructions for [Windows](docs/WindowsSetup.md).
+> Note: While the following instructions use a Linux shell the same can be done on other platforms like Windows with slightly adjusted commands.
+> 
+> For Windows and Mac, first follow the steps for installing prerequisites on the binary installation page: https://github.com/ros2/ros2/wiki/Installation
+>
+> Stop and return here when you reach the "Downloading ROS 2" section.
 
-First of all, download the ament repositories in a separate workspace:
+Download the ament repositories in a separate workspace:
 
 ```
-mkdir -p ~/ament_ws/src
-cd ~/ament_ws
-wget https://raw.githubusercontent.com/esteve/ament_java/master/ament_java.repos
-vcs import ~/ament_ws/src < ament_java.repos
+mkdir ament_ws/src
+cd ament_ws
+curl -skL https://raw.githubusercontent.com/esteve/ament_java/master/ament_java.repos -o ament_java.repos
+vcs import src < ament_java.repos
 src/ament/ament_tools/scripts/ament.py build --symlink-install --isolated
 ```
+
+> Note: On Windows, use `python src/ament/ament_tools/scripts/ament.py build`, as `*.py` scripts must be prefixed with `python`, `--symlink-install` is not supported due to a bug in Python symlinks, and `--isolated` creates paths that are too long.
+> Additionally, you may need to call something like `call "C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\VC\Auxiliary\Build\vcvars64.bat"` if you have not run from a VS 2017 terminal.
 
 We need to split the build process between Ament and the rest of `ros2_java` workspace so that the additional build type for Gradle projects is picked up by Ament.
 
@@ -68,19 +75,23 @@ $ sudo add-apt-repository ppa:cwchien/gradle
 $ sudo apt install -y gradle
 ```
 
+> Note: On Windows, you may use `choco install -y gradle`
+
 The following sections deal with building the `ros2_java` codebase for the desktop Java runtime and for Android.
 
 Desktop
 -------
 
 ```
-mkdir -p ~/ros2_java_ws/src
-cd ~/ros2_java_ws
-wget https://raw.githubusercontent.com/esteve/ros2_java/master/ros2_java_desktop.repos
-vcs import ~/ros2_java_ws/src < ros2_java_desktop.repos
-. ~/ament_ws/install_isolated/local_setup.sh
+mkdir ros2_java_ws/src
+cd ros2_java_ws
+curl -skL https://raw.githubusercontent.com/esteve/ros2_java/master/ros2_java_desktop.repos -o ros2_java_desktop.repos
+vcs import src < ros2_java_desktop.repos
+. ../ament_ws/install_isolated/local_setup.sh
 ament build --symlink-install --isolated
 ```
+
+> On Windows, if you would like to use OpenSplice, call something like `call "C:\opensplice67\HDE\x86_64.win64\release.bat"` before building.
 
 Now you can just run a bunch of examples, head over to https://github.com/esteve/ros2_java_examples for more information.
 
