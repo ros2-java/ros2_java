@@ -17,12 +17,16 @@
 
 #include <string>
 
+#include "rcljava_common/visibility_control.h"
+
 namespace rcljava_common
 {
 namespace exceptions
 {
+RCLJAVA_COMMON_PUBLIC
 void rcljava_throw_rclexception(JNIEnv * env, int rcl_ret_code, const std::string & message);
 
+RCLJAVA_COMMON_PUBLIC
 void rcljava_throw_exception(JNIEnv *, const char *, const std::string &);
 }  // namespace exceptions
 }  // namespace rcljava_common

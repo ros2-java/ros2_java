@@ -1,3 +1,4 @@
+#!/bin/sh
 set -e
 
 ROS2_CURDIR=$PWD
@@ -28,9 +29,10 @@ if [ -z "$ROS2_JAVA_SKIP_FETCH" ]; then
   cd $AMENT_WS
   wget https://raw.githubusercontent.com/esteve/ament_java/$ROS2_JAVA_BRANCH/ament_java.repos || wget https://raw.githubusercontent.com/esteve/ament_java/master/ament_java.repos
   vcs import $AMENT_WS/src < ament_java.repos
+  cd src/ament_java
   vcs custom --git --args checkout $ROS2_JAVA_BRANCH || true
+  cd $AMENT_WS
   vcs export --exact
-#  vcs custom --git --args rebase origin/master || true
 
   cd $ROS2_JAVA_WS
   if [ -z "$TRAVIS" ]; then
@@ -40,17 +42,12 @@ if [ -z "$ROS2_JAVA_SKIP_FETCH" ]; then
     wget https://raw.githubusercontent.com/esteve/ros2_java/$ROS2_JAVA_BRANCH/ros2_java_desktop_travis.repos || wget https://raw.githubusercontent.com/esteve/ros2_java/master/ros2_java_desktop_travis.repos
     vcs import $ROS2_JAVA_WS/src < ros2_java_desktop_travis.repos
   fi
+  cd src/ros2_java
   vcs custom --git --args checkout $ROS2_JAVA_BRANCH || true
+  cd $ROS2_JAVA_WS
   vcs export --exact
   cd src/ros2
 #  vcs custom --git --args rebase origin/master || true
-
-  cd $ROS2_JAVA_WS/src/ros2/rosidl_typesupport
-  if [ -z "$TRAVIS" ]; then
-    patch -p1 < ../../ros2_java/ros2_java/rosidl_typesupport_ros2_java.patch
-  else
-    patch -p1 < ../../ros2_java/ros2_java/rosidl_typesupport_ros2_java_travis.patch
-  fi
 
   if [ -n "$TRAVIS" ]; then
     find $ROS2_JAVA_WS/src/ros2/examples/rclcpp $ROS2_JAVA_WS/src/ros2/examples/rclpy -name "package.xml" -printf "%h\n" | xargs -i touch {}/AMENT_IGNORE
@@ -64,10 +61,13 @@ fi
 
 . $AMENT_INSTALL_DIR/local_setup.sh
 
-cd $ROS2_JAVA_WS
-ament build --parallel --symlink-install --isolated --install-space $ROS2_JAVA_INSTALL_DIR --build-space $ROS2_JAVA_BUILD_DIR $@
+if [ -z "$ROS2_JAVA_SKIP_JAVA" ]; then
+  cd $ROS2_JAVA_WS
+  ament build --parallel --symlink-install --isolated --install-space $ROS2_JAVA_INSTALL_DIR --build-space $ROS2_JAVA_BUILD_DIR $@
+fi
 
 if [ -z "$ROS2_JAVA_SKIP_TESTS" ]; then
+  cd $ROS2_JAVA_WS
   . $ROS2_JAVA_INSTALL_DIR/local_setup.sh
 
   ament test --symlink-install --isolated --install-space $ROS2_JAVA_INSTALL_DIR --build-space $ROS2_JAVA_BUILD_DIR --only-packages ament_cmake_export_jars rcljava rcljava_common rosidl_generator_java | tee /tmp/test_logging.log

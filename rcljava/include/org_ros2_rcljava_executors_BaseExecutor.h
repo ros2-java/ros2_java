@@ -39,6 +39,14 @@ JNIEXPORT void JNICALL Java_org_ros2_rcljava_executors_BaseExecutor_nativeWaitSe
 
 /*
  * Class:     org_ros2_rcljava_executors_BaseExecutor
+ * Method:    nativeDisposeWaitSet
+ * Signature: (J)V
+ */
+JNIEXPORT void JNICALL Java_org_ros2_rcljava_executors_BaseExecutor_nativeDisposeWaitSet(
+  JNIEnv *, jclass, jlong);
+
+/*
+ * Class:     org_ros2_rcljava_executors_BaseExecutor
  * Method:    nativeWaitSetClearSubscriptions
  * Signature: (J)V
  */

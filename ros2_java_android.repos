@@ -23,6 +23,10 @@ repositories:
     type: git
     url: https://github.com/ros2/example_interfaces.git
     version: master
+  ros2/libyaml_vendor:
+    type: git
+    url: https://github.com/ros2/libyaml_vendor.git
+    version: master
   ros2/poco_vendor:
     type: git
     url: https://github.com/ros2/poco_vendor.git
@@ -54,6 +58,10 @@ repositories:
   ros2/rosidl_dds:
     type: git
     url: https://github.com/ros2/rosidl_dds.git
+    version: master
+  ros2/rosidl_defaults:
+    type: git
+    url: https://github.com/ros2/rosidl_defaults.git
     version: master
   ros2/rosidl_typesupport:
     type: git

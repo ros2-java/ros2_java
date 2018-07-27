@@ -6,8 +6,10 @@ services:
   - docker
 
 env:
-  - ROS2_JAVA_BRANCH=$TRAVIS_BRANCH DOCKER_TAG=java SCRIPT_PATH=build_java.sh
-  - ROS2_JAVA_BRANCH=$TRAVIS_BRANCH DOCKER_TAG=android SCRIPT_PATH=build_android.sh
+  - UBUNTU_DISTRO=xenial ROS2_JAVA_BRANCH=$TRAVIS_BRANCH DOCKER_TAG=java SCRIPT_PATH=build_java.sh
+  - UBUNTU_DISTRO=xenial ROS2_JAVA_BRANCH=$TRAVIS_BRANCH DOCKER_TAG=android SCRIPT_PATH=build_android.sh
+  - UBUNTU_DISTRO=bionic ROS2_JAVA_BRANCH=$TRAVIS_BRANCH DOCKER_TAG=java SCRIPT_PATH=build_java.sh
+  - UBUNTU_DISTRO=bionic ROS2_JAVA_BRANCH=$TRAVIS_BRANCH DOCKER_TAG=android SCRIPT_PATH=build_android.sh
 
 script:
-  - docker run -v $TRAVIS_BUILD_DIR/ci-scripts:/ci-scripts -e TRAVIS=$TRAVIS -e ROS2_JAVA_BRANCH=$ROS2_JAVA_BRANCH -it --rm esteve/ros2-ubuntu-xenial-travisci:$DOCKER_TAG sh /ci-scripts/$SCRIPT_PATH
+  - docker run $EXTRA_DOCKER_ARGS -v $TRAVIS_BUILD_DIR/ci-scripts:/ci-scripts -e TRAVIS=$TRAVIS -e ROS2_JAVA_BRANCH=$ROS2_JAVA_BRANCH -it --rm esteve/ros2-ubuntu-$UBUNTU_DISTRO-travisci:$DOCKER_TAG sh /ci-scripts/$SCRIPT_PATH

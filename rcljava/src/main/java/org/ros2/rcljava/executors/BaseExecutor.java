@@ -204,7 +204,6 @@ public class BaseExecutor {
     }
 
     long waitSetHandle = nativeGetZeroInitializedWaitSet();
-
     nativeWaitSetInit(waitSetHandle, subscriptionsSize, 0, timersSize, clientsSize, servicesSize);
 
     nativeWaitSetClearSubscriptions(waitSetHandle);
@@ -289,6 +288,8 @@ public class BaseExecutor {
         clientIterator.remove();
       }
     }
+
+    nativeDisposeWaitSet(waitSetHandle);
   }
 
   protected AnyExecutable getNextExecutable() {
@@ -356,6 +357,8 @@ public class BaseExecutor {
       executeAnyExecutable(anyExecutable);
     }
   }
+
+  private static native void nativeDisposeWaitSet(long waitSetHandle);
 
   private static native long nativeGetZeroInitializedWaitSet();
 

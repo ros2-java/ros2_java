@@ -47,15 +47,24 @@ The current set of features include:
 Sounds great, how can I try this out?
 -------------------------------------
 
-First of all, download the ament repositories in a separate workspace:
+> Note: While the following instructions use a Linux shell the same can be done on other platforms like Windows with slightly adjusted commands.
+> 
+> For Windows and Mac, first follow the steps for installing prerequisites on the binary installation page: https://github.com/ros2/ros2/wiki/Installation
+>
+> Stop and return here when you reach the "Downloading ROS 2" section.
+
+Download the ament repositories in a separate workspace:
 
 ```
-mkdir -p ~/ament_ws/src
-cd ~/ament_ws
-wget https://raw.githubusercontent.com/esteve/ament_java/master/ament_java.repos
-vcs import ~/ament_ws/src < ament_java.repos
+mkdir ament_ws/src
+cd ament_ws
+curl -skL https://raw.githubusercontent.com/esteve/ament_java/master/ament_java.repos -o ament_java.repos
+vcs import src < ament_java.repos
 src/ament/ament_tools/scripts/ament.py build --symlink-install --isolated
 ```
+
+> Note: On Windows, use `python src/ament/ament_tools/scripts/ament.py build`, as `*.py` scripts must be prefixed with `python`, `--symlink-install` is not supported due to a bug in Python symlinks, and `--isolated` creates paths that are too long.
+> Additionally, you may need to call `call "C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\VC\Auxiliary\Build\vcvars64.bat"` if you have not run from a VS 2017 terminal.
 
 We need to split the build process between Ament and the rest of `ros2_java` workspace so that the additional build type for Gradle projects is picked up by Ament.
 
@@ -79,22 +88,23 @@ $ brew cask install java8
 $ export JAVA_HOME=/Library/Java/JavaVirtualMachines/1.8.0.jdk/Contents/Home
 ``` 
 
+> Note: On Windows, you may use `choco install -y gradle`
+
 The following sections deal with building the `ros2_java` codebase for the desktop Java runtime and for Android.
 
 Desktop
 -------
 
 ```
-mkdir -p ~/ros2_java_ws/src
-cd ~/ros2_java_ws
-wget https://raw.githubusercontent.com/esteve/ros2_java/master/ros2_java_desktop.repos
-vcs import ~/ros2_java_ws/src < ros2_java_desktop.repos
-cd ~/ros2_java_ws/src/ros2/rosidl_typesupport
-patch -p1 < ../../ros2_java/ros2_java/rosidl_typesupport_ros2_java.patch
-cd ~/ros2_java_ws
-. ~/ament_ws/install_isolated/local_setup.sh
+mkdir ros2_java_ws/src
+cd ros2_java_ws
+curl -skL https://raw.githubusercontent.com/esteve/ros2_java/master/ros2_java_desktop.repos -o ros2_java_desktop.repos
+vcs import src < ros2_java_desktop.repos
+. ../ament_ws/install_isolated/local_setup.sh
 ament build --symlink-install --isolated
 ```
+
+> On Windows, if you would like to use OpenSplice, call `call "C:\opensplice67\HDE\x86_64.win64\release.bat"` before building.
 
 Now you can just run a bunch of examples, head over to https://github.com/esteve/ros2_java_examples for more information.
 
@@ -106,6 +116,10 @@ The Android setup is slightly more complex, you'll need the SDK and NDK installe
 Make sure to download at least the SDK for Android Lollipop (or greater), the examples require the API level 21 at least and NDK 14.
 
 You may download the Android NDK from [the official](https://developer.android.com/ndk/downloads/index.html) website, let's assume you've downloaded 16b (the latest stable version as of 2018-04-28) and you unpack it to `~/android_ndk`
+
+We'll also need to have the [Android SDK](https://developer.android.com/studio/#downloads) installed, for example, in `~/android_sdk` and set the `ANDROID_HOME` environment variable pointing to it.
+
+Although the `ros2_java_android.repos` file contains all the repositories for the Android bindings to compile, we'll have to disable certain packages (`python_cmake_module`, `rosidl_generator_py`, `test_msgs`) that are included the repositories and that we either don't need or can't cross-compile properly (e.g. the Python generator)
 
 ```
 # define paths
@@ -131,15 +145,9 @@ mkdir -p ${ROS2_ANDROID_WORKSPACE}/src
 cd ${ROS2_ANDROID_WORKSPACE}
 wget https://raw.githubusercontent.com/esteve/ros2_java/master/ros2_java_android.repos
 vcs import ${ROS2_ANDROID_WORKSPACE}/src < ros2_java_android.repos
-cd ${ROS2_ANDROID_WORKSPACE}/src/ros2
-touch rosidl/python_cmake_module/AMENT_IGNORE
-touch rosidl/rosidl_generator_py/AMENT_IGNORE
-touch rcl_interfaces/test_msgs/AMENT_IGNORE
-cd ${ROS2_ANDROID_WORKSPACE}/src/ros2/rosidl_typesupport
-patch -p1 < ../../ros2_java/ros2_java/rosidl_typesupport_ros2_android.patch
-cd ${ROS2_ANDROID_WORKSPACE}
 source ${AMENT_WORKSPACE}/install_isolated/local_setup.sh
-ament build --isolated --cmake-args \
+ament build --isolated --skip-packages test_msgs \
+  --cmake-args \
   -DPYTHON_EXECUTABLE=${PYTHON3_EXEC} \
   -DCMAKE_TOOLCHAIN_FILE=$ANDROID_NDK/build/cmake/android.toolchain.cmake \
   -DANDROID_FUNCTION_LEVEL_LINKING=OFF \

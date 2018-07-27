@@ -154,8 +154,8 @@ target_include_directories(${PROJECT_NAME}
   ${JNI_INCLUDE_DIRS}
 )
 
+ament_export_dependencies(ament_cmake)
 ament_export_include_directories(include)
-
 ament_export_libraries(${PROJECT_NAME})
 
 install(
