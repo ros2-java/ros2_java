@@ -91,8 +91,6 @@ vcs import src < ros2_java_desktop.repos
 ament build --symlink-install --isolated
 ```
 
-To use OpenSplice or Connext DDS implementations, uncomment those repositories from `ros2_java_desktop.repos`
-
 > On Windows, if you would like to use OpenSplice, call `call "C:\opensplice67\HDE\x86_64.win64\release.bat"` before building.
 
 Now you can just run a bunch of examples, head over to https://github.com/esteve/ros2_java_examples for more information.
