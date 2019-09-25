@@ -1,4 +1,9 @@
-@# Included from rosidl_generator_java/resource/idl.java.em
+@# Generation triggered from rosidl_generator_java/resource/idl.java.em
+// generated from rosidl_generator_java/resource/msg.java.em
+// with input from @(package_name):@(interface_path)
+// generated code does not contain a copyright notice
+
+package @(package_name + '.' + interface_path.parts[0]);
 @{
 from rosidl_generator_java import convert_lower_case_underscore_to_camel_case
 from rosidl_generator_java import get_java_type
@@ -12,20 +17,23 @@ from rosidl_parser.definition import BoundedSequence
 from rosidl_parser.definition import NamespacedType
 
 type_name = message.structure.namespaced_type.name
+
+message_imports = [
+    'org.apache.commons.lang3.builder.EqualsBuilder',
+    'org.apache.commons.lang3.builder.HashCodeBuilder',
+    'org.ros2.rcljava.common.JNIUtils',
+    'org.ros2.rcljava.interfaces.MessageDefinition',
+    'org.slf4j.Logger',
+    'org.slf4j.LoggerFactory',
+]
 }@
-package @('.'.join(message.structure.namespaced_type.namespaced_name()[:-1]));
-
-import org.ros2.rcljava.common.JNIUtils;
-import org.ros2.rcljava.interfaces.MessageDefinition;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import org.apache.commons.lang3.builder.EqualsBuilder;
-import org.apache.commons.lang3.builder.HashCodeBuilder;
+@[for message_import in message_imports]@
+import @(message_import);
+@[end for]@
 
 @[for member in message.structure.members]@
 @[  if isinstance(member.type, NamespacedType)]@
+// Member '@(member.name)'
 import @('.'.join(member.type.namespaced_name()));
 @[  end if]@
 @[end for]@

@@ -54,6 +54,9 @@ if(BUILD_TESTING)
     "msg/Uint8.msg"
     "msg/Various.msg"
   )
+  set(service_files
+    "srv/BasicTypes.srv"
+  )
 
   include(cmake/register_java.cmake)
   include(cmake/rosidl_generator_java_get_typesupports.cmake)
@@ -66,7 +69,7 @@ if(BUILD_TESTING)
     "${CMAKE_CURRENT_SOURCE_DIR}/resource"
   )
 
-  rosidl_generate_interfaces(${PROJECT_NAME} ${message_files}
+  rosidl_generate_interfaces(${PROJECT_NAME} ${message_files} ${service_files}
     SKIP_INSTALL
   )
 

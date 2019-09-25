@@ -63,6 +63,15 @@ foreach(_abs_idl_file ${rosidl_generate_interfaces_ABS_IDL_FILES})
   list(APPEND _generated_java_files
     "${_output_path}/${_parent_folder}/${_idl_name}.java"
   )
+  # Services generated extra files
+  if(_parent_folder STREQUAL "srv")
+    list(APPEND _generated_java_files
+      "${_output_path}/${_parent_folder}/${_idl_name}_Request.java"
+    )
+    list(APPEND _generated_java_files
+      "${_output_path}/${_parent_folder}/${_idl_name}_Response.java"
+    )
+  endif()
   foreach(_typesupport_impl ${_typesupport_impls})
     list(APPEND _generated_extension_${_typesupport_impl}_files "${_output_path}/${_parent_folder}/${_idl_name}.ep.${_typesupport_impl}.cpp")
   endforeach()
@@ -180,6 +189,7 @@ foreach(_generated_cpp_file ${_generated_extension_files})
     ${_library_name}
     ${rosidl_generate_interfaces_TARGET}${_target_suffix}
     ${rosidl_generate_interfaces_TARGET}__rosidl_typesupport_c
+    ${_target_dependencies}
   )
   set(_extension_compile_flags "")
   if(CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID MATCHES "Clang")

@@ -15,8 +15,10 @@
 
 from ast import literal_eval
 from collections import defaultdict
+import pathlib
 
 from rosidl_cmake import generate_files
+from rosidl_cmake import read_generator_arguments
 from rosidl_parser.definition import AbstractGenericString
 from rosidl_parser.definition import AbstractNestedType
 from rosidl_parser.definition import AbstractString
@@ -32,16 +34,26 @@ def convert_lower_case_underscore_to_camel_case(word):
 
 
 def generate_java(generator_arguments_file, typesupport_impls):
-    mapping = {
-        'idl.java.em': '%s.java',
+    args = read_generator_arguments(generator_arguments_file)
+    additional_context = {
+        'output_dir': pathlib.Path(args['output_dir']),
+        'template_basepath': pathlib.Path(args['template_dir']),
     }
-    generate_files(generator_arguments_file, mapping, keep_case=True)
+    mapping = {
+        'idl.java.em': '_%s.java',
+    }
+    generate_files(
+        generator_arguments_file, mapping, additional_context=additional_context, keep_case=True)
 
     for impl in typesupport_impls:
         mapping = {
           'idl.cpp.em': '%s.ep.{0}.cpp'.format(impl),
         }
-        generate_files(generator_arguments_file, mapping, keep_case=True)
+        generate_files(
+            generator_arguments_file,
+            mapping,
+            additional_context=additional_context,
+            keep_case=True)
     return 0
 
 
