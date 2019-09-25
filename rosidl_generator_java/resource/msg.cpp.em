@@ -11,6 +11,8 @@ from rosidl_generator_java import get_jni_type
 from rosidl_generator_java import get_normalized_type
 from rosidl_generator_java import value_methods
 from rosidl_parser.definition import AbstractGenericString
+from rosidl_parser.definition import AbstractString
+from rosidl_parser.definition import AbstractWString
 from rosidl_parser.definition import AbstractNestedType
 from rosidl_parser.definition import AbstractSequence
 from rosidl_parser.definition import Array
@@ -46,9 +48,14 @@ for member in message.structure.members:
     # We do not cache strings because java.lang.String behaves differently
     if not isinstance(type_, AbstractGenericString):
         cache[get_normalized_type(type_)] = get_jni_type(type_)
-    else:
-        # TODO(jacobperron): wstring support
+
+    if isinstance(type_, AbstractString):
         includes.add('rosidl_generator_c/string.h')
+        includes.add('rosidl_generator_c/string_functions.h')
+
+    if isinstance(type_, AbstractWString):
+        includes.add('rosidl_generator_c/u16string.h')
+        includes.add('rosidl_generator_c/u16string_functions.h')
 
     if isinstance(type_, NamespacedType):
         namespaced_types.add(get_jni_type(type_))
@@ -61,6 +68,7 @@ for member in message.structure.members:
 @[for include in includes]@
 #include "@(include)"
 @[end for]@
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -165,9 +173,13 @@ normalized_type = get_normalized_type(member.type)
 @[    if isinstance(member.type, AbstractSequence)]@
     jmethodID _jlist_@(member.name)_size_mid = env->GetMethodID(_j@(list_normalized_type)_class_global, "size", "()I");
     jint _jlist_@(member.name)_size = env->CallIntMethod(_jlist_@(member.name)_object, _jlist_@(member.name)_size_mid);
-@[      if isinstance(member.type.value_type, AbstractGenericString)]@
+@[      if isinstance(member.type.value_type, AbstractString)]@
     if (!rosidl_generator_c__String__Sequence__init(&(ros_message->@(member.name)), _jlist_@(member.name)_size)) {
       rcljava_throw_exception(env, "java/lang/IllegalStateException", "unable to create String__Array ros_message");
+    }
+@[      elif isinstance(member.type.value_type, AbstractWString)]@
+    if (!rosidl_generator_c__U16String__Sequence__init(&(ros_message->@(member.name)), _jlist_@(member.name)_size)) {
+      rcljava_throw_exception(env, "java/lang/IllegalStateException", "unable to create U16String__Array ros_message");
     }
 @[      else]@
 @[        if isinstance(member.type.value_type, BasicType)]@
@@ -190,13 +202,21 @@ normalized_type = get_normalized_type(member.type)
 
     for (jint i = 0; i < _jlist_@(member.name)_size; ++i) {
       auto element = env->CallObjectMethod(_jlist_@(member.name)_object, _jlist_@(member.name)_get_mid, i);
-@[    if isinstance(member.type.value_type, AbstractGenericString)]@
+@[    if isinstance(member.type.value_type, AbstractString)]@
       jstring _jfield_@(member.name)_value = static_cast<jstring>(element);
       if (_jfield_@(member.name)_value != nullptr) {
         const char * _str@(member.name) = env->GetStringUTFChars(_jfield_@(member.name)_value, 0);
         rosidl_generator_c__String__assign(
           &_dest_@(member.name)[i], _str@(member.name));
         env->ReleaseStringUTFChars(_jfield_@(member.name)_value, _str@(member.name));
+      }
+@[    elif isinstance(member.type.value_type, AbstractWString)]@
+      jstring _jfield_@(member.name)_value = static_cast<jstring>(element);
+      if (_jfield_@(member.name)_value != nullptr) {
+        const jchar * _str@(member.name) = env->GetStringChars(_jfield_@(member.name)_value, 0);
+        rosidl_generator_c__U16String__assign(
+          &_dest_@(member.name)[i], _str@(member.name));
+        env->ReleaseStringChars(_jfield_@(member.name)_value, _str@(member.name));
       }
 @[    elif isinstance(member.type.value_type, BasicType)]@
 @{
@@ -215,10 +235,17 @@ call_method_name = 'Call%sMethod' % get_java_type(member.type.value_type, use_pr
   jstring _jvalue@(member.name) = static_cast<jstring>(env->GetObjectField(_jmessage_obj, _jfield_@(member.name)_fid));
 
   if (_jvalue@(member.name) != nullptr) {
+@[      if isinstance(member.type, AbstractString)]@
     const char * _str@(member.name) = env->GetStringUTFChars(_jvalue@(member.name), 0);
     rosidl_generator_c__String__assign(
       &ros_message->@(member.name), _str@(member.name));
     env->ReleaseStringUTFChars(_jvalue@(member.name), _str@(member.name));
+@[      else]@
+    const jchar * _str@(member.name) = env->GetStringChars(_jvalue@(member.name), 0);
+    rosidl_generator_c__U16String__assign(
+      &ros_message->@(member.name), _str@(member.name));
+    env->ReleaseStringChars(_jvalue@(member.name), _str@(member.name));
+@[      end if]@
   }
 @[    elif isinstance(member.type, BasicType)]@
 @{
@@ -280,7 +307,11 @@ normalized_type = get_normalized_type(member.type)
 @[      if isinstance(member.type.value_type, AbstractGenericString)]@
     jobject _jlist_@(member.name)_element = nullptr;
     if (_ros_@(member.name)_element.data != nullptr) {
+@[        if isinstance(member.type.value_type, AbstractString)]@
       _jlist_@(member.name)_element = env->NewStringUTF(_ros_@(member.name)_element.data);
+@[        else]@
+      _jlist_@(member.name)_element = env->NewString(_ros_@(member.name)_element.data, _ros_@(member.name)_element.size);
+@[        end if]@
     }
 @[      else]@
     jobject _jlist_@(member.name)_element = env->NewObject(
@@ -320,7 +351,11 @@ normalized_type = get_normalized_type(member.type)
 @[    if isinstance(member.type, AbstractGenericString)]@
   auto _jfield_@(member.name)_fid = env->GetFieldID(_j@(msg_normalized_type)_class_global, "@(member.name)", "Ljava/lang/String;");
   if (_ros_message->@(member.name).data != nullptr) {
+@[      if isinstance(member.type, AbstractString)]@
     env->SetObjectField(_jmessage_obj, _jfield_@(member.name)_fid, env->NewStringUTF(_ros_message->@(member.name).data));
+@[      else]@
+    env->SetObjectField(_jmessage_obj, _jfield_@(member.name)_fid, env->NewString(_ros_message->@(member.name).data, _ros_message->@(member.name).size));
+@[      end if]@
   }
 @[    elif isinstance(member.type, BasicType)]@
 @{

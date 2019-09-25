@@ -21,8 +21,6 @@ from rosidl_cmake import generate_files
 from rosidl_cmake import read_generator_arguments
 from rosidl_parser.definition import AbstractGenericString
 from rosidl_parser.definition import AbstractNestedType
-from rosidl_parser.definition import AbstractString
-from rosidl_parser.definition import AbstractWString
 from rosidl_parser.definition import BASIC_TYPES
 from rosidl_parser.definition import BasicType
 from rosidl_parser.definition import NamespacedType
@@ -87,13 +85,8 @@ def primitive_value_to_java(type_, value):
         "Could not convert non-basic type '{}' to Java".format(type_)
     assert value is not None, "Value for for type '{}' must not be None".format(type_)
 
-    if isinstance(type_, AbstractString):
+    if isinstance(type_, AbstractGenericString):
         return '"%s"' % escape_string(value)
-
-    if isinstance(type_, AbstractWString):
-        assert False, 'wide strings unsupported'
-        # TODO(jacobperron): support for wide strings
-        # return '"{}"'.format(escape_wstring(value))
 
     if type_.typename == 'boolean':
         return 'true' if value else 'false'
@@ -112,7 +105,6 @@ def primitive_value_to_java(type_, value):
 IDL_TYPE_TO_JAVA_PRIMITIVE = {
     'boolean': ('boolean', 'java.lang.Boolean'),
     'char': ('char', 'java.lang.Char'),
-    # 'wchar': ( TODO ),
     'octet': ('byte', 'java.lang.Byte'),
     'float': ('float', 'java.lang.Float'),
     'double': ('double', 'java.lang.Double'),
@@ -135,10 +127,8 @@ def get_java_type(type_, use_primitives=True):
         return '.'.join(type_.namespaced_name())
     if isinstance(type_, BasicType):
         return IDL_TYPE_TO_JAVA_PRIMITIVE[type_.typename][0 if use_primitives else 1]
-    if isinstance(type_, AbstractString):
+    if isinstance(type_, AbstractGenericString):
         return 'java.lang.String'
-    if isinstance(type_, AbstractWString):
-        assert False, 'wide strings are not supported'
 
     assert False, "unknown type '%s'" % type_
 
