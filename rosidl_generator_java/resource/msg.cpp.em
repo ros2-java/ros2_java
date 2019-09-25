@@ -97,7 +97,8 @@ _j@(normalized_type)_to_java_signature _j@(normalized_type)_to_java_function = n
 @{
 message_fqn = message.structure.namespaced_type.namespaced_name()
 underscore_separated_type_name = '_'.join(message_fqn)
-underscore_separated_jni_type_name = '_1'.join(message_fqn)
+# JNI name mangling: https://docs.oracle.com/javase/8/docs/technotes/guides/jni/spec/design.html#resolving_native_method_names
+underscore_separated_jni_type_name = message_fqn[0].replace('_', '_1') + '_' + '_'.join(message_fqn[1:])
 }@
 /*
  * Class:     @(underscore_separated_type_name)
