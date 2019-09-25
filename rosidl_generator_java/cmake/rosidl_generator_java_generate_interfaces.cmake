@@ -39,8 +39,6 @@ if(NOT WIN32)
   endif()
 endif()
 
-set(CMAKE_JAVA_COMPILE_FLAGS "-source" "1.6" "-target" "1.6")
-
 # Get a list of typesupport implementations from valid rmw implementations.
 rosidl_generator_java_get_typesupports(_typesupport_impls)
 
