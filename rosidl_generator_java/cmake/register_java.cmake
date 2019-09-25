@@ -13,9 +13,9 @@
 # limitations under the License.
 
 macro(rosidl_generator_java_extras BIN GENERATOR_FILES TEMPLATE_DIR)
-  find_package(ament_cmake_core QUIET REQUIRED)
+  find_package(ament_cmake_core REQUIRED)
   ament_register_extension(
-    "rosidl_generate_interfaces"
+    "rosidl_generate_idl_interfaces"
     "rosidl_generator_java"
     "rosidl_generator_java_generate_interfaces.cmake")
 

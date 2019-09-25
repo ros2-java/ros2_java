@@ -11,19 +11,14 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
-
 add_custom_command(
   OUTPUT
-  ${_generated_msg_java_files}
-  ${_generated_msg_cpp_files}
-  ${_generated_srv_java_files}
-  ${_generated_srv_cpp_files}
+  ${_generated_extension_files}
+  ${_generated_java_files}
   COMMAND ${PYTHON_EXECUTABLE} ${rosidl_generator_java_BIN}
   --generator-arguments-file "${generator_arguments_file}"
-  --typesupport-impl "${_typesupport_impl}"
   --typesupport-impls "${_typesupport_impls}"
-  DEPENDS ${target_dependencies}
+  DEPENDS ${target_dependencies} ${rosidl_generate_interfaces_TARGET}
   COMMENT "Generating Java code for ROS interfaces"
   VERBATIM
 )
@@ -34,17 +29,14 @@ else()
   add_custom_target(
     ${rosidl_generate_interfaces_TARGET}${_target_suffix}
     DEPENDS
-    ${_generated_msg_java_files}
-    ${_generated_msg_cpp_files}
-    ${_generated_srv_java_files}
-    ${_generated_srv_cpp_files}
+    ${_generated_extension_files}
+    ${_generated_java_files}
   )
 endif()
 
 add_jar("${PROJECT_NAME}_messages_jar"
   SOURCES
-  ${_generated_msg_java_files}
-  ${_generated_srv_java_files}
+  ${_generated_java_files}
   OUTPUT_NAME
   ${PROJECT_NAME}_messages
   INCLUDE_JARS

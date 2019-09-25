@@ -68,12 +68,12 @@ public class InterfacesTest {
 
   @Test
   public final void testChar() {
-    char expected1 = 'a';
+    byte expected1 = 'a';
     rosidl_generator_java.msg.Char charOne = new rosidl_generator_java.msg.Char();
     charOne.setEmptyChar(expected1);
     assertEquals(expected1, charOne.getEmptyChar());
 
-    char expected2 = 'b';
+    byte expected2 = 'b';
     rosidl_generator_java.msg.Char charTwo = new rosidl_generator_java.msg.Char();
     charTwo.setEmptyChar(expected2);
     assertEquals(expected2, charTwo.getEmptyChar());

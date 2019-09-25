@@ -51,48 +51,36 @@ endif()
 
 set(_output_path
   "${CMAKE_CURRENT_BINARY_DIR}/rosidl_generator_java/${PROJECT_NAME}")
-set(_generated_cpp_files "")
-set(_generated_msg_java_files "")
-set(_generated_msg_cpp_files "")
-set(_generated_srv_java_files "")
-set(_generated_srv_cpp_files "")
+set(_generated_extension_files "")
+set(_generated_java_files "")
 
-foreach(_idl_file ${rosidl_generate_interfaces_IDL_FILES})
-  get_filename_component(_parent_folder "${_idl_file}" DIRECTORY)
+foreach(_typesupport_impl ${_typesupport_impls})
+  set(_generated_extension_${_typesupport_impl}_files "")
+endforeach()
+
+foreach(_abs_idl_file ${rosidl_generate_interfaces_ABS_IDL_FILES})
+  get_filename_component(_parent_folder "${_abs_idl_file}" DIRECTORY)
   get_filename_component(_parent_folder "${_parent_folder}" NAME)
-  get_filename_component(_module_name "${_idl_file}" NAME_WE)
+  get_filename_component(_idl_name "${_abs_idl_file}" NAME_WE)
+  list(APPEND _generated_java_files
+    "${_output_path}/${_parent_folder}/${_idl_name}.java"
+  )
+  foreach(_typesupport_impl ${_typesupport_impls})
+    list(APPEND _generated_extension_${_typesupport_impl}_files "${_output_path}/${_parent_folder}/${_idl_name}.ep.${_typesupport_impl}.cpp")
+  endforeach()
+endforeach()
 
-  if(_parent_folder STREQUAL "msg")
-    list(APPEND _generated_msg_java_files
-      "${_output_path}/${_parent_folder}/${_module_name}.java"
-    )
-
-    foreach(_typesupport_impl ${_typesupport_impls})
-      list_append_unique(_generated_msg_cpp_files
-        "${_output_path}/${_parent_folder}/${_module_name}.ep.${_typesupport_impl}.cpp"
-      )
-      list(APPEND _type_support_by_generated_msg_cpp_files "${_typesupport_impl}")
-    endforeach()
-  elseif(_parent_folder STREQUAL "srv")
-    list(APPEND _generated_srv_java_files
-      "${_output_path}/${_parent_folder}/${_module_name}.java"
-    )
-
-    foreach(_typesupport_impl ${_typesupport_impls})
-      list_append_unique(_generated_srv_cpp_files
-        "${_output_path}/${_parent_folder}/${_module_name}.ep.${_typesupport_impl}.cpp"
-      )
-      list(APPEND _type_support_by_generated_srv_cpp_files "${_typesupport_impl}")
-    endforeach()
-  else()
-    message(FATAL_ERROR "Interface file with unknown parent folder: ${_idl_file}")
-  endif()
+foreach(_typesupport_impl ${_typesupport_impls})
+  foreach(_generated_file ${_generated_extension_${_typesupport_impl}_files})
+    list(APPEND _generated_extension_files "${_generated_file}")
+    list(APPEND _typesupport_by_generated_cpp_files "${_typesupport_impl}")
+  endforeach()
 endforeach()
 
 set(_dependency_files "")
 set(_dependencies "")
 foreach(_pkg_name ${rosidl_generate_interfaces_DEPENDENCY_PACKAGE_NAMES})
-  foreach(_idl_file ${${_pkg_name}_INTERFACE_FILES})
+  foreach(_idl_file ${${_pkg_name}_IDL_FILES})
     set(_abs_idl_file "${${_pkg_name}_DIR}/../${_idl_file}")
     normalize_path(_abs_idl_file "${_abs_idl_file}")
     list(APPEND _dependency_files "${_abs_idl_file}")
@@ -100,14 +88,17 @@ foreach(_pkg_name ${rosidl_generate_interfaces_DEPENDENCY_PACKAGE_NAMES})
   endforeach()
 endforeach()
 
+# TODO(jacobperron): Add action template
 set(target_dependencies
   "${rosidl_generator_java_BIN}"
   ${rosidl_generator_java_GENERATOR_FILES}
+  "${rosidl_generator_java_TEMPLATE_DIR}/idl.cpp.em"
   "${rosidl_generator_java_TEMPLATE_DIR}/msg.cpp.em"
   "${rosidl_generator_java_TEMPLATE_DIR}/srv.cpp.em"
+  "${rosidl_generator_java_TEMPLATE_DIR}/idl.java.em"
   "${rosidl_generator_java_TEMPLATE_DIR}/msg.java.em"
   "${rosidl_generator_java_TEMPLATE_DIR}/srv.java.em"
-  ${rosidl_generate_interfaces_IDL_FILES}
+  ${rosidl_generate_interfaces_ABS_IDL_FILES}
   ${_dependency_files})
 foreach(dep ${target_dependencies})
   if(NOT EXISTS "${dep}")
@@ -119,7 +110,7 @@ set(generator_arguments_file "${CMAKE_BINARY_DIR}/rosidl_generator_java__argumen
 rosidl_write_generator_arguments(
   "${generator_arguments_file}"
   PACKAGE_NAME "${PROJECT_NAME}"
-  ROS_INTERFACE_FILES "${rosidl_generate_interfaces_IDL_FILES}"
+  IDL_TUPLES "${rosidl_generate_interfaces_IDL_TUPLES}"
   ROS_INTERFACE_DEPENDENCIES "${_dependencies}"
   OUTPUT_DIR "${_output_path}"
   TEMPLATE_DIR "${rosidl_generator_java_TEMPLATE_DIR}"
@@ -128,7 +119,6 @@ rosidl_write_generator_arguments(
 
 file(MAKE_DIRECTORY "${_output_path}")
 
-set(_generated_extension_files "")
 set(_extension_dependencies "")
 set(_target_suffix "__java")
 
@@ -156,10 +146,8 @@ add_subdirectory("${_subdir}" ${rosidl_generate_interfaces_TARGET}${_target_suff
 
 set_property(
   SOURCE
-  ${_generated_msg_java_files}
-  ${_generated_msg_cpp_files}
-  ${_generated_srv_java_files}
-  ${_generated_srv_cpp_files}
+  ${_generated_extension_files}
+  ${_generated_java_files}
   PROPERTY GENERATED 1)
 
 macro(set_properties _build_type)
@@ -172,28 +160,21 @@ macro(set_properties _build_type)
     OUTPUT_NAME "${_library_path}")
 endmacro()
 
-set(_type_support_by_generated_cpp_files ${_type_support_by_generated_msg_cpp_files} ${_type_support_by_generated_srv_cpp_files})
-set(_generated_cpp_files ${_generated_msg_cpp_files} ${_generated_srv_cpp_files})
-
-set(_javaext_suffix "__javaext")
-foreach(_generated_cpp_file ${_generated_cpp_files})
-  get_filename_component(_full_folder "${_generated_cpp_file}" DIRECTORY)
-  get_filename_component(_package_folder "${_full_folder}" DIRECTORY)
-  get_filename_component(_package_name "${_package_folder}" NAME)
-  get_filename_component(_parent_folder "${_full_folder}" NAME)
-  get_filename_component(_base_msg_name "${_generated_cpp_file}" NAME_WE)
-  list(FIND _generated_cpp_files ${_generated_cpp_file} _file_index)
-  list(GET _type_support_by_generated_cpp_files ${_file_index} _typesupport_impl)
+foreach(_generated_cpp_file ${_generated_extension_files})
+  list(FIND _generated_extension_files ${_generated_cpp_file} _file_index)
+  list(GET _typesupport_by_generated_cpp_files ${_file_index} _typesupport_impl)
   find_package(${_typesupport_impl} REQUIRED)
-  set(_generated_msg_cpp_common_file "${_full_folder}/${_base_msg_name}.cpp")
+  get_filename_component(_parent_folder "${_generated_cpp_file}" DIRECTORY)
+  get_filename_component(_parent_folder "${_parent_folder}" NAME)
+  get_filename_component(_parent_folder "${_parent_folder}" NAME)
+  get_filename_component(_base_name "${_generated_cpp_file}" NAME_WE)
   string(REGEX REPLACE "^rosidl_typesupport_" "" _short_typesupport_impl ${_typesupport_impl})
-  set(_library_name
-    "${_parent_folder}${_base_msg_name}${_short_typesupport_impl}"
-  )
+  set(_library_name "${_parent_folder}${_base_name}${_short_typesupport_impl}")
   set(_library_path
-    "${_package_name}_${_parent_folder}_${_base_msg_name}__jni__${_typesupport_impl}"
+    "${rosidl_generate_interfaces_TARGET}_${_parent_folder}_${_base_name}__jni__${_typesupport_impl}"
   )
   string_camel_case_to_lower_case_underscore(${_library_path} _library_path)
+
   add_library(${_library_name} SHARED
     ${_generated_cpp_file}
   )
@@ -248,9 +229,6 @@ foreach(_generated_cpp_file ${_generated_cpp_files})
     )
     target_link_libraries(${_library_name} ${${_pkg_name}_JNI_LIBRARIES})
   endforeach()
-  add_dependencies(${_library_name}
-    ${rosidl_generate_interfaces_TARGET}__${_typesupport_impl}
-  )
   if(NOT rosidl_generate_interfaces_SKIP_INSTALL)
     install(TARGETS ${_library_name}
       ARCHIVE DESTINATION lib/jni
@@ -277,7 +255,7 @@ add_custom_command(
 
 if(NOT rosidl_generate_interfaces_SKIP_INSTALL)
   set(_install_jar_dir "${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}")
-  if(NOT _generated_msg_java_files STREQUAL "" OR NOT _generated_srv_java_files STREQUAL "")
+  if(NOT _generated_java_files STREQUAL "")
     install_jar("${PROJECT_NAME}_messages_jar" "share/${PROJECT_NAME}/java")
     ament_export_jars("share/${PROJECT_NAME}/java/${PROJECT_NAME}_messages.jar")
   endif()
@@ -285,10 +263,8 @@ endif()
 
 if(BUILD_TESTING AND rosidl_generate_interfaces_ADD_LINTER_TESTS)
   if(
-    NOT _generated_msg_java_files STREQUAL "" OR
-    NOT _generated_msg_cpp_files STREQUAL "" OR
-    NOT _generated_srv_java_files STREQUAL "" OR
-    NOT _generated_srv_cpp_files STREQUAL ""
+    NOT _generated_java_files STREQUAL "" OR
+    NOT _generated_extension_files STREQUAL ""
   )
     find_package(ament_cmake_cppcheck REQUIRED)
     ament_cppcheck(
