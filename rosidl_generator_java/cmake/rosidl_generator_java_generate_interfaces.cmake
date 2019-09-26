@@ -63,15 +63,23 @@ foreach(_abs_idl_file ${rosidl_generate_interfaces_ABS_IDL_FILES})
   list(APPEND _generated_java_files
     "${_output_path}/${_parent_folder}/${_idl_name}.java"
   )
+  # TODO(jacobperron): Is there a more robust way of detecting services and actions
   # Services generated extra files
   if(_parent_folder STREQUAL "srv")
     list(APPEND _generated_java_files
       "${_output_path}/${_parent_folder}/${_idl_name}_Request.java"
-    )
-    list(APPEND _generated_java_files
       "${_output_path}/${_parent_folder}/${_idl_name}_Response.java"
     )
   endif()
+  # Actions generated extra files
+  if(_parent_folder STREQUAL "action")
+    list(APPEND _generated_java_files
+      "${_output_path}/${_parent_folder}/${_idl_name}_Goal.java"
+      "${_output_path}/${_parent_folder}/${_idl_name}_Result.java"
+      "${_output_path}/${_parent_folder}/${_idl_name}_Feedback.java"
+    )
+  endif()
+
   foreach(_typesupport_impl ${_typesupport_impls})
     list(APPEND _generated_extension_${_typesupport_impl}_files "${_output_path}/${_parent_folder}/${_idl_name}.ep.${_typesupport_impl}.cpp")
   endforeach()
@@ -95,13 +103,14 @@ foreach(_pkg_name ${rosidl_generate_interfaces_DEPENDENCY_PACKAGE_NAMES})
   endforeach()
 endforeach()
 
-# TODO(jacobperron): Add action template
 set(target_dependencies
   "${rosidl_generator_java_BIN}"
   ${rosidl_generator_java_GENERATOR_FILES}
+  "${rosidl_generator_java_TEMPLATE_DIR}/action.cpp.em"
   "${rosidl_generator_java_TEMPLATE_DIR}/idl.cpp.em"
   "${rosidl_generator_java_TEMPLATE_DIR}/msg.cpp.em"
   "${rosidl_generator_java_TEMPLATE_DIR}/srv.cpp.em"
+  "${rosidl_generator_java_TEMPLATE_DIR}/action.java.em"
   "${rosidl_generator_java_TEMPLATE_DIR}/idl.java.em"
   "${rosidl_generator_java_TEMPLATE_DIR}/msg.java.em"
   "${rosidl_generator_java_TEMPLATE_DIR}/srv.java.em"

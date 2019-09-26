@@ -17,6 +17,7 @@
 import os
 
 from rosidl_cmake import expand_template
+from rosidl_parser.definition import Action
 from rosidl_parser.definition import Message
 from rosidl_parser.definition import Service
 
@@ -66,5 +67,21 @@ for service in content.get_elements_of_type(Service):
 @# Handle actions
 @#######################################################################
 @{
-# TODO
+data = {
+    'package_name': package_name,
+    'interface_path': interface_path,
+    'output_dir': output_dir,
+    'template_basepath': template_basepath,
+}
+
+for action in content.get_elements_of_type(Action):
+    data.update({'action': action})
+    type_name = action.namespaced_type.name
+    namespaces = action.namespaced_type.namespaces
+    output_file = os.path.join(output_dir, *namespaces[1:], type_name + '.java')
+    expand_template(
+        'action.java.em',
+        data,
+        output_file,
+        template_basepath=template_basepath)
 }@

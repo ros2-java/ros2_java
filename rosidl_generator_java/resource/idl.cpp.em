@@ -96,5 +96,15 @@ TEMPLATE(
 @# Handle actions
 @#######################################################################
 @{
-# TODO
+from rosidl_parser.definition import Action
 }@
+@[for action in content.get_elements_of_type(Action)]@
+@{
+TEMPLATE(
+    'action.cpp.em',
+    package_name=package_name,
+    jni_package_name=jni_package_name,
+    action=action,
+    include_directives=include_directives)
+}@
+@[end for]@
