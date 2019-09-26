@@ -94,7 +94,17 @@ def primitive_value_to_java(type_, value):
     if type_.typename == 'float':
         return '%sf' % value
 
+    # Java doesn't support unsigned literals (values over 2^31-1)
+    # Instead we should convert to the corresponding negative number
+    if type_.typename == 'uint32' and int(value) > 2**31-1:
+        negative_value = int(value) - 2**32
+        return str(negative_value)
+
     if type_.typename in ('uint64', 'int64'):
+        # Java doesn't support unsigned literals (values over 2^63-1)
+        # Instead we should convert to the corresponding negative number
+        if type_.typename == 'uint64' and int(value) > 2**63-1:
+            value = int(value) - 2**64
         return '%sL' % value
 
     if type_.typename in BASIC_TYPES:
