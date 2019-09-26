@@ -29,10 +29,12 @@ ament_index_register_resource("rosidl_generator_packages")
 if(BUILD_TESTING)
   find_package(rosidl_cmake REQUIRED)
   find_package(rosidl_generator_c REQUIRED)
+  find_package(test_interface_files REQUIRED)
 
   find_package(ament_lint_auto REQUIRED)
   ament_lint_auto_find_test_dependencies()
 
+  # TODO(jacobperron): Use test_interface_files instead and update tests
   set(message_files
     "msg/Bool.msg"
     "msg/Byte.msg"
@@ -54,9 +56,6 @@ if(BUILD_TESTING)
     "msg/Uint8.msg"
     "msg/Various.msg"
   )
-  set(service_files
-    "srv/BasicTypes.srv"
-  )
 
   include(cmake/register_java.cmake)
   include(cmake/rosidl_generator_java_get_typesupports.cmake)
@@ -69,7 +68,9 @@ if(BUILD_TESTING)
     "${CMAKE_CURRENT_SOURCE_DIR}/resource"
   )
 
-  rosidl_generate_interfaces(${PROJECT_NAME} ${message_files} ${service_files}
+  rosidl_generate_interfaces(${PROJECT_NAME}
+    ${message_files}
+    ${test_interface_files_SRV_FILES}
     SKIP_INSTALL
   )
 
