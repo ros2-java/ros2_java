@@ -94,6 +94,9 @@ def primitive_value_to_java(type_, value):
     if type_.typename == 'float':
         return '%sf' % value
 
+    if type_.typename in ('uint64', 'int64'):
+        return '%sL' % value
+
     if type_.typename in BASIC_TYPES:
         return str(value)
 
