@@ -94,6 +94,14 @@ def primitive_value_to_java(type_, value):
     if type_.typename == 'float':
         return '%sf' % value
 
+    if type_.typename in ('octet', 'uint8', 'int8'):
+        # literal is treated as an integer so we must cast
+        return '(byte) %s' % value
+
+    if type_.typename in ('uint16', 'int16'):
+        # literal is treated as an integer so we must cast
+        return '(short) %s' % value
+
     # Java doesn't support unsigned literals (values over 2^31-1)
     # Instead we should convert to the corresponding negative number
     if type_.typename == 'uint32' and int(value) > 2**31-1:
