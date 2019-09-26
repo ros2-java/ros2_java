@@ -11,29 +11,46 @@
 @#  - content (IdlContent, list of elements, e.g. Messages or Services)
 @#######################################################################
 @{
-# TODO(jacobperron): Maybe we can remove this
 include_directives = set()
-}@
-#include <jni.h>
 
-#include <cassert>
-#include <cstdint>
-#include <string>
+jni_includes = [
+    'jni.h',
+]
+include_directives.update(jni_includes)
+std_includes = [
+    'cassert',
+    'cstdint',
+    'string',
+]
+include_directives.update(std_includes)
+rosidl_includes = [
+    'rosidl_generator_c/message_type_support_struct.h',
+]
+include_directives.update(rosidl_includes)
+rcljava_includes = [
+    'rcljava_common/exceptions.h',
+    'rcljava_common/signatures.h',
+]
+include_directives.update(rcljava_includes)
+}@
+@[for include in jni_includes]@
+#include <@(include)>
+@[end for]@
+
+@[for include in std_includes]@
+#include <@(include)>
+@[end for]@
+
+@[for include in rosidl_includes]@
+#include "@(include)"
+@[end for]@
+
+@[for include in rcljava_includes]@
+#include "@(include)"
+@[end for]@
 
 // Ensure that a jlong is big enough to store raw pointers
 static_assert(sizeof(jlong) >= sizeof(std::intptr_t), "jlong must be able to store pointers");
-
-#include "rosidl_generator_c/message_type_support_struct.h"
-
-@# TODO(jacobperron): Make these includes conditional
-#include "rosidl_generator_c/string.h"
-#include "rosidl_generator_c/string_functions.h"
-
-#include "rosidl_generator_c/primitives_sequence.h"
-#include "rosidl_generator_c/primitives_sequence_functions.h"
-
-#include "rcljava_common/exceptions.h"
-#include "rcljava_common/signatures.h"
 
 using rcljava_common::exceptions::rcljava_throw_exception;
 
@@ -53,7 +70,6 @@ TEMPLATE(
     'msg.cpp.em',
     package_name=package_name,
     jni_package_name=jni_package_name,
-    # interface_path=interface_path,
     message=message,
     include_directives=include_directives)
 }@
@@ -71,7 +87,6 @@ TEMPLATE(
     'srv.cpp.em',
     package_name=package_name,
     jni_package_name=jni_package_name,
-    # interface_path=interface_path,
     service=service,
     include_directives=include_directives)
 }@

@@ -44,6 +44,7 @@ for member in message.structure.members:
         type_ = type_.value_type
         if isinstance(type_, BasicType):
             includes.add('rosidl_generator_c/primitives_sequence.h')
+            includes.add('rosidl_generator_c/primitives_sequence_functions.h')
 
     # We do not cache strings because java.lang.String behaves differently
     if not isinstance(type_, AbstractGenericString):
@@ -62,12 +63,17 @@ for member in message.structure.members:
         # TODO(jacobperron): double-check, we may have to handle service/action suffixes (see C generator)
         includes.add(idl_structure_type_to_c_include_prefix(type_) + '.h')
 }@
-
-#include "@(idl_structure_type_to_c_include_prefix(message.structure.namespaced_type)).h"
-
 @[for include in includes]@
+@[  if include in include_directives]@
+// already included above
+// @
+@[  else]@
+@{include_directives.add(include)}@
+@[  end if]@
 #include "@(include)"
 @[end for]@
+
+#include "@(idl_structure_type_to_c_include_prefix(message.structure.namespaced_type)).h"
 
 #ifdef __cplusplus
 extern "C" {

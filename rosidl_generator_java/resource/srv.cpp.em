@@ -1,8 +1,21 @@
 @# Included from rosidl_generator_java/resource/idl.cpp.em
 @{
 from rosidl_generator_c import idl_structure_type_to_c_include_prefix
+
+service_includes = [
+    'rosidl_generator_c/service_type_support_struct.h',
+]
 }@
-#include "rosidl_generator_c/service_type_support_struct.h"
+@[for include in service_includes]@
+@[  if include in include_directives]@
+// already included above
+// @
+@[  else]@
+@{include_directives.add(include)}@
+@[  end if]@
+#include "@(include)"
+@[end for]@
+
 #include "@(idl_structure_type_to_c_include_prefix(service.namespaced_type)).h"
 
 #ifdef __cplusplus
