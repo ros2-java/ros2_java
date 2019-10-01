@@ -64,14 +64,14 @@ foreach(_abs_idl_file ${rosidl_generate_interfaces_ABS_IDL_FILES})
     "${_output_path}/${_parent_folder}/${_idl_name}.java"
   )
   # TODO(jacobperron): Is there a more robust way of detecting services and actions
-  # Services generated extra files
+  # Services generate extra files
   if(_parent_folder STREQUAL "srv")
     list(APPEND _generated_java_files
       "${_output_path}/${_parent_folder}/${_idl_name}_Request.java"
       "${_output_path}/${_parent_folder}/${_idl_name}_Response.java"
     )
   endif()
-  # Actions generated extra files
+  # Actions generate extra files
   if(_parent_folder STREQUAL "action")
     list(APPEND _generated_java_files
       "${_output_path}/${_parent_folder}/${_idl_name}_Goal.java"

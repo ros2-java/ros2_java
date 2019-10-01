@@ -23,10 +23,11 @@ extern "C" {
 #endif
 
 @{
+from rosidl_generator_java import get_jni_mangled_name
+
 service_fqn = service.namespaced_type.namespaced_name()
 underscore_separated_type_name = '_'.join(service_fqn)
-# JNI name mangling: https://docs.oracle.com/javase/8/docs/technotes/guides/jni/spec/design.html#resolving_native_method_names
-underscore_separated_jni_type_name = service_fqn[0].replace('_', '_1') + '_' + '_'.join(service_fqn[1:])
+underscore_separated_jni_type_name = get_jni_mangled_name(service_fqn)
 }@
 /*
  * Class:     @(underscore_separated_type_name)
