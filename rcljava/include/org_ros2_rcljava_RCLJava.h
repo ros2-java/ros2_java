@@ -22,10 +22,11 @@ extern "C" {
 #endif
 /*
  * Class:     org_ros2_rcljava_RCLJava
- * Method:    nativeRCLJavaInit
- * Signature: ()V
+ * Method:    nativeCreateContextHandle
+ * Signature: ()J
  */
-JNIEXPORT void JNICALL Java_org_ros2_rcljava_RCLJava_nativeRCLJavaInit(JNIEnv *, jclass);
+JNIEXPORT jlong JNICALL
+  Java_org_ros2_rcljava_RCLJava_nativeCreateContextHandle(JNIEnv *, jclass);
 
 /*
  * Class:     org_ros2_rcljava_RCLJava
@@ -48,13 +49,6 @@ JNIEXPORT jstring JNICALL Java_org_ros2_rcljava_RCLJava_nativeGetRMWIdentifier(J
  * Signature: ()Z
  */
 JNIEXPORT jboolean JNICALL Java_org_ros2_rcljava_RCLJava_nativeOk(JNIEnv *, jclass);
-
-/*
- * Class:     org_ros2_rcljava_RCLJava
- * Method:    nativeShutdown
- * Signature: ()V
- */
-JNIEXPORT void JNICALL Java_org_ros2_rcljava_RCLJava_nativeShutdown(JNIEnv *, jclass);
 
 /*
  * Class:     org_ros2_rcljava_RCLJava

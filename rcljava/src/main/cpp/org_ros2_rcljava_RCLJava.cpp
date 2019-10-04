@@ -35,16 +35,13 @@ using rcljava_common::signatures::convert_from_java_signature;
 using rcljava_common::signatures::convert_to_java_signature;
 using rcljava_common::signatures::destroy_ros_message_signature;
 
-JNIEXPORT void JNICALL
-Java_org_ros2_rcljava_RCLJava_nativeRCLJavaInit(JNIEnv * env, jclass)
+JNIEXPORT jlong JNICALL
+Java_org_ros2_rcljava_RCLJava_nativeCreateContextHandle(JNIEnv * env, jclass)
 {
-  // TODO(esteve): parse args
-  rcl_ret_t ret = rcl_init(0, nullptr, rcl_get_default_allocator());
-  if (ret != RCL_RET_OK) {
-    std::string msg = "Failed to init: " + std::string(rcl_get_error_string().str);
-    rcl_reset_error();
-    rcljava_throw_rclexception(env, ret, msg);
-  }
+  rcl_context_t * context = static_cast<rcl_context_t *>(malloc(sizeof(rcl_context_t)));
+  *context = rcl_get_zero_initialized_context();
+  jlong context_handle = reinterpret_cast<jlong>(context);
+  return context_handle;
 }
 
 JNIEXPORT jlong JNICALL
@@ -86,17 +83,6 @@ JNIEXPORT jboolean JNICALL
 Java_org_ros2_rcljava_RCLJava_nativeOk(JNIEnv *, jclass)
 {
   return rcl_ok();
-}
-
-JNIEXPORT void JNICALL
-Java_org_ros2_rcljava_RCLJava_nativeShutdown(JNIEnv * env, jclass)
-{
-  rcl_ret_t ret = rcl_shutdown();
-  if (ret != RCL_RET_OK) {
-    std::string msg = "Failed to shutdown: " + std::string(rcl_get_error_string().str);
-    rcl_reset_error();
-    rcljava_throw_rclexception(env, ret, msg);
-  }
 }
 
 JNIEXPORT jlong JNICALL

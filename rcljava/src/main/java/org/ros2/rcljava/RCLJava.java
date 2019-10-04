@@ -25,6 +25,8 @@ import java.util.concurrent.LinkedBlockingQueue;
 
 import org.ros2.rcljava.client.Client;
 import org.ros2.rcljava.common.JNIUtils;
+import org.ros2.rcljava.contexts.Context;
+import org.ros2.rcljava.contexts.ContextImpl;
 import org.ros2.rcljava.executors.SingleThreadedExecutor;
 import org.ros2.rcljava.interfaces.MessageDefinition;
 import org.ros2.rcljava.interfaces.ServiceDefinition;
@@ -61,6 +63,17 @@ public final class RCLJava {
   private RCLJava() {}
 
   /**
+   * The default context.
+   */
+  private static Context defaultContext;
+
+  /**
+   * All the @{link Context}s that have been created.
+   * Does not include the default context.
+   */
+  private static Collection<Context> contexts;
+
+  /**
    * All the @{link Node}s that have been created.
    */
   private static Collection<Node> nodes;
@@ -89,6 +102,9 @@ public final class RCLJava {
 
       node.dispose();
     }
+    for (Context context : contexts) {
+      context.dispose();
+    }
   }
 
   static {
@@ -107,6 +123,17 @@ public final class RCLJava {
    *   implementation.
    */
   private static boolean initialized = false;
+
+  /**
+   * Get the default context.
+   */
+  public static Context getDefaultContext() {
+    if (this.defaultContext == null) {
+      long contextHandle = RCLJava.nativeCreateContextHandle();
+      this.defaultContext = new ContextImpl(contextHandle);
+    }
+    return this.defaultContext;
+  }
 
   /**
    * @return true if RCLJava has been fully initialized, false otherwise.
@@ -129,7 +156,10 @@ public final class RCLJava {
           logger.error("Native code library failed to load.\n" + ule);
           System.exit(1);
         }
-        RCLJava.nativeRCLJavaInit();
+
+        // Initialize default context
+        getDefaultContext().init();
+
         logger.info("Using RMW implementation: {}", RCLJava.getRMWIdentifier());
         initialized = true;
       }
@@ -137,9 +167,11 @@ public final class RCLJava {
   }
 
   /**
-   * Initialize the underlying rcl layer.
+   * Create a context (rcl_context_t) and return a pointer to it as an integer.
+   *
+   * @return A pointer to the underlying context structure.
    */
-  private static native void nativeRCLJavaInit();
+  private static native long nativeCreateContextHandle();
 
   /**
    * Create a ROS2 node (rcl_node_t) and return a pointer to it as an integer.
@@ -176,6 +208,18 @@ public final class RCLJava {
    */
   public static boolean ok() {
     return nativeOk();
+  }
+
+  /**
+   * Create a @{link Context}.
+   *
+   * @return A @{link Context} that represents the underlying context structure.
+   */
+  public static Context createContext() {
+    long contextHandle = nativeCreateContextHandle();
+    Context context = new ContextImpl(contextHandle);
+    contexts.add(context);
+    return context;
   }
 
   /**
@@ -255,11 +299,13 @@ public final class RCLJava {
     getGlobalExecutor().removeNode(composableNode);
   }
 
-  private static native void nativeShutdown();
-
   public static void shutdown() {
     cleanup();
-    nativeShutdown();
+    if (this.defaultContext != null) {
+      this.defaultContext.shutdown();
+      this.defaultContext.dispose();
+      this.defaultContext = null;
+    }
   }
 
   public static long convertQoSProfileToHandle(final QoSProfile qosProfile) {
