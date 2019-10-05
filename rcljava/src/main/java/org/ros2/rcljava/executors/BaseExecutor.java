@@ -204,15 +204,10 @@ public class BaseExecutor {
     }
 
     long waitSetHandle = nativeGetZeroInitializedWaitSet();
-    nativeWaitSetInit(waitSetHandle, subscriptionsSize, 0, timersSize, clientsSize, servicesSize);
+    long contextHandle = RCLJava.getDefaultContext().getHandle();
+    nativeWaitSetInit(waitSetHandle, contextHandle, subscriptionsSize, 0, timersSize, clientsSize, servicesSize, 0);
 
-    nativeWaitSetClearSubscriptions(waitSetHandle);
-
-    nativeWaitSetClearTimers(waitSetHandle);
-
-    nativeWaitSetClearServices(waitSetHandle);
-
-    nativeWaitSetClearClients(waitSetHandle);
+    nativeWaitSetClear(waitSetHandle);
 
     for (Map.Entry<Long, Subscription> entry : this.subscriptionHandles) {
       nativeWaitSetAddSubscription(waitSetHandle, entry.getKey());
@@ -362,10 +357,12 @@ public class BaseExecutor {
 
   private static native long nativeGetZeroInitializedWaitSet();
 
-  private static native void nativeWaitSetInit(long waitSetHandle, int numberOfSubscriptions,
-      int numberOfGuardConditions, int numberOfTimers, int numberOfClients, int numberOfServices);
+  private static native void nativeWaitSetInit(
+      long waitSetHandle, long contextHandle, int numberOfSubscriptions,
+      int numberOfGuardConditions, int numberOfTimers, int numberOfClients,
+      int numberOfServices, int numberOfEvents);
 
-  private static native void nativeWaitSetClearSubscriptions(long waitSetHandle);
+  private static native void nativeWaitSetClear(long waitSetHandle);
 
   private static native void nativeWaitSetAddSubscription(
       long waitSetHandle, long subscriptionHandle);
@@ -375,13 +372,7 @@ public class BaseExecutor {
   private static native MessageDefinition nativeTake(
       long subscriptionHandle, Class<MessageDefinition> messageType);
 
-  private static native void nativeWaitSetClearTimers(long waitSetHandle);
-
-  private static native void nativeWaitSetClearServices(long waitSetHandle);
-
   private static native void nativeWaitSetAddService(long waitSetHandle, long serviceHandle);
-
-  private static native void nativeWaitSetClearClients(long waitSetHandle);
 
   private static native void nativeWaitSetAddClient(long waitSetHandle, long clientHandle);
 

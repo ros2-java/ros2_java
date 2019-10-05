@@ -49,7 +49,7 @@ Java_org_ros2_rcljava_publisher_PublisherImpl_nativePublish(
 
   void * raw_ros_message = convert_from_java(jmsg, nullptr);
 
-  rcl_ret_t ret = rcl_publish(publisher, raw_ros_message);
+  rcl_ret_t ret = rcl_publish(publisher, raw_ros_message, nullptr);
 
   destroy_ros_message_signature destroy_ros_message =
     reinterpret_cast<destroy_ros_message_signature>(jmsg_destructor_handle);

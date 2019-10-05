@@ -215,12 +215,15 @@ Java_org_ros2_rcljava_node_NodeImpl_nativeDispose(JNIEnv * env, jclass, jlong no
 
 JNIEXPORT jlong JNICALL
 Java_org_ros2_rcljava_node_NodeImpl_nativeCreateTimerHandle(
-  JNIEnv * env, jclass, jlong timer_period)
+  JNIEnv * env, jclass, jlong clock_handle, jlong context_handle, jlong timer_period)
 {
+  rcl_clock_t * clock = reinterpret_cast<rcl_clock_t *>(clock_handle);
+  rcl_context_t * context = reinterpret_cast<rcl_context_t *>(context_handle);
+
   rcl_timer_t * timer = static_cast<rcl_timer_t *>(malloc(sizeof(rcl_timer_t)));
   *timer = rcl_get_zero_initialized_timer();
 
-  rcl_ret_t ret = rcl_timer_init(timer, timer_period, NULL, rcl_get_default_allocator());
+  rcl_ret_t ret = rcl_timer_init(timer, clock, context, timer_period, NULL, rcl_get_default_allocator());
 
   if (ret != RCL_RET_OK) {
     std::string msg = "Failed to create timer: " + std::string(rcl_get_error_string().str);

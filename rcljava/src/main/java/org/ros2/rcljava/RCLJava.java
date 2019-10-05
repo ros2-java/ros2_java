@@ -128,11 +128,11 @@ public final class RCLJava {
    * Get the default context.
    */
   public static Context getDefaultContext() {
-    if (this.defaultContext == null) {
+    if (RCLJava.defaultContext == null) {
       long contextHandle = RCLJava.nativeCreateContextHandle();
-      this.defaultContext = new ContextImpl(contextHandle);
+      RCLJava.defaultContext = new ContextImpl(contextHandle);
     }
-    return this.defaultContext;
+    return RCLJava.defaultContext;
   }
 
   /**
@@ -178,9 +178,10 @@ public final class RCLJava {
    *
    * @param nodeName The name that will identify this node in a ROS2 graph.
    * @param namespace The namespace of the node.
+   * @param contextHandle Pointer to a context (rcl_context_t) with which to associated the node.
    * @return A pointer to the underlying ROS2 node structure.
    */
-  private static native long nativeCreateNodeHandle(String nodeName, String namespace);
+  private static native long nativeCreateNodeHandle(String nodeName, String namespace, long contextHandle);
 
   /**
    * @return The identifier of the currently active RMW implementation via the
@@ -207,7 +208,14 @@ public final class RCLJava {
    * @return true if RCLJava hasn't been shut down, false otherwise.
    */
   public static boolean ok() {
-    return nativeOk();
+    return RCLJava.getDefaultContext().isValid();
+  }
+
+  /**
+   * @return true if RCLJava hasn't been shut down, false otherwise.
+   */
+  public static boolean ok(final Context context) {
+    return context.isValid();
   }
 
   /**
@@ -230,7 +238,7 @@ public final class RCLJava {
    *     structure.
    */
   public static Node createNode(final String nodeName) {
-    return createNode(nodeName, "");
+    return createNode(nodeName, "", RCLJava.getDefaultContext());
   }
 
   /**
@@ -241,9 +249,9 @@ public final class RCLJava {
    * @return A @{link Node} that represents the underlying ROS2 node
    *     structure.
    */
-  public static Node createNode(final String nodeName, final String namespace) {
-    long nodeHandle = nativeCreateNodeHandle(nodeName, namespace);
-    Node node = new NodeImpl(nodeHandle, nodeName);
+  public static Node createNode(final String nodeName, final String namespace, final Context context) {
+    long nodeHandle = nativeCreateNodeHandle(nodeName, namespace, context.getHandle());
+    Node node = new NodeImpl(nodeHandle, nodeName, context);
     nodes.add(node);
     return node;
   }
@@ -301,10 +309,10 @@ public final class RCLJava {
 
   public static void shutdown() {
     cleanup();
-    if (this.defaultContext != null) {
-      this.defaultContext.shutdown();
-      this.defaultContext.dispose();
-      this.defaultContext = null;
+    if (RCLJava.defaultContext != null) {
+      RCLJava.defaultContext.shutdown();
+      RCLJava.defaultContext.dispose();
+      RCLJava.defaultContext = null;
     }
   }
 

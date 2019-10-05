@@ -31,10 +31,10 @@ JNIEXPORT jlong JNICALL
 /*
  * Class:     org_ros2_rcljava_RCLJava
  * Method:    nativeCreateNodeHandle
- * Signature: (Ljava/lang/String;Ljava/lang/String;)J
+ * Signature: (Ljava/lang/String;Ljava/lang/String;J)J
  */
 JNIEXPORT jlong JNICALL
-  Java_org_ros2_rcljava_RCLJava_nativeCreateNodeHandle(JNIEnv *, jclass, jstring, jstring);
+  Java_org_ros2_rcljava_RCLJava_nativeCreateNodeHandle(JNIEnv *, jclass, jstring, jstring, jlong);
 
 /*
  * Class:     org_ros2_rcljava_RCLJava
@@ -42,13 +42,6 @@ JNIEXPORT jlong JNICALL
  * Signature: ()Ljava/lang/String;
  */
 JNIEXPORT jstring JNICALL Java_org_ros2_rcljava_RCLJava_nativeGetRMWIdentifier(JNIEnv *, jclass);
-
-/*
- * Class:     org_ros2_rcljava_RCLJava
- * Method:    nativeOk
- * Signature: ()Z
- */
-JNIEXPORT jboolean JNICALL Java_org_ros2_rcljava_RCLJava_nativeOk(JNIEnv *, jclass);
 
 /*
  * Class:     org_ros2_rcljava_RCLJava
