@@ -175,7 +175,7 @@ add_jar("${PROJECT_NAME}_jar"
 install_jar("${PROJECT_NAME}_jar" "share/${PROJECT_NAME}/java")
 ament_export_jars("share/${PROJECT_NAME}/java/${PROJECT_NAME}.jar")
 
-if(BUILD_TESTING)
+if(FALSE) #BUILD_TESTING)
   find_package(ament_lint_auto REQUIRED)
   find_package(std_msgs REQUIRED)
   ament_lint_auto_find_test_dependencies()
