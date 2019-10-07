@@ -57,7 +57,7 @@ set(${PROJECT_NAME}_jni_sources
   "src/main/cpp/org_ros2_rcljava_RCLJava.cpp"
   "src/main/cpp/org_ros2_rcljava_Time.cpp"
   "src/main/cpp/org_ros2_rcljava_client_ClientImpl.cpp"
-  "src/main/cpp/org_ros2_rcljava_context_ContextImpl.cpp"
+  "src/main/cpp/org_ros2_rcljava_contexts_ContextImpl.cpp"
   "src/main/cpp/org_ros2_rcljava_executors_BaseExecutor.cpp"
   "src/main/cpp/org_ros2_rcljava_node_NodeImpl.cpp"
   "src/main/cpp/org_ros2_rcljava_publisher_PublisherImpl.cpp"

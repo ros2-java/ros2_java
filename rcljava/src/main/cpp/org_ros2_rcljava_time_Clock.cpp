@@ -21,7 +21,7 @@
 #include "rcljava_common/exceptions.h"
 #include "rcljava_common/signatures.h"
 
-#include "org_ros2_rcljava_context_ContextImpl.h"
+#include "org_ros2_rcljava_time_Clock.h"
 
 using rcljava_common::exceptions::rcljava_throw_exception;
 using rcljava_common::exceptions::rcljava_throw_rclexception;

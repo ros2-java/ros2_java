@@ -13,7 +13,7 @@
 // limitations under the License.
 
 #include <jni.h>
-/* Header for class org_ros2_rcljava_context_ContextImpl */
+/* Header for class org_ros2_rcljava_contexts_ContextImpl */
 
 #ifndef ORG_ROS2_RCLJAVA_CONTEXT_CONTEXTIMPL_H_
 #define ORG_ROS2_RCLJAVA_CONTEXT_CONTEXTIMPL_H_
@@ -22,33 +22,33 @@ extern "C" {
 #endif
 
 /*
- * Class:     org_ros2_rcljava_context_ContextImpl
+ * Class:     org_ros2_rcljava_contexts_ContextImpl
  * Method:    nativeInit
  * Signature: (J)V
  */
-JNIEXPORT void JNICALL Java_org_ros2_rcljava_context_ContextImpl_nativeInit(JNIEnv *, jclass, jlong);
+JNIEXPORT void JNICALL Java_org_ros2_rcljava_contexts_ContextImpl_nativeInit(JNIEnv *, jclass, jlong);
 
 /*
- * Class:     org_ros2_rcljava_context_ContextImpl
+ * Class:     org_ros2_rcljava_contexts_ContextImpl
  * Method:    nativeShutdown
  * Signature: (J)V
  */
-JNIEXPORT void JNICALL Java_org_ros2_rcljava_context_ContextImpl_nativeShutdown(JNIEnv *, jclass, jlong);
+JNIEXPORT void JNICALL Java_org_ros2_rcljava_contexts_ContextImpl_nativeShutdown(JNIEnv *, jclass, jlong);
 
 /*
- * Class:     org_ros2_rcljava_context_ContextImpl
+ * Class:     org_ros2_rcljava_contexts_ContextImpl
  * Method:    nativeIsValid
  * Signature: (J)Z
  */
-JNIEXPORT jboolean JNICALL Java_org_ros2_rcljava_context_ContextImpl_nativeIsValid(
+JNIEXPORT jboolean JNICALL Java_org_ros2_rcljava_contexts_ContextImpl_nativeIsValid(
   JNIEnv *, jclass, jlong);
 
 /*
- * Class:     org_ros2_rcljava_context_ContextImpl
+ * Class:     org_ros2_rcljava_contexts_ContextImpl
  * Method:    nativeDispose
  * Signature: (J)V
  */
-JNIEXPORT void JNICALL Java_org_ros2_rcljava_context_ContextImpl_nativeDispose(JNIEnv *, jclass, jlong);
+JNIEXPORT void JNICALL Java_org_ros2_rcljava_contexts_ContextImpl_nativeDispose(JNIEnv *, jclass, jlong);
 
 #ifdef __cplusplus
 }

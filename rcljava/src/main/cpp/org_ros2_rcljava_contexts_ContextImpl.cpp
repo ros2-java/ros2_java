@@ -21,12 +21,12 @@
 #include "rcljava_common/exceptions.h"
 #include "rcljava_common/signatures.h"
 
-#include "org_ros2_rcljava_context_ContextImpl.h"
+#include "org_ros2_rcljava_contexts_ContextImpl.h"
 
 using rcljava_common::exceptions::rcljava_throw_rclexception;
 
 JNIEXPORT jboolean JNICALL
-Java_org_ros2_rcljava_context_ContextImpl_nativeIsValid(JNIEnv *, jclass, jlong context_handle)
+Java_org_ros2_rcljava_contexts_ContextImpl_nativeIsValid(JNIEnv *, jclass, jlong context_handle)
 {
   rcl_context_t * context = reinterpret_cast<rcl_context_t *>(context_handle);
   bool is_valid = rcl_context_is_valid(context);
@@ -34,7 +34,7 @@ Java_org_ros2_rcljava_context_ContextImpl_nativeIsValid(JNIEnv *, jclass, jlong 
 }
 
 JNIEXPORT void JNICALL
-Java_org_ros2_rcljava_context_ContextImpl_nativeInit(JNIEnv * env, jclass, jlong context_handle)
+Java_org_ros2_rcljava_contexts_ContextImpl_nativeInit(JNIEnv * env, jclass, jlong context_handle)
 {
   // TODO(jacobperron): Encapsulate init options into a Java class
   rcl_init_options_t init_options = rcl_get_zero_initialized_init_options();
@@ -70,7 +70,7 @@ Java_org_ros2_rcljava_context_ContextImpl_nativeInit(JNIEnv * env, jclass, jlong
 }
 
 JNIEXPORT void JNICALL
-Java_org_ros2_rcljava_context_ContextImpl_nativeShutdown(JNIEnv * env, jclass, jlong context_handle)
+Java_org_ros2_rcljava_contexts_ContextImpl_nativeShutdown(JNIEnv * env, jclass, jlong context_handle)
 {
   rcl_context_t * context = reinterpret_cast<rcl_context_t *>(context_handle);
   rcl_ret_t ret = rcl_shutdown(context);
@@ -82,7 +82,7 @@ Java_org_ros2_rcljava_context_ContextImpl_nativeShutdown(JNIEnv * env, jclass, j
 }
 
 JNIEXPORT void JNICALL
-Java_org_ros2_rcljava_context_ContextImpl_nativeDispose(JNIEnv * env, jclass, jlong context_handle)
+Java_org_ros2_rcljava_contexts_ContextImpl_nativeDispose(JNIEnv * env, jclass, jlong context_handle)
 {
   if (0 == context_handle) {
     // already destroyed
