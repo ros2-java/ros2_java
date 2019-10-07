@@ -92,6 +92,11 @@ Java_org_ros2_rcljava_RCLJava_nativeConvertQoSProfileToHandle(
   qos_profile->depth = depth;
   qos_profile->reliability = static_cast<rmw_qos_reliability_policy_t>(reliability);
   qos_profile->durability = static_cast<rmw_qos_durability_policy_t>(durability);
+  // TODO(jacobperron): Expose deadline, lifespan, and liveliness settings as parameters
+  qos_profile->deadline = rmw_qos_profile_default.deadline;
+  qos_profile->lifespan = rmw_qos_profile_default.lifespan;
+  qos_profile->liveliness = rmw_qos_profile_default.liveliness;
+  qos_profile->liveliness_lease_duration = rmw_qos_profile_default.liveliness_lease_duration;
   qos_profile->avoid_ros_namespace_conventions = avoidROSNamespaceConventions;
   return reinterpret_cast<jlong>(qos_profile);
 }
