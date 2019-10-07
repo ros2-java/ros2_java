@@ -49,9 +49,20 @@ Java_org_ros2_rcljava_context_ContextImpl_nativeInit(JNIEnv * env, jclass, jlong
   rcl_context_t * context = reinterpret_cast<rcl_context_t *>(context_handle);
   // TODO(esteve): parse args
   ret = rcl_init(0, nullptr, &init_options, context);
-  rcl_init_options_fini(&init_options);
   if (RCL_RET_OK != ret) {
     std::string msg = "Failed to init context: " + std::string(rcl_get_error_string().str);
+    rcl_ret_t ignored_ret = rcl_init_options_fini(&init_options);
+    (void)ignored_ret;
+    rcl_reset_error();
+    rcljava_throw_rclexception(env, ret, msg);
+    return;
+  }
+
+  rcl_ret_t fini_ret = rcl_init_options_fini(&init_options);
+  if (RCL_RET_OK != fini_ret) {
+    std::string msg = "Failed to init context: " + std::string(rcl_get_error_string().str);
+    rcl_ret_t ignored_ret = rcl_shutdown(context);
+    (void)ignored_ret;
     rcl_reset_error();
     rcljava_throw_rclexception(env, ret, msg);
     return;
