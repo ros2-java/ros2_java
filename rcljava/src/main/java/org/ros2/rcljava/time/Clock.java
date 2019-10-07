@@ -15,9 +15,24 @@
 
 package org.ros2.rcljava.time;
 
+import org.ros2.rcljava.common.JNIUtils;
+
 import org.ros2.rcljava.interfaces.Disposable;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 public class Clock implements Disposable {
+  private static final Logger logger = LoggerFactory.getLogger(Clock.class);
+
+  static {
+    try {
+      JNIUtils.loadImplementation(Clock.class);
+    } catch (UnsatisfiedLinkError ule) {
+      logger.error("Native code library failed to load.\n" + ule);
+      System.exit(1);
+    }
+  }
 
   /**
    * The underlying clock handle (rcl_clock_t).
@@ -35,7 +50,7 @@ public class Clock implements Disposable {
    * @param clockType The RCL clock type.
    * @return A pointer to the underlying clock structure as an integer.
    */
-  private static native long nativeCreateClock(ClockType clockType);
+  private static native long nativeCreateClockHandle(ClockType clockType);
 
   /**
    * Constructor.
@@ -44,7 +59,7 @@ public class Clock implements Disposable {
    */
   public Clock(ClockType clockType) {
     this.clockType = clockType;
-    this.handle = Clock.nativeCreateClock(clockType);
+    this.handle = Clock.nativeCreateClockHandle(clockType);
   }
 
   /**

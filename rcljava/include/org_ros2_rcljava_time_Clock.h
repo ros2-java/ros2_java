@@ -20,13 +20,12 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
-
 /*
  * Class:     org_ros2_rcljava_time_Clock
  * Method:    nativeCreateClock
  * Signature: (Lorg/ros2/rcljava/time/ClockType;)J
  */
-JNIEXPORT jlong JNICALL Java_org_ros2_rcljava_time_Clock_nativeCreateClock(JNIEnv *, jclass, jobject);
+JNIEXPORT jlong JNICALL Java_org_ros2_rcljava_time_Clock_nativeCreateClockHandle(JNIEnv *, jclass, jobject);
 
 /*
  * Class:     org_ros2_rcljava_time_Clock

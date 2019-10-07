@@ -27,10 +27,10 @@ using rcljava_common::exceptions::rcljava_throw_exception;
 using rcljava_common::exceptions::rcljava_throw_rclexception;
 
 JNIEXPORT jlong JNICALL
-Java_org_ros2_rcljava_time_Clock_nativeCreateClock(JNIEnv * env, jclass, jobject jclock_type)
+Java_org_ros2_rcljava_time_Clock_nativeCreateClockHandle(JNIEnv * env, jclass, jobject jclock_type)
 {
   // Convert from Java ClockType to rcl_clock_type_t
-  jclass clock_type_enum = env->FindClass("org.ros2.rcljava.time/ClockType");
+  jclass clock_type_enum = env->FindClass("org/ros2/rcljava/time/ClockType");
   jmethodID get_name_method = env->GetMethodID(clock_type_enum, "name", "()Ljava/lang/String;");
   jstring clock_type_name = (jstring)env->CallObjectMethod(jclock_type, get_name_method);
   const char * clock_type_name_native = env->GetStringUTFChars(clock_type_name, 0);
