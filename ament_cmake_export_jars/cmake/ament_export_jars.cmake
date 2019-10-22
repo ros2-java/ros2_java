@@ -41,7 +41,8 @@ macro(ament_export_jars)
             list_append_unique(_AMENT_EXPORT_ABSOLUTE_JARS "${_arg}")
         endif()
       else()
-        list_append_unique(_AMENT_EXPORT_RELATIVE_CLASSPATH "\$AMENT_CURRENT_PREFIX/${_arg}")
+        list_append_unique(_AMENT_EXPORT_RELATIVE_CLASSPATH "${_arg}")
+        # list_append_unique(_AMENT_EXPORT_RELATIVE_CLASSPATH "\$AMENT_CURRENT_PREFIX/${_arg}")
         set(_arg "\${${PROJECT_NAME}_DIR}/../../../${_arg}")
         list_append_unique(_AMENT_EXPORT_RELATIVE_JARS "${_arg}")
       endif()
@@ -60,17 +61,27 @@ macro(ament_export_jars)
       set(_ament_build_type_gradle_classpath_filename
         "${CMAKE_CURRENT_BINARY_DIR}/ament_build_type_gradle_classpath.sh.in")
     endif()
+    set(_ament_build_type_gradle_dsv_key "ament_build_type_gradle_classpath_dsv")
+    set(_ament_build_type_gradle_dsv_filename
+      "${CMAKE_CURRENT_BINARY_DIR}/ament_build_type_gradle_classpath.dsv.in")
 
     ament_index_get_resource(
       classpath_template "templates" "${_ament_build_type_gradle_classpath_key}")
+    ament_index_get_resource(
+      dsv_template "templates" "${_ament_build_type_gradle_dsv_key}")
 
     file(WRITE
       "${_ament_build_type_gradle_classpath_filename}"
       "${classpath_template}")
+    file(WRITE
+      "${_ament_build_type_gradle_dsv_filename}"
+      "${dsv_template}")
 
+    find_package(ament_cmake_core REQUIRED)
     if(NOT WIN32)
-      find_package(ament_cmake_core QUIET REQUIRED)
       ament_environment_hooks("${_ament_build_type_gradle_classpath_filename}")
     endif()
+    ament_environment_hooks("${_ament_build_type_gradle_dsv_filename}")
+
   endif()
 endmacro()
