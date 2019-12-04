@@ -60,7 +60,6 @@ for member in message.structure.members:
 
     if isinstance(type_, NamespacedType):
         namespaced_types.add(get_jni_type(type_))
-        # TODO(jacobperron): double-check, we may have to handle service/action suffixes (see C generator)
         includes.add(idl_structure_type_to_c_include_prefix(type_) + '.h')
 }@
 @[for include in includes]@
