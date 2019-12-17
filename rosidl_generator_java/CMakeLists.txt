@@ -37,6 +37,8 @@ if(BUILD_TESTING)
   include(cmake/register_java.cmake)
   include(cmake/rosidl_generator_java_get_typesupports.cmake)
 
+  # Trick ament_target_dependencies() into thinking this package has been found
+  set(rosidl_generator_java_FOUND "1")
   set(rosidl_generator_java_DIR "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 
   rosidl_generator_java_extras(
