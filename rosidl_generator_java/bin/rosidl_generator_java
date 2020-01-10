@@ -28,16 +28,12 @@ def main(argv=sys.argv[1:]):
         required=True,
         help='The location of the file containing the generator arguments')
     parser.add_argument(
-        '--typesupport-impl',
-        required=True,
-        help='The typesupport implementation targeted by the C interface')
-    parser.add_argument(
         '--typesupport-impls',
         required=True,
         help='All the available typesupport implementations')
     args = parser.parse_args(argv)
 
-    return generate_java(args.generator_arguments_file, args.typesupport_impl, args.typesupport_impls)
+    return generate_java(args.generator_arguments_file, args.typesupport_impls.split(';'))
 
 
 if __name__ == '__main__':

@@ -24,19 +24,17 @@ endif()
 include(UseJava)
 include(JavaExtra)
 
-set(CMAKE_JAVA_COMPILE_FLAGS "-source" "1.6" "-target" "1.6")
-
 ament_index_register_resource("rosidl_generator_packages")
 
 if(BUILD_TESTING)
   find_package(rosidl_cmake REQUIRED)
   find_package(rosidl_generator_c REQUIRED)
-
-  find_package(ament_lint_auto REQUIRED)
+  find_package(test_interface_files REQUIRED)
 
   find_package(ament_lint_auto REQUIRED)
   ament_lint_auto_find_test_dependencies()
 
+  # TODO(jacobperron): Use test_interface_files instead and update tests
   set(message_files
     "msg/Bool.msg"
     "msg/Byte.msg"
@@ -70,7 +68,9 @@ if(BUILD_TESTING)
     "${CMAKE_CURRENT_SOURCE_DIR}/resource"
   )
 
-  rosidl_generate_interfaces(${PROJECT_NAME} ${message_files}
+  rosidl_generate_interfaces(${PROJECT_NAME}
+    ${message_files}
+    ${test_interface_files_SRV_FILES}
     SKIP_INSTALL
   )
 
