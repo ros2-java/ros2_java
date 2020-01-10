@@ -1,4 +1,5 @@
 # Copyright 2016-2017 Esteve Fernandez <esteve@apache.org>
+# Copyright 2019 Open Source Robotics Foundation, Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -12,15 +13,17 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from ast import literal_eval
 from collections import defaultdict
-import os
+import pathlib
 
-from rosidl_cmake import convert_camel_case_to_lower_case_underscore
-from rosidl_cmake import expand_template
-from rosidl_cmake import get_newest_modification_time
+from rosidl_cmake import generate_files
 from rosidl_cmake import read_generator_arguments
-from rosidl_parser import parse_message_file
-from rosidl_parser import parse_service_file
+from rosidl_parser.definition import AbstractGenericString
+from rosidl_parser.definition import AbstractNestedType
+from rosidl_parser.definition import BASIC_TYPES
+from rosidl_parser.definition import BasicType
+from rosidl_parser.definition import NamespacedType
 
 
 # Taken from http://stackoverflow.com/a/6425628
@@ -28,201 +31,176 @@ def convert_lower_case_underscore_to_camel_case(word):
     return ''.join(x.capitalize() or '_' for x in word.split('_'))
 
 
-def generate_java(generator_arguments_file, typesupport_impl, typesupport_impls):
+def generate_java(generator_arguments_file, typesupport_impls):
     args = read_generator_arguments(generator_arguments_file)
-    typesupport_impls = typesupport_impls.split(';')
-
-    template_dir = args['template_dir']
-    type_support_impl_by_filename = {
-        '%s.ep.{0}.cpp'.format(impl): impl
-        for impl in typesupport_impls
+    additional_context = {
+        'output_dir': pathlib.Path(args['output_dir']),
+        'template_basepath': pathlib.Path(args['template_dir']),
     }
-    mapping_msgs = {
-        os.path.join(template_dir, 'msg.java.em'): ['%s.java'],
-        os.path.join(template_dir, 'msg.cpp.em'): type_support_impl_by_filename.keys(),
+    mapping = {
+        'idl.java.em': '_%s.java',
     }
+    generate_files(
+        generator_arguments_file, mapping, additional_context=additional_context, keep_case=True)
 
-    mapping_srvs = {
-        os.path.join(template_dir, 'srv.java.em'): ['%s.java'],
-        os.path.join(template_dir, 'srv.cpp.em'): type_support_impl_by_filename.keys(),
-    }
-
-    for template_file in mapping_msgs.keys():
-        assert os.path.exists(template_file), \
-            'Messages template file %s not found' % template_file
-    for template_file in mapping_srvs.keys():
-        assert os.path.exists(template_file), \
-            'Services template file %s not found' % template_file
-
-    functions = {'get_java_type': get_java_type, }
-    latest_target_timestamp = get_newest_modification_time(args['target_dependencies'])
-
-    modules = defaultdict(list)
-    for ros_interface_file in args['ros_interface_files']:
-        extension = os.path.splitext(ros_interface_file)[1]
-        subfolder = os.path.basename(os.path.dirname(ros_interface_file))
-        if extension == '.msg':
-            spec = parse_message_file(args['package_name'], ros_interface_file)
-            mapping = mapping_msgs
-            type_name = spec.base_type.type
-        elif extension == '.srv':
-            spec = parse_service_file(args['package_name'], ros_interface_file)
-            mapping = mapping_srvs
-            type_name = spec.srv_name
-        else:
-            continue
-
-        module_name = convert_camel_case_to_lower_case_underscore(type_name)
-        modules[subfolder].append((module_name, type_name))
-        package_name = args['package_name']
-        jni_package_name = package_name.replace('_', '_1')
-        jni_type_name = type_name.replace('_', '_1')
-        for template_file, generated_filenames in mapping.items():
-            for generated_filename in generated_filenames:
-                data = {
-                    'constant_value_to_java': constant_value_to_java,
-                    'value_to_java': value_to_java,
-                    'convert_camel_case_to_lower_case_underscore':
-                    convert_camel_case_to_lower_case_underscore,
-                    'convert_lower_case_underscore_to_camel_case':
-                    convert_lower_case_underscore_to_camel_case,
-                    'get_builtin_java_type': get_builtin_java_type,
-                    'module_name': module_name,
-                    'package_name': package_name,
-                    'jni_package_name': jni_package_name,
-                    'jni_type_name': jni_type_name,
-                    'spec': spec,
-                    'subfolder': subfolder,
-                    'typesupport_impl': type_support_impl_by_filename.get(generated_filename, ''),
-                    'typesupport_impls': typesupport_impls,
-                    'type_name': type_name,
-                }
-                data.update(functions)
-                generated_file = os.path.join(args['output_dir'], subfolder,
-                                              generated_filename % type_name)
-                expand_template(
-                    template_file, data, generated_file, minimum_timestamp=latest_target_timestamp)
-
+    for impl in typesupport_impls:
+        mapping = {
+          'idl.cpp.em': '%s.ep.{0}.cpp'.format(impl),
+        }
+        generate_files(
+            generator_arguments_file,
+            mapping,
+            additional_context=additional_context,
+            keep_case=True)
     return 0
 
 
 def escape_string(s):
     s = s.replace('\\', '\\\\')
-    s = s.replace("'", "\\'")
+    s = s.replace('"', '\\"')
     return s
 
 
-def value_to_java(type_, value):
-    assert type_.is_primitive_type()
-    assert value is not None
+def escape_wstring(s):
+    return escape_string(s)
 
-    if not type_.is_array:
+
+def value_to_java(type_, value):
+    assert not isinstance(type_, NamespacedType), \
+        "Could not convert non-basic type '{}' to Java".format(type_)
+    assert value is not None, "Value for for type '{}' must not be None".format(type_)
+
+    if not isinstance(type_, AbstractNestedType):
         return primitive_value_to_java(type_, value)
 
     java_values = []
-    for single_value in value:
-        java_value = primitive_value_to_java(type_, single_value)
+    for single_value in literal_eval(value):
+        java_value = primitive_value_to_java(type_.value_type, single_value)
         java_values.append(java_value)
     return '{%s}' % ', '.join(java_values)
 
 
 def primitive_value_to_java(type_, value):
-    assert type_.is_primitive_type()
-    assert value is not None
+    assert isinstance(type_, (BasicType, AbstractGenericString)), \
+        "Could not convert non-basic type '{}' to Java".format(type_)
+    assert value is not None, "Value for for type '{}' must not be None".format(type_)
 
-    if type_.type == 'bool':
-        return 'true' if value else 'false'
-
-    if type_.type in [
-            'byte',
-            'char',
-            'int8',
-            'uint8',
-            'int16',
-            'uint16',
-            'int32',
-            'uint32',
-            'int64',
-            'uint64',
-            'float64',
-    ]:
-        return str(value)
-
-    if type_.type == 'float32':
-        return '%sf' % value
-
-    if type_.type == 'string':
+    if isinstance(type_, AbstractGenericString):
         return '"%s"' % escape_string(value)
 
-    assert False, "unknown primitive type '%s'" % type_
-
-
-def constant_value_to_java(type_, value):
-    assert value is not None
-
-    if type_ == 'bool':
+    if type_.typename == 'boolean':
         return 'true' if value else 'false'
 
-    if type_ in [
-            'byte',
-            'char',
-            'int8',
-            'uint8',
-            'int16',
-            'uint16',
-            'int32',
-            'uint32',
-            'int64',
-            'uint64',
-            'float64',
-    ]:
-        return str(value)
-
-    if type_ == 'float32':
+    if type_.typename == 'float':
         return '%sf' % value
 
-    if type_ == 'string':
-        return '"%s"' % escape_string(value)
+    if type_.typename in ('octet', 'uint8', 'int8'):
+        # literal is treated as an integer so we must cast
+        return '(byte) %s' % value
 
-    assert False, "unknown constant type '%s'" % type_
+    if type_.typename in ('uint16', 'int16'):
+        # literal is treated as an integer so we must cast
+        return '(short) %s' % value
+
+    # Java doesn't support unsigned literals (values over 2^31-1)
+    # Instead we should convert to the corresponding negative number
+    if type_.typename == 'uint32' and int(value) > 2**31-1:
+        negative_value = int(value) - 2**32
+        return str(negative_value)
+
+    if type_.typename in ('uint64', 'int64'):
+        # Java doesn't support unsigned literals (values over 2^63-1)
+        # Instead we should convert to the corresponding negative number
+        if type_.typename == 'uint64' and int(value) > 2**63-1:
+            value = int(value) - 2**64
+        return '%sL' % value
+
+    if type_.typename in BASIC_TYPES:
+        return str(value)
+
+    assert False, "unknown primitive type '%s'" % type_.typename
 
 
-def get_builtin_java_type(type_, use_primitives=True):
-    if type_ == 'bool':
-        return 'boolean' if use_primitives else 'java.lang.Boolean'
+# Map IDL types to Java primitive types
+# Maps to a tuple: (primitive, class type)
+IDL_TYPE_TO_JAVA_PRIMITIVE = {
+    'boolean': ('boolean', 'java.lang.Boolean'),
+    'char': ('char', 'java.lang.Char'),
+    'octet': ('byte', 'java.lang.Byte'),
+    'float': ('float', 'java.lang.Float'),
+    'double': ('double', 'java.lang.Double'),
+    'long double': ('double', 'java.lang.Double'),
+    'uint8': ('byte', 'java.lang.Byte'),
+    'int8': ('byte', 'java.lang.Byte'),
+    'uint16': ('short', 'java.lang.Short'),
+    'int16': ('short', 'java.lang.Short'),
+    'uint32': ('int', 'java.lang.Integer'),
+    'int32': ('int', 'java.lang.Integer'),
+    'uint64': ('long', 'java.lang.Long'),
+    'int64': ('long', 'java.lang.Long'),
+}
 
-    if type_ == 'byte':
-        return 'byte' if use_primitives else 'java.lang.Byte'
 
-    if type_ == 'char':
-        return 'char' if use_primitives else 'java.lang.Character'
-
-    if type_ == 'float32':
-        return 'float' if use_primitives else 'java.lang.Float'
-
-    if type_ == 'float64':
-        return 'double' if use_primitives else 'java.lang.Double'
-
-    if type_ in ['int8', 'uint8']:
-        return 'byte' if use_primitives else 'java.lang.Byte'
-
-    if type_ in ['int16', 'uint16']:
-        return 'short' if use_primitives else 'java.lang.Short'
-
-    if type_ in ['int32', 'uint32']:
-        return 'int' if use_primitives else 'java.lang.Integer'
-
-    if type_ in ['int64', 'uint64']:
-        return 'long' if use_primitives else 'java.lang.Long'
-
-    if type_ == 'string':
+def get_java_type(type_, use_primitives=True):
+    if isinstance(type_, AbstractNestedType):
+        type_ = type_.value_type
+    if isinstance(type_, NamespacedType):
+        return '.'.join(type_.namespaced_name())
+    if isinstance(type_, BasicType):
+        return IDL_TYPE_TO_JAVA_PRIMITIVE[type_.typename][0 if use_primitives else 1]
+    if isinstance(type_, AbstractGenericString):
         return 'java.lang.String'
 
     assert False, "unknown type '%s'" % type_
 
 
-def get_java_type(type_, use_primitives=True, subfolder='msg'):
-    if not type_.is_primitive_type():
-        return '%s.%s.%s' % (type_.pkg_name, subfolder, type_.type)
+def get_normalized_type(type_):
+    return get_java_type(type_, use_primitives=False).replace('.', '__')
 
-    return get_builtin_java_type(type_.type, use_primitives=use_primitives)
+
+def get_jni_type(type_):
+    return get_java_type(type_, use_primitives=False).replace('.', '/')
+
+
+# JNI performance tips taken from http://planet.jboss.org/post/jni_performance_the_saga_continues
+constructor_signatures = defaultdict(lambda: '()V')
+constructor_signatures['java/lang/Boolean'] = '(Z)V'
+constructor_signatures['java/lang/Byte'] = '(B)V'
+constructor_signatures['java/lang/Character'] = '(C)V'
+constructor_signatures['java/lang/Double'] = '(D)V'
+constructor_signatures['java/lang/Float'] = '(F)V'
+constructor_signatures['java/lang/Integer'] = '(I)V'
+constructor_signatures['java/lang/Long'] = '(J)V'
+constructor_signatures['java/lang/Short'] = '(S)V'
+constructor_signatures['java/util/List'] = None
+
+value_methods = {}
+value_methods['java/lang/Boolean'] = ('booleanValue', '()Z')
+value_methods['java/lang/Byte'] = ('byteValue', '()B')
+value_methods['java/lang/Character'] = ('charValue', '()C')
+value_methods['java/lang/Double'] = ('doubleValue', '()D')
+value_methods['java/lang/Float'] = ('floatValue', '()F')
+value_methods['java/lang/Integer'] = ('intValue', '()I')
+value_methods['java/lang/Long'] = ('longValue', '()J')
+value_methods['java/lang/Short'] = ('shortValue', '()S')
+
+jni_signatures = {}
+jni_signatures['java/lang/Boolean'] = 'Z'
+jni_signatures['java/lang/Byte'] = 'B'
+jni_signatures['java/lang/Character'] = 'C'
+jni_signatures['java/lang/Double'] = 'D'
+jni_signatures['java/lang/Float'] = 'F'
+jni_signatures['java/lang/Integer'] = 'I'
+jni_signatures['java/lang/Long'] = 'J'
+jni_signatures['java/lang/Short'] = 'S'
+
+
+def get_jni_signature(type_):
+    global jni_signatures
+    return jni_signatures.get(get_jni_type(type_))
+
+
+def get_jni_mangled_name(fully_qualified_name):
+    # JNI name mangling:
+    # https://docs.oracle.com/javase/8/docs/technotes/guides/jni/spec/design.html#resolving_native_method_names
+    return fully_qualified_name[0].replace('_', '_1') + '_' + '_'.join(fully_qualified_name[1:])
