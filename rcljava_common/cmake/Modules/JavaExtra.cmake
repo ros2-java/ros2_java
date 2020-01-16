@@ -60,7 +60,7 @@ function(ament_add_junit_tests TARGET_NAME)
 
       set(junit_sha256 "59721f0805e223d84b90677887d9ff567dc534d7c502ca903c0c2b17f05c116a")
 
-      set(junit_url "http://central.maven.org/maven2/junit/junit/${junit_version}/junit-${junit_version}.jar")
+      set(junit_url "https://repo1.maven.org/maven2/junit/junit/${junit_version}/junit-${junit_version}.jar")
 
       set(junit_jar_path "${CMAKE_CURRENT_BINARY_DIR}/jars/junit-${junit_version}.jar")
 
@@ -85,7 +85,7 @@ function(ament_add_junit_tests TARGET_NAME)
 
     set(hamcrest_sha256 "4877670629ab96f34f5f90ab283125fcd9acb7e683e66319a68be6eb2cca60de")
 
-    set(hamcrest_url "http://central.maven.org/maven2/org/hamcrest/hamcrest-all/${hamcrest_version}/hamcrest-all-${hamcrest_version}.jar")
+    set(hamcrest_url "https://repo1.maven.org/maven2/org/hamcrest/hamcrest-all/${hamcrest_version}/hamcrest-all-${hamcrest_version}.jar")
 
     set(hamcrest_jar_path "${CMAKE_CURRENT_BINARY_DIR}/jars/hamcrest-all-${hamcrest_version}.jar")
 
