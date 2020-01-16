@@ -57,7 +57,7 @@ Sounds great, how can I try this out?
 Download the ament repositories in a separate workspace:
 
 ```
-mkdir ament_ws/src
+mkdir -p ament_ws/src
 cd ament_ws
 curl -skL https://raw.githubusercontent.com/esteve/ament_java/master/ament_java.repos -o ament_java.repos
 vcs import src < ament_java.repos
@@ -97,7 +97,7 @@ Desktop
 -------
 
 ```
-mkdir ros2_java_ws/src
+mkdir -p ros2_java_ws/src
 cd ros2_java_ws
 curl -skL https://raw.githubusercontent.com/esteve/ros2_java/master/ros2_java_desktop.repos -o ros2_java_desktop.repos
 vcs import src < ros2_java_desktop.repos
