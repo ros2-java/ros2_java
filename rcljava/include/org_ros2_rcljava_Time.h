@@ -25,14 +25,16 @@ extern "C" {
  * Method:    nativeRCLSystemTimeNow
  * Signature: ()J
  */
-JNIEXPORT jlong JNICALL Java_org_ros2_rcljava_Time_nativeRCLSystemTimeNow(JNIEnv *, jclass);
+JNIEXPORT jlong
+JNICALL Java_org_ros2_rcljava_Time_nativeRCLSystemTimeNow(JNIEnv *, jclass);
 
 /*
  * Class:     org_ros2_rcljava_Time
  * Method:    nativeRCLSteadyTimeNow
  * Signature: ()J
  */
-JNIEXPORT jlong JNICALL Java_org_ros2_rcljava_Time_nativeRCLSteadyTimeNow(JNIEnv *, jclass);
+JNIEXPORT jlong
+JNICALL Java_org_ros2_rcljava_Time_nativeRCLSteadyTimeNow(JNIEnv *, jclass);
 
 #ifdef __cplusplus
 }

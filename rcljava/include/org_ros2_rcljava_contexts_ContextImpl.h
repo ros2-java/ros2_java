@@ -15,8 +15,8 @@
 #include <jni.h>
 /* Header for class org_ros2_rcljava_contexts_ContextImpl */
 
-#ifndef ORG_ROS2_RCLJAVA_CONTEXT_CONTEXTIMPL_H_
-#define ORG_ROS2_RCLJAVA_CONTEXT_CONTEXTIMPL_H_
+#ifndef ORG_ROS2_RCLJAVA_CONTEXTS_CONTEXTIMPL_H_
+#define ORG_ROS2_RCLJAVA_CONTEXTS_CONTEXTIMPL_H_
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -26,31 +26,34 @@ extern "C" {
  * Method:    nativeInit
  * Signature: (J)V
  */
-JNIEXPORT void JNICALL Java_org_ros2_rcljava_contexts_ContextImpl_nativeInit(JNIEnv *, jclass, jlong);
+JNIEXPORT void
+JNICALL Java_org_ros2_rcljava_contexts_ContextImpl_nativeInit(JNIEnv *, jclass, jlong);
 
 /*
  * Class:     org_ros2_rcljava_contexts_ContextImpl
  * Method:    nativeShutdown
  * Signature: (J)V
  */
-JNIEXPORT void JNICALL Java_org_ros2_rcljava_contexts_ContextImpl_nativeShutdown(JNIEnv *, jclass, jlong);
+JNIEXPORT void
+JNICALL Java_org_ros2_rcljava_contexts_ContextImpl_nativeShutdown(JNIEnv *, jclass, jlong);
 
 /*
  * Class:     org_ros2_rcljava_contexts_ContextImpl
  * Method:    nativeIsValid
  * Signature: (J)Z
  */
-JNIEXPORT jboolean JNICALL Java_org_ros2_rcljava_contexts_ContextImpl_nativeIsValid(
-  JNIEnv *, jclass, jlong);
+JNIEXPORT jboolean
+JNICALL Java_org_ros2_rcljava_contexts_ContextImpl_nativeIsValid(JNIEnv *, jclass, jlong);
 
 /*
  * Class:     org_ros2_rcljava_contexts_ContextImpl
  * Method:    nativeDispose
  * Signature: (J)V
  */
-JNIEXPORT void JNICALL Java_org_ros2_rcljava_contexts_ContextImpl_nativeDispose(JNIEnv *, jclass, jlong);
+JNIEXPORT void
+JNICALL Java_org_ros2_rcljava_contexts_ContextImpl_nativeDispose(JNIEnv *, jclass, jlong);
 
 #ifdef __cplusplus
 }
 #endif
-#endif  // ORG_ROS2_RCLJAVA_CONTEXT_CONTEXTIMPL_H_
+#endif  // ORG_ROS2_RCLJAVA_CONTEXTS_CONTEXTIMPL_H_

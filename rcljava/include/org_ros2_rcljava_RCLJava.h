@@ -25,30 +25,33 @@ extern "C" {
  * Method:    nativeCreateContextHandle
  * Signature: ()J
  */
-JNIEXPORT jlong JNICALL
-  Java_org_ros2_rcljava_RCLJava_nativeCreateContextHandle(JNIEnv *, jclass);
+JNIEXPORT jlong
+JNICALL Java_org_ros2_rcljava_RCLJava_nativeCreateContextHandle(JNIEnv *, jclass);
 
 /*
  * Class:     org_ros2_rcljava_RCLJava
  * Method:    nativeCreateNodeHandle
  * Signature: (Ljava/lang/String;Ljava/lang/String;J)J
  */
-JNIEXPORT jlong JNICALL
-  Java_org_ros2_rcljava_RCLJava_nativeCreateNodeHandle(JNIEnv *, jclass, jstring, jstring, jlong);
+JNIEXPORT jlong
+JNICALL Java_org_ros2_rcljava_RCLJava_nativeCreateNodeHandle(
+  JNIEnv *, jclass, jstring, jstring, jlong);
 
 /*
  * Class:     org_ros2_rcljava_RCLJava
  * Method:    nativeGetRMWIdentifier
  * Signature: ()Ljava/lang/String;
  */
-JNIEXPORT jstring JNICALL Java_org_ros2_rcljava_RCLJava_nativeGetRMWIdentifier(JNIEnv *, jclass);
+JNIEXPORT jstring
+JNICALL Java_org_ros2_rcljava_RCLJava_nativeGetRMWIdentifier(JNIEnv *, jclass);
 
 /*
  * Class:     org_ros2_rcljava_RCLJava
  * Method:    nativeConvertQoSProfileToHandle
  * Signature: (IIIIZ)J
  */
-JNIEXPORT jlong JNICALL Java_org_ros2_rcljava_RCLJava_nativeConvertQoSProfileToHandle(
+JNIEXPORT jlong
+JNICALL Java_org_ros2_rcljava_RCLJava_nativeConvertQoSProfileToHandle(
   JNIEnv *, jclass, jint, jint, jint, jint, jboolean);
 
 /*
@@ -56,8 +59,8 @@ JNIEXPORT jlong JNICALL Java_org_ros2_rcljava_RCLJava_nativeConvertQoSProfileToH
  * Method:    nativeDisposeQoSProfile
  * Signature: (J)V
  */
-JNIEXPORT void JNICALL
-  Java_org_ros2_rcljava_RCLJava_nativeDisposeQoSProfile(JNIEnv *, jclass, jlong);
+JNIEXPORT void
+JNICALL Java_org_ros2_rcljava_RCLJava_nativeDisposeQoSProfile(JNIEnv *, jclass, jlong);
 
 #ifdef __cplusplus
 }

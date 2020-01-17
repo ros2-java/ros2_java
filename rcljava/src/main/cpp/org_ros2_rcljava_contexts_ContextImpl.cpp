@@ -14,6 +14,8 @@
 
 #include <jni.h>
 
+#include <string>
+
 #include "rcl/context.h"
 #include "rcl/error_handling.h"
 #include "rcl/init.h"
@@ -70,7 +72,8 @@ Java_org_ros2_rcljava_contexts_ContextImpl_nativeInit(JNIEnv * env, jclass, jlon
 }
 
 JNIEXPORT void JNICALL
-Java_org_ros2_rcljava_contexts_ContextImpl_nativeShutdown(JNIEnv * env, jclass, jlong context_handle)
+Java_org_ros2_rcljava_contexts_ContextImpl_nativeShutdown(
+  JNIEnv * env, jclass, jlong context_handle)
 {
   rcl_context_t * context = reinterpret_cast<rcl_context_t *>(context_handle);
   rcl_ret_t ret = rcl_shutdown(context);

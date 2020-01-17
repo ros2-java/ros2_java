@@ -13,7 +13,9 @@
 // limitations under the License.
 
 #include <jni.h>
+
 #include <cstdlib>
+#include <string>
 
 #include "rcl/error_handling.h"
 #include "rcl/time.h"

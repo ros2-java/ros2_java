@@ -25,14 +25,16 @@ extern "C" {
  * Method:    nativeCreateClock
  * Signature: (Lorg/ros2/rcljava/time/ClockType;)J
  */
-JNIEXPORT jlong JNICALL Java_org_ros2_rcljava_time_Clock_nativeCreateClockHandle(JNIEnv *, jclass, jobject);
+JNIEXPORT jlong
+JNICALL Java_org_ros2_rcljava_time_Clock_nativeCreateClockHandle(JNIEnv *, jclass, jobject);
 
 /*
  * Class:     org_ros2_rcljava_time_Clock
  * Method:    nativeDispose
  * Signature: (J)V
  */
-JNIEXPORT void JNICALL Java_org_ros2_rcljava_time_Clock_nativeDispose(JNIEnv *, jclass, jlong);
+JNIEXPORT void
+JNICALL Java_org_ros2_rcljava_time_Clock_nativeDispose(JNIEnv *, jclass, jlong);
 
 #ifdef __cplusplus
 }

@@ -25,8 +25,8 @@ extern "C" {
  * Method:    nativeDispose
  * Signature: (JJ)V
  */
-JNIEXPORT void JNICALL
-  Java_org_ros2_rcljava_service_ServiceImpl_nativeDispose(JNIEnv *, jclass, jlong, jlong);
+JNIEXPORT void
+JNICALL Java_org_ros2_rcljava_service_ServiceImpl_nativeDispose(JNIEnv *, jclass, jlong, jlong);
 
 #ifdef __cplusplus
 }
