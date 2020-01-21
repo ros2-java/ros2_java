@@ -76,6 +76,10 @@ Java_org_ros2_rcljava_contexts_ContextImpl_nativeShutdown(
   JNIEnv * env, jclass, jlong context_handle)
 {
   rcl_context_t * context = reinterpret_cast<rcl_context_t *>(context_handle);
+  // Only attempt shutdown if the context is valid
+  if (!rcl_context_is_valid(context)) {
+    return;
+  }
   rcl_ret_t ret = rcl_shutdown(context);
   if (RCL_RET_OK != ret) {
     std::string msg = "Failed to shutdown context: " + std::string(rcl_get_error_string().str);

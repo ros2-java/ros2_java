@@ -108,7 +108,15 @@ public final class RCLJava {
   }
 
   static {
+    try {
+      JNIUtils.loadImplementation(RCLJava.class);
+    } catch (UnsatisfiedLinkError ule) {
+      logger.error("Native code library failed to load.\n" + ule);
+      System.exit(1);
+    }
+
     nodes = new LinkedBlockingQueue<Node>();
+    contexts = new LinkedBlockingQueue<Context>();
 
     // NOTE(esteve): disabling shutdown hook for now to avoid JVM crashes
     // Runtime.getRuntime().addShutdownHook(new Thread() {
@@ -119,17 +127,11 @@ public final class RCLJava {
   }
 
   /**
-   * Flag to indicate if RCLJava has been fully initialized, with a valid RMW
-   *   implementation.
-   */
-  private static boolean initialized = false;
-
-  /**
    * Get the default context.
    */
-  public static Context getDefaultContext() {
+  public static synchronized Context getDefaultContext() {
     if (RCLJava.defaultContext == null) {
-      long contextHandle = RCLJava.nativeCreateContextHandle();
+      long contextHandle = nativeCreateContextHandle();
       RCLJava.defaultContext = new ContextImpl(contextHandle);
     }
     return RCLJava.defaultContext;
@@ -138,32 +140,26 @@ public final class RCLJava {
   /**
    * @return true if RCLJava has been fully initialized, false otherwise.
    */
+  @Deprecated
   public static boolean isInitialized() {
-    return RCLJava.initialized;
+    return RCLJava.ok();
   }
 
   /**
    * Initialize the RCLJava API. If successful, a valid RMW implementation will
    *   be loaded and accessible, enabling the creating of ROS2 entities
    *   (@{link Node}s, @{link Publisher}s and @{link Subscription}s.
+   *   This also initializes the default context.
    */
-  public static void rclJavaInit() {
-    synchronized (RCLJava.class) {
-      if (!RCLJava.initialized) {
-        try {
-          JNIUtils.loadImplementation(RCLJava.class);
-        } catch (UnsatisfiedLinkError ule) {
-          logger.error("Native code library failed to load.\n" + ule);
-          System.exit(1);
-        }
-
-        // Initialize default context
-        getDefaultContext().init();
-
-        logger.info("Using RMW implementation: {}", RCLJava.getRMWIdentifier());
-        initialized = true;
-      }
+  public static synchronized void rclJavaInit() {
+    if (RCLJava.ok()) {
+      return;
     }
+
+    // Initialize default context
+    getDefaultContext().init();
+
+    logger.info("Using RMW implementation: {}", RCLJava.getRMWIdentifier());
   }
 
   /**
@@ -307,10 +303,9 @@ public final class RCLJava {
     getGlobalExecutor().removeNode(composableNode);
   }
 
-  public static void shutdown() {
+  public static synchronized void shutdown() {
     cleanup();
     if (RCLJava.defaultContext != null) {
-      RCLJava.defaultContext.shutdown();
       RCLJava.defaultContext.dispose();
       RCLJava.defaultContext = null;
     }

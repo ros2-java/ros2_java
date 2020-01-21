@@ -177,133 +177,136 @@ ament_export_jars("share/${PROJECT_NAME}/java/${PROJECT_NAME}.jar")
 
 if(BUILD_TESTING)
   find_package(ament_lint_auto REQUIRED)
-  # find_package(std_msgs REQUIRED)
+  find_package(std_msgs REQUIRED)
   ament_lint_auto_find_test_dependencies()
 
-  # set(${PROJECT_NAME}_message_files
-  #   "msg/BoundedArrayNested.msg"
-  #   "msg/BoundedArrayPrimitives.msg"
-  #   "msg/Builtins.msg"
-  #   "msg/DynamicArrayNested.msg"
-  #   "msg/DynamicArrayPrimitives.msg"
-  #   "msg/Empty.msg"
-  #   "msg/FieldsWithSameType.msg"
-  #   "msg/Nested.msg"
-  #   "msg/Primitives.msg"
-  #   "msg/StaticArrayNested.msg"
-  #   "msg/StaticArrayPrimitives.msg"
-  #   "msg/UInt32.msg"
-  # )
+  set(${PROJECT_NAME}_message_files
+    "msg/BoundedArrayNested.msg"
+    "msg/BoundedArrayPrimitives.msg"
+    "msg/Builtins.msg"
+    "msg/DynamicArrayNested.msg"
+    "msg/DynamicArrayPrimitives.msg"
+    "msg/Empty.msg"
+    "msg/FieldsWithSameType.msg"
+    "msg/Nested.msg"
+    "msg/Primitives.msg"
+    "msg/StaticArrayNested.msg"
+    "msg/StaticArrayPrimitives.msg"
+    "msg/UInt32.msg"
+  )
 
-  # set(${PROJECT_NAME}_service_files
-  #   "srv/AddTwoInts.srv"
-  # )
+  set(${PROJECT_NAME}_service_files
+    "srv/AddTwoInts.srv"
+  )
 
-  # rosidl_generate_interfaces(${PROJECT_NAME}
-  #   ${${PROJECT_NAME}_message_files}
-  #   ${${PROJECT_NAME}_service_files}
-  #   DEPENDENCIES
-  #   builtin_interfaces
-  #   rcl_interfaces
-  #   SKIP_INSTALL
-  # )
+  rosidl_generator_java_get_typesupports(_java_type_supports)
 
-  # get_property(_${PROJECT_NAME}_jar_file
-  #   TARGET "${PROJECT_NAME}_jar"
-  #   PROPERTY "JAR_FILE")
+  rosidl_generate_interfaces(${PROJECT_NAME}
+    ${${PROJECT_NAME}_message_files}
+    ${${PROJECT_NAME}_service_files}
+    DEPENDENCIES
+    builtin_interfaces
+    rcl_interfaces
+    ${_java_type_supports}
+    SKIP_INSTALL
+  )
 
-  # get_property(_${PROJECT_NAME}_messages_jar_file
-  #   TARGET "${PROJECT_NAME}_messages_jar"
-  #   PROPERTY "JAR_FILE")
+  get_property(_${PROJECT_NAME}_jar_file
+    TARGET "${PROJECT_NAME}_jar"
+    PROPERTY "JAR_FILE")
 
-  # set(${PROJECT_NAME}_test_sources
-  #   "src/test/java/org/ros2/rcljava/RCLJavaTest.java"
-  #   "src/test/java/org/ros2/rcljava/TimeTest.java"
-  #   "src/test/java/org/ros2/rcljava/client/ClientTest.java"
-  #   "src/test/java/org/ros2/rcljava/node/NodeTest.java"
-  #   "src/test/java/org/ros2/rcljava/parameters/AsyncParametersClientTest.java"
-  #   "src/test/java/org/ros2/rcljava/parameters/SyncParametersClientTest.java"
-  #   "src/test/java/org/ros2/rcljava/publisher/PublisherTest.java"
-  #   "src/test/java/org/ros2/rcljava/subscription/SubscriptionTest.java"
-  #   "src/test/java/org/ros2/rcljava/timer/TimerTest.java"
-  # )
+  get_property(_${PROJECT_NAME}_messages_jar_file
+    TARGET "${PROJECT_NAME}_messages_jar"
+    PROPERTY "JAR_FILE")
 
-  # set(${PROJECT_NAME}_testsuites
-  #   "org.ros2.rcljava.RCLJavaTest"
-  #   "org.ros2.rcljava.TimeTest"
-  #   "org.ros2.rcljava.client.ClientTest"
-  #   "org.ros2.rcljava.node.NodeTest"
-  #   "org.ros2.rcljava.parameters.SyncParametersClientTest"
-  #   "org.ros2.rcljava.publisher.PublisherTest"
-  #   "org.ros2.rcljava.subscription.SubscriptionTest"
-  #   "org.ros2.rcljava.timer.TimerTest"
-  # )
+  set(${PROJECT_NAME}_test_sources
+    "src/test/java/org/ros2/rcljava/RCLJavaTest.java"
+    # "src/test/java/org/ros2/rcljava/TimeTest.java"
+    # "src/test/java/org/ros2/rcljava/client/ClientTest.java"
+    # "src/test/java/org/ros2/rcljava/node/NodeTest.java"
+    # "src/test/java/org/ros2/rcljava/parameters/AsyncParametersClientTest.java"
+    # "src/test/java/org/ros2/rcljava/parameters/SyncParametersClientTest.java"
+    # "src/test/java/org/ros2/rcljava/publisher/PublisherTest.java"
+    # "src/test/java/org/ros2/rcljava/subscription/SubscriptionTest.java"
+    # "src/test/java/org/ros2/rcljava/timer/TimerTest.java"
+  )
 
-  # set(_deps_library_dirs "")
-  # foreach(_dep_lib ${rcljava_test_msgs_LIBRARIES})
-  #   get_filename_component(_dep_dir "${_dep_lib}" DIRECTORY)
-  #   list_append_unique(_deps_library_dirs ${_dep_dir})
-  # endforeach()
-  # foreach(_dep_lib ${rcljava_test_msgs_JNI_LIBRARIES})
-  #   get_filename_component(_dep_dir "${_dep_lib}" DIRECTORY)
-  #   list_append_unique(_deps_library_dirs ${_dep_dir})
-  # endforeach()
+  set(${PROJECT_NAME}_testsuites
+    "org.ros2.rcljava.RCLJavaTest"
+    # "org.ros2.rcljava.TimeTest"
+    # "org.ros2.rcljava.client.ClientTest"
+    # "org.ros2.rcljava.node.NodeTest"
+    # "org.ros2.rcljava.parameters.SyncParametersClientTest"
+    # "org.ros2.rcljava.publisher.PublisherTest"
+    # "org.ros2.rcljava.subscription.SubscriptionTest"
+    # "org.ros2.rcljava.timer.TimerTest"
+  )
 
-  # foreach(_dep_lib ${std_msgs_LIBRARIES})
-  #   get_filename_component(_dep_dir "${_dep_lib}" DIRECTORY)
-  #   list_append_unique(_deps_library_dirs ${_dep_dir})
-  # endforeach()
-  # foreach(_dep_lib ${std_msgs_JNI_LIBRARIES})
-  #   get_filename_component(_dep_dir "${_dep_lib}" DIRECTORY)
-  #   list_append_unique(_deps_library_dirs ${_dep_dir})
-  # endforeach()
+  set(_deps_library_dirs "")
+  foreach(_dep_lib ${rcljava_test_msgs_LIBRARIES})
+    get_filename_component(_dep_dir "${_dep_lib}" DIRECTORY)
+    list_append_unique(_deps_library_dirs ${_dep_dir})
+  endforeach()
+  foreach(_dep_lib ${rcljava_test_msgs_JNI_LIBRARIES})
+    get_filename_component(_dep_dir "${_dep_lib}" DIRECTORY)
+    list_append_unique(_deps_library_dirs ${_dep_dir})
+  endforeach()
 
-  # foreach(_dep_lib ${builtin_interfaces_LIBRARIES})
-  #   get_filename_component(_dep_dir "${_dep_lib}" DIRECTORY)
-  #   list_append_unique(_deps_library_dirs ${_dep_dir})
-  # endforeach()
-  # foreach(_dep_lib ${builtin_interfaces_JNI_LIBRARIES})
-  #   get_filename_component(_dep_dir "${_dep_lib}" DIRECTORY)
-  #   list_append_unique(_deps_library_dirs ${_dep_dir})
-  # endforeach()
+  foreach(_dep_lib ${std_msgs_LIBRARIES})
+    get_filename_component(_dep_dir "${_dep_lib}" DIRECTORY)
+    list_append_unique(_deps_library_dirs ${_dep_dir})
+  endforeach()
+  foreach(_dep_lib ${std_msgs_JNI_LIBRARIES})
+    get_filename_component(_dep_dir "${_dep_lib}" DIRECTORY)
+    list_append_unique(_deps_library_dirs ${_dep_dir})
+  endforeach()
 
-  # foreach(_dep_lib ${rcl_interfaces_LIBRARIES})
-  #   get_filename_component(_dep_dir "${_dep_lib}" DIRECTORY)
-  #   list_append_unique(_deps_library_dirs ${_dep_dir})
-  # endforeach()
-  # foreach(_dep_lib ${rcl_interfaces_JNI_LIBRARIES})
-  #   get_filename_component(_dep_dir "${_dep_lib}" DIRECTORY)
-  #   list_append_unique(_deps_library_dirs ${_dep_dir})
-  # endforeach()
+  foreach(_dep_lib ${builtin_interfaces_LIBRARIES})
+    get_filename_component(_dep_dir "${_dep_lib}" DIRECTORY)
+    list_append_unique(_deps_library_dirs ${_dep_dir})
+  endforeach()
+  foreach(_dep_lib ${builtin_interfaces_JNI_LIBRARIES})
+    get_filename_component(_dep_dir "${_dep_lib}" DIRECTORY)
+    list_append_unique(_deps_library_dirs ${_dep_dir})
+  endforeach()
 
-  # list_append_unique(_deps_library_dirs ${CMAKE_CURRENT_BINARY_DIR})
-  # list_append_unique(_deps_library_dirs ${CMAKE_CURRENT_BINARY_DIR}/rcljava)
-  # list_append_unique(_deps_library_dirs ${CMAKE_CURRENT_BINARY_DIR}/rosidl_generator_java/rcljava/msg/)
-  # list_append_unique(_deps_library_dirs ${CMAKE_CURRENT_BINARY_DIR}/rosidl_generator_java/rcljava/srv/)
+  foreach(_dep_lib ${rcl_interfaces_LIBRARIES})
+    get_filename_component(_dep_dir "${_dep_lib}" DIRECTORY)
+    list_append_unique(_deps_library_dirs ${_dep_dir})
+  endforeach()
+  foreach(_dep_lib ${rcl_interfaces_JNI_LIBRARIES})
+    get_filename_component(_dep_dir "${_dep_lib}" DIRECTORY)
+    list_append_unique(_deps_library_dirs ${_dep_dir})
+  endforeach()
 
-  # foreach(testsuite ${${PROJECT_NAME}_testsuites})
-  #   ament_add_junit_tests("${PROJECT_NAME}_tests_${testsuite}"
-  #     TIMEOUT 90
-  #     WORKING_DIRECTORY
-  #     "${CMAKE_CURRENT_BINARY_DIR}"
-  #     SOURCES
-  #     "${${PROJECT_NAME}_test_sources}"
-  #     TESTS
-  #     "${testsuite}"
-  #     INCLUDE_JARS
-  #     "${rcljava_common_JARS}"
-  #     "${rcljava_test_msgs_JARS}"
-  #     "${std_msgs_JARS}"
-  #     "${builtin_interfaces_JARS}"
-  #     "${rcl_interfaces_JARS}"
-  #     "${_${PROJECT_NAME}_jar_file}"
-  #     "${_${PROJECT_NAME}_messages_jar_file}"
-  #     APPEND_LIBRARY_DIRS
-  #     "${_deps_library_dirs}"
-  #   )
+  list_append_unique(_deps_library_dirs ${CMAKE_CURRENT_BINARY_DIR})
+  list_append_unique(_deps_library_dirs ${CMAKE_CURRENT_BINARY_DIR}/rcljava)
+  list_append_unique(_deps_library_dirs ${CMAKE_CURRENT_BINARY_DIR}/rosidl_generator_java/rcljava/msg/)
+  list_append_unique(_deps_library_dirs ${CMAKE_CURRENT_BINARY_DIR}/rosidl_generator_java/rcljava/srv/)
 
-  #   add_dependencies("${PROJECT_NAME}_tests_${testsuite}" "${PROJECT_NAME}_messages_jar")
-  # endforeach()
+  foreach(testsuite ${${PROJECT_NAME}_testsuites})
+    ament_add_junit_tests("${PROJECT_NAME}_tests_${testsuite}"
+      TIMEOUT 90
+      WORKING_DIRECTORY
+      "${CMAKE_CURRENT_BINARY_DIR}"
+      SOURCES
+      "${${PROJECT_NAME}_test_sources}"
+      TESTS
+      "${testsuite}"
+      INCLUDE_JARS
+      "${rcljava_common_JARS}"
+      "${rcljava_test_msgs_JARS}"
+      "${std_msgs_JARS}"
+      "${builtin_interfaces_JARS}"
+      "${rcl_interfaces_JARS}"
+      "${_${PROJECT_NAME}_jar_file}"
+      "${_${PROJECT_NAME}_messages_jar_file}"
+      APPEND_LIBRARY_DIRS
+      "${_deps_library_dirs}"
+    )
+
+    add_dependencies("${PROJECT_NAME}_tests_${testsuite}" "${PROJECT_NAME}_messages_jar")
+  endforeach()
 
 endif()
 
