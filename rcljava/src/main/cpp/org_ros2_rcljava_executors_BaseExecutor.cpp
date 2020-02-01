@@ -139,7 +139,7 @@ Java_org_ros2_rcljava_executors_BaseExecutor_nativeWaitSetClearSubscriptions(
   JNIEnv * env, jclass, jlong wait_set_handle)
 {
   rcl_wait_set_t * wait_set = reinterpret_cast<rcl_wait_set_t *>(wait_set_handle);
-  rcl_ret_t ret = rcl_wait_set_clear_subscriptions(wait_set);
+  rcl_ret_t ret = rcl_wait_set_clear(wait_set);
   if (ret != RCL_RET_OK) {
     std::string msg =
       "Failed to clear subscriptions from wait set: " + std::string(rcl_get_error_string());
@@ -154,7 +154,7 @@ Java_org_ros2_rcljava_executors_BaseExecutor_nativeWaitSetAddSubscription(
 {
   rcl_wait_set_t * wait_set = reinterpret_cast<rcl_wait_set_t *>(wait_set_handle);
   rcl_subscription_t * subscription = reinterpret_cast<rcl_subscription_t *>(subscription_handle);
-  rcl_ret_t ret = rcl_wait_set_add_subscription(wait_set, subscription);
+  rcl_ret_t ret = rcl_wait_set_add_subscription(wait_set, subscription, NULL);
   if (ret != RCL_RET_OK) {
     std::string msg =
       "Failed to add subscription to wait set: " + std::string(rcl_get_error_string());
@@ -199,7 +199,7 @@ Java_org_ros2_rcljava_executors_BaseExecutor_nativeTake(
 
   void * taken_msg = convert_from_java(jmsg, nullptr);
 
-  rcl_ret_t ret = rcl_take(subscription, taken_msg, nullptr);
+  rcl_ret_t ret = rcl_take(subscription, taken_msg, nullptr, nullptr);
 
   if (ret != RCL_RET_OK && ret != RCL_RET_SUBSCRIPTION_TAKE_FAILED) {
     destroy_ros_message(taken_msg);
@@ -235,7 +235,7 @@ Java_org_ros2_rcljava_executors_BaseExecutor_nativeWaitSetClearTimers(
   JNIEnv * env, jclass, jlong wait_set_handle)
 {
   rcl_wait_set_t * wait_set = reinterpret_cast<rcl_wait_set_t *>(wait_set_handle);
-  rcl_ret_t ret = rcl_wait_set_clear_timers(wait_set);
+  rcl_ret_t ret = rcl_wait_set_clear(wait_set);
   if (ret != RCL_RET_OK) {
     std::string msg =
       "Failed to clear timers from wait set: " + std::string(rcl_get_error_string());
@@ -249,7 +249,7 @@ Java_org_ros2_rcljava_executors_BaseExecutor_nativeWaitSetClearServices(
   JNIEnv * env, jclass, jlong wait_set_handle)
 {
   rcl_wait_set_t * wait_set = reinterpret_cast<rcl_wait_set_t *>(wait_set_handle);
-  rcl_ret_t ret = rcl_wait_set_clear_services(wait_set);
+  rcl_ret_t ret = rcl_wait_set_clear(wait_set);
   if (ret != RCL_RET_OK) {
     std::string msg =
       "Failed to clear services from wait set: " + std::string(rcl_get_error_string());
@@ -264,7 +264,7 @@ Java_org_ros2_rcljava_executors_BaseExecutor_nativeWaitSetAddService(
 {
   rcl_wait_set_t * wait_set = reinterpret_cast<rcl_wait_set_t *>(wait_set_handle);
   rcl_service_t * service = reinterpret_cast<rcl_service_t *>(service_handle);
-  rcl_ret_t ret = rcl_wait_set_add_service(wait_set, service);
+  rcl_ret_t ret = rcl_wait_set_add_service(wait_set, service, NULL);
   if (ret != RCL_RET_OK) {
     std::string msg =
       "Failed to add service to wait set: " + std::string(rcl_get_error_string());
@@ -278,7 +278,7 @@ Java_org_ros2_rcljava_executors_BaseExecutor_nativeWaitSetClearClients(
   JNIEnv * env, jclass, jlong wait_set_handle)
 {
   rcl_wait_set_t * wait_set = reinterpret_cast<rcl_wait_set_t *>(wait_set_handle);
-  rcl_ret_t ret = rcl_wait_set_clear_clients(wait_set);
+  rcl_ret_t ret = rcl_wait_set_clear(wait_set);
   if (ret != RCL_RET_OK) {
     std::string msg =
       "Failed to clear clients from wait set: " + std::string(rcl_get_error_string());
@@ -293,7 +293,7 @@ Java_org_ros2_rcljava_executors_BaseExecutor_nativeWaitSetAddClient(
 {
   rcl_wait_set_t * wait_set = reinterpret_cast<rcl_wait_set_t *>(wait_set_handle);
   rcl_client_t * client = reinterpret_cast<rcl_client_t *>(client_handle);
-  rcl_ret_t ret = rcl_wait_set_add_client(wait_set, client);
+  rcl_ret_t ret = rcl_wait_set_add_client(wait_set, client, NULL);
   if (ret != RCL_RET_OK) {
     std::string msg =
       "Failed to add client to wait set: " + std::string(rcl_get_error_string());
