@@ -47,7 +47,7 @@ public class NodeTest {
 
   private boolean boolValue1, boolValue2;
   private byte byteValue1, byteValue2;
-  private char charValue1, charValue2;
+  private byte charValue1, charValue2;
   private float float32Value1, float32Value2;
   private double float64Value1, float64Value2;
   private byte int8Value1, int8Value2;
@@ -61,7 +61,7 @@ public class NodeTest {
   private String stringValue1, stringValue2;
 
   boolean checkPrimitives(rcljava.msg.Primitives primitives, boolean booleanValue, byte byteValue,
-      char charValue, float float32Value, double float64Value, byte int8Value, byte uint8Value,
+      byte charValue, float float32Value, double float64Value, byte int8Value, byte uint8Value,
       short int16Value, short uint16Value, int int32Value, int uint32Value, long int64Value,
       long uint64Value, String stringValue) {
     boolean result = true;
@@ -112,7 +112,7 @@ public class NodeTest {
 
     boolValue1 = true;
     byteValue1 = (byte) 123;
-    charValue1 = '\u0012';
+    charValue1 = (byte) '\u0012';
     float32Value1 = 12.34f;
     float64Value1 = 43.21;
     int8Value1 = (byte) -12;
@@ -142,7 +142,7 @@ public class NodeTest {
 
     boolValue2 = false;
     byteValue2 = (byte) 42;
-    charValue2 = '\u0021';
+    charValue2 = (byte) '\u0021';
     float32Value2 = 13.34f;
     float64Value2 = 44.21;
     int8Value2 = (byte) -13;
@@ -275,7 +275,7 @@ public class NodeTest {
 
     List<Boolean> boolValues = Arrays.asList(new Boolean[] {true, false, true});
     List<Byte> byteValues = Arrays.asList(new Byte[] {123, 42});
-    List<Character> charValues = Arrays.asList(new Character[] {'\u0012', '\u0021'});
+    List<Byte> charValues = Arrays.asList(new Byte[] {'\u0012', '\u0021'});
     List<Float> float32Values = Arrays.asList(new Float[] {12.34f, 13.34f});
     List<Double> float64Values = Arrays.asList(new Double[] {43.21, 44.21});
     List<Byte> int8Values = Arrays.asList(new Byte[] {-12, -13});
@@ -437,7 +437,7 @@ public class NodeTest {
 
     List<Boolean> boolValues = Arrays.asList(new Boolean[] {true, false, true});
     List<Byte> byteValues = Arrays.asList(new Byte[] {123, 42});
-    List<Character> charValues = Arrays.asList(new Character[] {'\u0012', '\u0021'});
+    List<Byte> charValues = Arrays.asList(new Byte[] {'\u0012', '\u0021'});
     List<Float> float32Values = Arrays.asList(new Float[] {12.34f, 13.34f});
     List<Double> float64Values = Arrays.asList(new Double[] {43.21, 44.21});
     List<Byte> int8Values = Arrays.asList(new Byte[] {-12, -13});
@@ -703,7 +703,7 @@ public class NodeTest {
 
     List<Boolean> boolValues = Arrays.asList(new Boolean[] {true, false, true});
     List<Byte> byteValues = Arrays.asList(new Byte[] {123, 42, 24});
-    List<Character> charValues = Arrays.asList(new Character[] {'\u0012', '\u0021', '\u0008'});
+    List<Byte> charValues = Arrays.asList(new Byte[] {'\u0012', '\u0021', '\u0008'});
     List<Float> float32Values = Arrays.asList(new Float[] {12.34f, 13.34f, 14.34f});
     List<Double> float64Values = Arrays.asList(new Double[] {43.21, 54.21, 65.21});
     List<Byte> int8Values = Arrays.asList(new Byte[] {-12, -13, -14});

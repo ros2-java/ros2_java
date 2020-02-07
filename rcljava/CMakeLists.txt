@@ -221,9 +221,9 @@ if(BUILD_TESTING)
 
   set(${PROJECT_NAME}_test_sources
     "src/test/java/org/ros2/rcljava/RCLJavaTest.java"
-    # "src/test/java/org/ros2/rcljava/TimeTest.java"
+    "src/test/java/org/ros2/rcljava/TimeTest.java"
     # "src/test/java/org/ros2/rcljava/client/ClientTest.java"
-    # "src/test/java/org/ros2/rcljava/node/NodeTest.java"
+    "src/test/java/org/ros2/rcljava/node/NodeTest.java"
     # "src/test/java/org/ros2/rcljava/parameters/AsyncParametersClientTest.java"
     # "src/test/java/org/ros2/rcljava/parameters/SyncParametersClientTest.java"
     # "src/test/java/org/ros2/rcljava/publisher/PublisherTest.java"
@@ -233,9 +233,9 @@ if(BUILD_TESTING)
 
   set(${PROJECT_NAME}_testsuites
     "org.ros2.rcljava.RCLJavaTest"
-    # "org.ros2.rcljava.TimeTest"
+    "org.ros2.rcljava.TimeTest"
     # "org.ros2.rcljava.client.ClientTest"
-    # "org.ros2.rcljava.node.NodeTest"
+    "org.ros2.rcljava.node.NodeTest"
     # "org.ros2.rcljava.parameters.SyncParametersClientTest"
     # "org.ros2.rcljava.publisher.PublisherTest"
     # "org.ros2.rcljava.subscription.SubscriptionTest"
