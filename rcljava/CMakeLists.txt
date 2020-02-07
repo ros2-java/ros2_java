@@ -226,9 +226,9 @@ if(BUILD_TESTING)
     "src/test/java/org/ros2/rcljava/node/NodeTest.java"
     # "src/test/java/org/ros2/rcljava/parameters/AsyncParametersClientTest.java"
     # "src/test/java/org/ros2/rcljava/parameters/SyncParametersClientTest.java"
-    # "src/test/java/org/ros2/rcljava/publisher/PublisherTest.java"
-    # "src/test/java/org/ros2/rcljava/subscription/SubscriptionTest.java"
-    # "src/test/java/org/ros2/rcljava/timer/TimerTest.java"
+    "src/test/java/org/ros2/rcljava/publisher/PublisherTest.java"
+    "src/test/java/org/ros2/rcljava/subscription/SubscriptionTest.java"
+    "src/test/java/org/ros2/rcljava/timer/TimerTest.java"
   )
 
   set(${PROJECT_NAME}_testsuites
@@ -237,9 +237,9 @@ if(BUILD_TESTING)
     # "org.ros2.rcljava.client.ClientTest"
     "org.ros2.rcljava.node.NodeTest"
     # "org.ros2.rcljava.parameters.SyncParametersClientTest"
-    # "org.ros2.rcljava.publisher.PublisherTest"
-    # "org.ros2.rcljava.subscription.SubscriptionTest"
-    # "org.ros2.rcljava.timer.TimerTest"
+    "org.ros2.rcljava.publisher.PublisherTest"
+    "org.ros2.rcljava.subscription.SubscriptionTest"
+    "org.ros2.rcljava.timer.TimerTest"
   )
 
   set(_deps_library_dirs "")
