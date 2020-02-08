@@ -34,8 +34,6 @@ if(NOT WIN32)
   add_compile_options(-Wall -Wextra -Wpedantic)
 endif()
 
-set(CMAKE_JAVA_COMPILE_FLAGS "-source" "1.6" "-target" "1.6")
-
 include_directories(include)
 
 function(set_properties _target_name _build_type)
