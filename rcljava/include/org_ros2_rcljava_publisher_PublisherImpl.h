@@ -25,7 +25,8 @@ extern "C" {
  * Method:    nativePublish
  * Signature: (JJLorg/ros2/rcljava/interfaces/MessageDefinition;)V
  */
-JNIEXPORT void JNICALL Java_org_ros2_rcljava_publisher_PublisherImpl_nativePublish(
+JNIEXPORT void
+JNICALL Java_org_ros2_rcljava_publisher_PublisherImpl_nativePublish(
   JNIEnv *, jclass, jlong, jlong, jobject);
 
 /*
@@ -33,8 +34,9 @@ JNIEXPORT void JNICALL Java_org_ros2_rcljava_publisher_PublisherImpl_nativePubli
  * Method:    nativeDispose
  * Signature: (JJ)V
  */
-JNIEXPORT void JNICALL
-  Java_org_ros2_rcljava_publisher_PublisherImpl_nativeDispose(JNIEnv *, jclass, jlong, jlong);
+JNIEXPORT void
+JNICALL Java_org_ros2_rcljava_publisher_PublisherImpl_nativeDispose(
+  JNIEnv *, jclass, jlong, jlong);
 
 #ifdef __cplusplus
 }

@@ -1,4 +1,4 @@
-// Copyright 2017-2018 Esteve Fernandez <esteve@apache.org>
+// Copyright 2019 Open Source Robotics Foundation, Inc.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -13,30 +13,30 @@
 // limitations under the License.
 
 #include <jni.h>
-/* Header for class org_ros2_rcljava_Time */
+/* Header for class org_ros2_rcljava_time_Clock */
 
-#ifndef ORG_ROS2_RCLJAVA_TIME_H_
-#define ORG_ROS2_RCLJAVA_TIME_H_
+#ifndef ORG_ROS2_RCLJAVA_TIME_CLOCK_H_
+#define ORG_ROS2_RCLJAVA_TIME_CLOCK_H_
 #ifdef __cplusplus
 extern "C" {
 #endif
 /*
- * Class:     org_ros2_rcljava_Time
- * Method:    nativeRCLSystemTimeNow
- * Signature: ()J
+ * Class:     org_ros2_rcljava_time_Clock
+ * Method:    nativeCreateClock
+ * Signature: (Lorg/ros2/rcljava/time/ClockType;)J
  */
 JNIEXPORT jlong
-JNICALL Java_org_ros2_rcljava_Time_nativeRCLSystemTimeNow(JNIEnv *, jclass);
+JNICALL Java_org_ros2_rcljava_time_Clock_nativeCreateClockHandle(JNIEnv *, jclass, jobject);
 
 /*
- * Class:     org_ros2_rcljava_Time
- * Method:    nativeRCLSteadyTimeNow
- * Signature: ()J
+ * Class:     org_ros2_rcljava_time_Clock
+ * Method:    nativeDispose
+ * Signature: (J)V
  */
-JNIEXPORT jlong
-JNICALL Java_org_ros2_rcljava_Time_nativeRCLSteadyTimeNow(JNIEnv *, jclass);
+JNIEXPORT void
+JNICALL Java_org_ros2_rcljava_time_Clock_nativeDispose(JNIEnv *, jclass, jlong);
 
 #ifdef __cplusplus
 }
 #endif
-#endif  // ORG_ROS2_RCLJAVA_TIME_H_
+#endif  // ORG_ROS2_RCLJAVA_TIME_CLOCK_H_

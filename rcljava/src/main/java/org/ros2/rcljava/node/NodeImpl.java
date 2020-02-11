@@ -22,6 +22,7 @@ import org.ros2.rcljava.common.JNIUtils;
 import org.ros2.rcljava.concurrent.Callback;
 import org.ros2.rcljava.consumers.Consumer;
 import org.ros2.rcljava.consumers.TriConsumer;
+import org.ros2.rcljava.contexts.Context;
 import org.ros2.rcljava.qos.QoSProfile;
 import org.ros2.rcljava.interfaces.MessageDefinition;
 import org.ros2.rcljava.interfaces.ServiceDefinition;
@@ -34,6 +35,8 @@ import org.ros2.rcljava.service.Service;
 import org.ros2.rcljava.service.ServiceImpl;
 import org.ros2.rcljava.subscription.Subscription;
 import org.ros2.rcljava.subscription.SubscriptionImpl;
+import org.ros2.rcljava.time.Clock;
+import org.ros2.rcljava.time.ClockType;
 import org.ros2.rcljava.timer.Timer;
 import org.ros2.rcljava.timer.WallTimer;
 import org.ros2.rcljava.timer.WallTimerImpl;
@@ -76,6 +79,16 @@ public class NodeImpl implements Node {
   private long handle;
 
   /**
+   * The context that this node is associated with.
+   */
+  private Context context;
+
+  /**
+   * The clock used by this node.
+   */
+  private Clock clock;
+
+  /**
    * All the @{link Subscription}s that have been created through this instance.
    */
   private final Collection<Subscription> subscriptions;
@@ -112,9 +125,11 @@ public class NodeImpl implements Node {
    * @param handle A pointer to the underlying ROS2 node structure. Must not
    *     be zero.
    */
-  public NodeImpl(final long handle, final String name) {
+  public NodeImpl(final long handle, final String name, final Context context) {
+    this.clock = new Clock(ClockType.SYSTEM_TIME);
     this.handle = handle;
     this.name = name;
+    this.context = context;
     this.publishers = new LinkedBlockingQueue<Publisher>();
     this.subscriptions = new LinkedBlockingQueue<Subscription>();
     this.services = new LinkedBlockingQueue<Service>();
@@ -315,12 +330,12 @@ public class NodeImpl implements Node {
     return this.handle;
   }
 
-  private static native long nativeCreateTimerHandle(long timerPeriod);
+  private static native long nativeCreateTimerHandle(long clockHandle, long contextHandle, long timerPeriod);
 
   public WallTimer createWallTimer(
       final long period, final TimeUnit unit, final Callback callback) {
     long timerPeriodNS = TimeUnit.NANOSECONDS.convert(period, unit);
-    long timerHandle = nativeCreateTimerHandle(timerPeriodNS);
+    long timerHandle = nativeCreateTimerHandle(clock.getHandle(), context.getHandle(), timerPeriodNS);
     WallTimer timer =
         new WallTimerImpl(new WeakReference<Node>(this), timerHandle, callback, timerPeriodNS);
     this.timers.add(timer);

@@ -32,7 +32,7 @@ Java_org_ros2_rcljava_Time_nativeRCLSystemTimeNow(JNIEnv * env, jclass)
   rcutils_ret_t ret = RCUTILS_RET_ERROR;
   ret = rcutils_system_time_now(&rcutils_now);
   if (ret != RCUTILS_RET_OK) {
-    std::string msg = "Could not get current time: " + std::string(rcl_get_error_string_safe());
+    std::string msg = "Could not get current time: " + std::string(rcl_get_error_string().str);
     rcl_reset_error();
     rcljava_throw_rclexception(env, ret, msg);
   }
@@ -46,7 +46,7 @@ Java_org_ros2_rcljava_Time_nativeRCLSteadyTimeNow(JNIEnv * env, jclass)
   rcutils_ret_t ret = RCUTILS_RET_ERROR;
   ret = rcutils_steady_time_now(&rcutils_now);
   if (ret != RCUTILS_RET_OK) {
-    std::string msg = "Could not get current time: " + std::string(rcl_get_error_string_safe());
+    std::string msg = "Could not get current time: " + std::string(rcl_get_error_string().str);
     rcl_reset_error();
     rcljava_throw_rclexception(env, ret, msg);
   }

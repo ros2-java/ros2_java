@@ -15,24 +15,18 @@
 
 package org.ros2.rcljava;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotEquals;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.assertFalse;
 
 import org.junit.Test;
 
 public class RCLJavaTest {
   @Test
-  public final void testInit() {
-    assertEquals(false, RCLJava.isInitialized());
+  public final void testInitShutdown() {
+    assertFalse(RCLJava.ok());
     RCLJava.rclJavaInit();
-    assertEquals(true, RCLJava.isInitialized());
-  }
-
-  @Test
-  public final void testOk() {
-    RCLJava.rclJavaInit();
-    assertEquals(true, RCLJava.ok());
+    assertTrue(RCLJava.ok());
     RCLJava.shutdown();
-    assertEquals(false, RCLJava.ok());
+    assertFalse(RCLJava.ok());
   }
 }
