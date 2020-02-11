@@ -34,29 +34,6 @@ if(BUILD_TESTING)
   find_package(ament_lint_auto REQUIRED)
   ament_lint_auto_find_test_dependencies()
 
-  # TODO(jacobperron): Use test_interface_files instead and update tests
-  set(message_files
-    "msg/Bool.msg"
-    "msg/Byte.msg"
-    "msg/Char.msg"
-    "msg/Constants.msg"
-    "msg/Empty.msg"
-    "msg/Float32.msg"
-    "msg/Float64.msg"
-    "msg/Int16.msg"
-    "msg/Int32.msg"
-    "msg/Int64.msg"
-    "msg/Int8.msg"
-    "msg/Nested.msg"
-    "msg/Primitives.msg"
-    "msg/Strings.msg"
-    "msg/Uint16.msg"
-    "msg/Uint32.msg"
-    "msg/Uint64.msg"
-    "msg/Uint8.msg"
-    "msg/Various.msg"
-  )
-
   include(cmake/register_java.cmake)
   include(cmake/rosidl_generator_java_get_typesupports.cmake)
 
@@ -70,6 +47,7 @@ if(BUILD_TESTING)
 
   rosidl_generate_interfaces(${PROJECT_NAME}
     ${message_files}
+    ${test_interface_files_MSG_FILES}
     ${test_interface_files_SRV_FILES}
     SKIP_INSTALL
   )
