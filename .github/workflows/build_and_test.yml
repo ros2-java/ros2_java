@@ -1,0 +1,20 @@
+name: CI
+
+on: [push]
+
+jobs:
+  build_and_test:
+    runs-on: ubuntu-18.04
+    steps:
+    - name: Install Java
+      run: |
+        sudo apt update -qq
+        sudo apt install -y default-jdk
+    - uses: ros-tooling/setup-ros@0.0.14
+      with:
+        required-ros-distributions: dashing
+    - uses: ros-tooling/action-ros-ci@8d58122
+      with:
+        package-name: rosidl_generator_java rcljava_common rcljava
+        source-ros-binary-installation: dashing
+        vcs-repo-file-url: https://raw.githubusercontent.com/ros2-java/ros2_java/jacob/update_desktop_repos/ros2_java_desktop.repos
