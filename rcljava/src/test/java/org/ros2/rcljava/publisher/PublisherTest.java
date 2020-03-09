@@ -33,5 +33,6 @@ public class PublisherTest {
     assertEquals(node.getHandle(), publisher.getNodeReference().get().getHandle());
     assertNotEquals(0, publisher.getNodeReference().get().getHandle());
     assertNotEquals(0, publisher.getHandle());
+    RCLJava.shutdown();
   }
 }
