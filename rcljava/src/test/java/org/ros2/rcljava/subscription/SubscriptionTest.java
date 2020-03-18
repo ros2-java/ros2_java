@@ -36,5 +36,6 @@ public class SubscriptionTest {
     assertEquals(node.getHandle(), subscription.getNodeReference().get().getHandle());
     assertNotEquals(0, subscription.getNodeReference().get().getHandle());
     assertNotEquals(0, subscription.getHandle());
+    RCLJava.shutdown();
   }
 }
