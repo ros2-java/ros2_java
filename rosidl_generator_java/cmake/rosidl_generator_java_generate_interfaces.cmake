@@ -70,6 +70,10 @@ foreach(_abs_idl_file ${rosidl_generate_interfaces_ABS_IDL_FILES})
       "${_output_path}/${_parent_folder}/${_idl_name}_Request.java"
       "${_output_path}/${_parent_folder}/${_idl_name}_Response.java"
     )
+    foreach(_typesupport_impl ${_typesupport_impls})
+      list(APPEND _generated_extension_${_typesupport_impl}_files "${_output_path}/${_parent_folder}/${_idl_name}_Request.ep.${_typesupport_impl}.cpp")
+      list(APPEND _generated_extension_${_typesupport_impl}_files "${_output_path}/${_parent_folder}/${_idl_name}_Response.ep.${_typesupport_impl}.cpp")
+    endforeach()
   endif()
   # Actions generate extra files
   if(_parent_folder STREQUAL "action")
@@ -78,6 +82,11 @@ foreach(_abs_idl_file ${rosidl_generate_interfaces_ABS_IDL_FILES})
       "${_output_path}/${_parent_folder}/${_idl_name}_Result.java"
       "${_output_path}/${_parent_folder}/${_idl_name}_Feedback.java"
     )
+    foreach(_typesupport_impl ${_typesupport_impls})
+      list(APPEND _generated_extension_${_typesupport_impl}_files "${_output_path}/${_parent_folder}/${_idl_name}_Goal.ep.${_typesupport_impl}.cpp")
+      list(APPEND _generated_extension_${_typesupport_impl}_files "${_output_path}/${_parent_folder}/${_idl_name}_Result.ep.${_typesupport_impl}.cpp")
+      list(APPEND _generated_extension_${_typesupport_impl}_files "${_output_path}/${_parent_folder}/${_idl_name}_Feedback.ep.${_typesupport_impl}.cpp")
+    endforeach()
   endif()
 
   foreach(_typesupport_impl ${_typesupport_impls})

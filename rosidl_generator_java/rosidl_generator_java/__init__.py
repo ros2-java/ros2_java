@@ -45,8 +45,9 @@ def generate_java(generator_arguments_file, typesupport_impls):
 
     for impl in typesupport_impls:
         mapping = {
-          'idl.cpp.em': '%s.ep.{0}.cpp'.format(impl),
+          'idl.cpp.em': '_%s.cpp',
         }
+        additional_context.update(typesupport_impl=impl)
         generate_files(
             generator_arguments_file,
             mapping,
@@ -203,4 +204,4 @@ def get_jni_signature(type_):
 def get_jni_mangled_name(fully_qualified_name):
     # JNI name mangling:
     # https://docs.oracle.com/javase/8/docs/technotes/guides/jni/spec/design.html#resolving_native_method_names
-    return fully_qualified_name[0].replace('_', '_1') + '_' + '_'.join(fully_qualified_name[1:])
+    return '_'.join(list(map(lambda name: name.replace('_', '_1'), fully_qualified_name)))

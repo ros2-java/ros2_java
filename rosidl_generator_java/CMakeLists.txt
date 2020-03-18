@@ -67,6 +67,7 @@ if(BUILD_TESTING)
   set(_deps_library_dirs "")
   list_append_unique(_deps_library_dirs ${CMAKE_CURRENT_BINARY_DIR})
   list_append_unique(_deps_library_dirs ${CMAKE_CURRENT_BINARY_DIR}/rosidl_generator_java/rosidl_generator_java/msg/)
+  list_append_unique(_deps_library_dirs ${CMAKE_CURRENT_BINARY_DIR}/rosidl_generator_java/rosidl_generator_java/srv/)
 
   foreach(testsuite ${${PROJECT_NAME}_testsuites})
     ament_add_junit_tests("${PROJECT_NAME}_tests_${testsuite}"

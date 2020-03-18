@@ -532,4 +532,73 @@ public class InterfacesTest {
 
     assertEquals(42, unbounded_seq.getAlignmentCheck());
   }
+
+  @Test
+  public final void testBasicTypesService() {
+    rosidl_generator_java.srv.BasicTypes_Request basicTypesRequest =
+      new rosidl_generator_java.srv.BasicTypes_Request();
+    rosidl_generator_java.srv.BasicTypes_Response basicTypesResponse =
+      new rosidl_generator_java.srv.BasicTypes_Response();
+    // Set request fields
+    boolean expectedBool1 = true;
+    basicTypesRequest.setBoolValue(expectedBool1);
+    byte expectedByte1 = 123;
+    basicTypesRequest.setByteValue(expectedByte1);
+    byte expectedChar1 = 'a';
+    basicTypesRequest.setCharValue(expectedChar1);
+    float expectedFloat1 = 12.34f;
+    basicTypesRequest.setFloat32Value(expectedFloat1);
+    double expectedDouble1 = 12.34;
+    basicTypesRequest.setFloat64Value(expectedDouble1);
+    byte expectedInt81 = 123;
+    basicTypesRequest.setInt8Value(expectedInt81);
+    short expectedInt161 = 1230;
+    basicTypesRequest.setInt16Value(expectedInt161);
+    int expectedInt321 = 123000;
+    basicTypesRequest.setInt32Value(expectedInt321);
+    long expectedInt641 = 42949672960L;
+    basicTypesRequest.setInt64Value(expectedInt641);
+
+    // Set response fields
+    boolean expectedBool2 = false;
+    basicTypesResponse.setBoolValue(expectedBool2);
+    byte expectedByte2 = -42;
+    basicTypesResponse.setByteValue(expectedByte2);
+    byte expectedChar2 = ' ';
+    basicTypesResponse.setCharValue(expectedChar2);
+    float expectedFloat2 = -43.21f;
+    basicTypesResponse.setFloat32Value(expectedFloat2);
+    double expectedDouble2 = -43.21;
+    basicTypesResponse.setFloat64Value(expectedDouble2);
+    byte expectedInt82 = -42;
+    basicTypesResponse.setInt8Value(expectedInt82);
+    short expectedInt162 = -420;
+    basicTypesResponse.setInt16Value(expectedInt162);
+    int expectedInt322 = -42000;
+    basicTypesResponse.setInt32Value(expectedInt322);
+    long expectedInt642 = -4200000L;
+    basicTypesResponse.setInt64Value(expectedInt642);
+
+    // Get request fields
+    assertEquals(expectedBool1, basicTypesRequest.getBoolValue());
+    assertEquals(expectedByte1, basicTypesRequest.getByteValue());
+    assertEquals(expectedChar1, basicTypesRequest.getCharValue());
+    assertEquals(expectedFloat1, basicTypesRequest.getFloat32Value(), 0.01f);
+    assertEquals(expectedDouble1, basicTypesRequest.getFloat64Value(), 0.01);
+    assertEquals(expectedInt81, basicTypesRequest.getInt8Value());
+    assertEquals(expectedInt161, basicTypesRequest.getInt16Value());
+    assertEquals(expectedInt321, basicTypesRequest.getInt32Value());
+    assertEquals(expectedInt641, basicTypesRequest.getInt64Value());
+
+    // Get response fields
+    assertEquals(expectedBool2, basicTypesResponse.getBoolValue());
+    assertEquals(expectedByte2, basicTypesResponse.getByteValue());
+    assertEquals(expectedChar2, basicTypesResponse.getCharValue());
+    assertEquals(expectedFloat2, basicTypesResponse.getFloat32Value(), 0.01f);
+    assertEquals(expectedDouble2, basicTypesResponse.getFloat64Value(), 0.01);
+    assertEquals(expectedInt82, basicTypesResponse.getInt8Value());
+    assertEquals(expectedInt162, basicTypesResponse.getInt16Value());
+    assertEquals(expectedInt322, basicTypesResponse.getInt32Value());
+    assertEquals(expectedInt642, basicTypesResponse.getInt64Value());
+  }
 }

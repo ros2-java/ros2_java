@@ -9,102 +9,90 @@
 @#  - package_name (string)
 @#  - interface_path (Path relative to the directory named after the package)
 @#  - content (IdlContent, list of elements, e.g. Messages or Services)
+@#  - output_dir (Path)
+@#  - template_basepath (Path)
+@#  - typesupport_impl (string, the typesupport identifier of the generated code)
 @#######################################################################
 @{
-include_directives = set()
+import os
 
-jni_includes = [
-    'jni.h',
-]
-include_directives.update(jni_includes)
-std_includes = [
-    'cassert',
-    'cstdint',
-    'string',
-]
-include_directives.update(std_includes)
-rosidl_includes = [
-    'rosidl_generator_c/message_type_support_struct.h',
-]
-include_directives.update(rosidl_includes)
-rcljava_includes = [
-    'rcljava_common/exceptions.h',
-    'rcljava_common/signatures.h',
-]
-include_directives.update(rcljava_includes)
-}@
-@[for include in jni_includes]@
-#include <@(include)>
-@[end for]@
+from rosidl_cmake import expand_template
+from rosidl_parser.definition import Action
+from rosidl_parser.definition import Message
+from rosidl_parser.definition import Service
 
-@[for include in std_includes]@
-#include <@(include)>
-@[end for]@
-
-@[for include in rosidl_includes]@
-#include "@(include)"
-@[end for]@
-
-@[for include in rcljava_includes]@
-#include "@(include)"
-@[end for]@
-
-// Ensure that a jlong is big enough to store raw pointers
-static_assert(sizeof(jlong) >= sizeof(std::intptr_t), "jlong must be able to store pointers");
-
-using rcljava_common::exceptions::rcljava_throw_exception;
-
-@{
-jni_package_name = package_name.replace('_', '_1')
 }@
 @
 @#######################################################################
 @# Handle messages
 @#######################################################################
 @{
-from rosidl_parser.definition import Message
+data = {
+    'package_name': package_name,
+    'output_dir': output_dir,
+    'template_basepath': template_basepath,
+}
+
+for message in content.get_elements_of_type(Message):
+    data.update({'message': message})
+    type_name = message.structure.namespaced_type.name
+    namespaces = message.structure.namespaced_type.namespaces
+    output_file = os.path.join(
+        output_dir, *namespaces[1:], '{0}.ep.{1}.cpp'.format(type_name, typesupport_impl))
+    expand_template(
+        'msg.cpp.em',
+        data,
+        output_file,
+        template_basepath=template_basepath)
 }@
-@[for message in content.get_elements_of_type(Message)]@
-@{
-TEMPLATE(
-    'msg.cpp.em',
-    package_name=package_name,
-    jni_package_name=jni_package_name,
-    message=message,
-    include_directives=include_directives)
-}@
-@[end for]@
 @
 @#######################################################################
 @# Handle services
 @#######################################################################
 @{
-from rosidl_parser.definition import Service
+data = {
+    'package_name': package_name,
+    'interface_path': interface_path,
+    'output_dir': output_dir,
+    'template_basepath': template_basepath,
+    'typesupport_impl': typesupport_impl,
+}
+
+for service in content.get_elements_of_type(Service):
+    data.update({'service': service})
+    type_name = service.namespaced_type.name
+    namespaces = service.namespaced_type.namespaces
+    output_file = os.path.join(
+        output_dir, *namespaces[1:], '{0}.ep.{1}.cpp'.format(type_name, typesupport_impl))
+    expand_template(
+        'srv.cpp.em',
+        data,
+        output_file,
+        template_basepath=template_basepath)
+
 }@
-@[for service in content.get_elements_of_type(Service)]@
-@{
-TEMPLATE(
-    'srv.cpp.em',
-    package_name=package_name,
-    jni_package_name=jni_package_name,
-    service=service,
-    include_directives=include_directives)
-}@
-@[end for]@
 @
 @#######################################################################
 @# Handle actions
 @#######################################################################
 @{
-from rosidl_parser.definition import Action
+data = {
+    'package_name': package_name,
+    'interface_path': interface_path,
+    'output_dir': output_dir,
+    'template_basepath': template_basepath,
+    'typesupport_impl': typesupport_impl,
+}
+
+for action in content.get_elements_of_type(Action):
+    data.update({'action': action})
+    type_name = action.namespaced_type.name
+    namespaces = action.namespaced_type.namespaces
+    output_file = os.path.join(
+        output_dir, *namespaces[1:], '{0}.ep.{1}.cpp'.format(type_name, typesupport_impl))
+    expand_template(
+        'action.cpp.em',
+        data,
+        output_file,
+        template_basepath=template_basepath)
 }@
-@[for action in content.get_elements_of_type(Action)]@
-@{
-TEMPLATE(
-    'action.cpp.em',
-    package_name=package_name,
-    jni_package_name=jni_package_name,
-    action=action,
-    include_directives=include_directives)
-}@
-@[end for]@
