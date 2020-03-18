@@ -12,8 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef RCLJAVA_COMMON__VISIBILITY_CONTROL_H_
-#define RCLJAVA_COMMON__VISIBILITY_CONTROL_H_
+#ifndef RCLJAVA_COMMON__VISIBILITY_CONTROL_HPP_
+#define RCLJAVA_COMMON__VISIBILITY_CONTROL_HPP_
 
 #ifdef __cplusplus
 extern "C"
@@ -55,4 +55,4 @@ extern "C"
 }
 #endif
 
-#endif  // RCLJAVA_COMMON__VISIBILITY_CONTROL_H_
+#endif  // RCLJAVA_COMMON__VISIBILITY_CONTROL_HPP_

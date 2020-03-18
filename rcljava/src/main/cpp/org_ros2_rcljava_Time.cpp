@@ -19,7 +19,7 @@
 #include "rcl/error_handling.h"
 #include "rcl/rcl.h"
 
-#include "rcljava_common/exceptions.h"
+#include "rcljava_common/exceptions.hpp"
 
 #include "org_ros2_rcljava_Time.h"
 

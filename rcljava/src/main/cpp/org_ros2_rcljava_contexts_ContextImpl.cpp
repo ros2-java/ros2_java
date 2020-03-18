@@ -20,8 +20,8 @@
 #include "rcl/error_handling.h"
 #include "rcl/init.h"
 
-#include "rcljava_common/exceptions.h"
-#include "rcljava_common/signatures.h"
+#include "rcljava_common/exceptions.hpp"
+#include "rcljava_common/signatures.hpp"
 
 #include "org_ros2_rcljava_contexts_ContextImpl.h"
 

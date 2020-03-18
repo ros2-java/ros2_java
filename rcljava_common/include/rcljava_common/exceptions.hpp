@@ -11,13 +11,13 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
-#ifndef RCLJAVA_COMMON__EXCEPTIONS_H_
-#define RCLJAVA_COMMON__EXCEPTIONS_H_
+#ifndef RCLJAVA_COMMON__EXCEPTIONS_HPP_
+#define RCLJAVA_COMMON__EXCEPTIONS_HPP_
 #include <jni.h>
 
 #include <string>
 
-#include "rcljava_common/visibility_control.h"
+#include "rcljava_common/visibility_control.hpp"
 
 namespace rcljava_common
 {
@@ -31,4 +31,4 @@ void rcljava_throw_exception(JNIEnv *, const char *, const std::string &);
 }  // namespace exceptions
 }  // namespace rcljava_common
 
-#endif  // RCLJAVA_COMMON__EXCEPTIONS_H_
+#endif  // RCLJAVA_COMMON__EXCEPTIONS_HPP_

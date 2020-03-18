@@ -24,8 +24,8 @@
 #include "rcl/rcl.h"
 #include "rmw/rmw.h"
 
-#include "rcljava_common/exceptions.h"
-#include "rcljava_common/signatures.h"
+#include "rcljava_common/exceptions.hpp"
+#include "rcljava_common/signatures.hpp"
 
 #include "org_ros2_rcljava_timer_WallTimerImpl.h"
 

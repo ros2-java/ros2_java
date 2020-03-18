@@ -24,8 +24,8 @@
 #include "rmw/rmw.h"
 #include "rosidl_generator_c/message_type_support_struct.h"
 
-#include "rcljava_common/exceptions.h"
-#include "rcljava_common/signatures.h"
+#include "rcljava_common/exceptions.hpp"
+#include "rcljava_common/signatures.hpp"
 
 #include "org_ros2_rcljava_subscription_SubscriptionImpl.h"
 

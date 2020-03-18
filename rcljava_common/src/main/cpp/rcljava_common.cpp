@@ -16,7 +16,7 @@
 #include <cassert>
 #include <string>
 
-#include "rcljava_common/exceptions.h"
+#include "rcljava_common/exceptions.hpp"
 
 namespace rcljava_common
 {

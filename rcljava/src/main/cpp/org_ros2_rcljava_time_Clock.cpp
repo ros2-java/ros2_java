@@ -20,8 +20,8 @@
 #include "rcl/error_handling.h"
 #include "rcl/time.h"
 
-#include "rcljava_common/exceptions.h"
-#include "rcljava_common/signatures.h"
+#include "rcljava_common/exceptions.hpp"
+#include "rcljava_common/signatures.hpp"
 
 #include "org_ros2_rcljava_time_Clock.h"
 

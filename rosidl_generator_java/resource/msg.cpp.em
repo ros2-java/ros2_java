@@ -102,8 +102,8 @@ elif message_c_include_prefix.endswith('__feedback'):
 
 #include "rosidl_generator_c/message_type_support_struct.h"
 
-#include "rcljava_common/exceptions.h"
-#include "rcljava_common/signatures.h"
+#include "rcljava_common/exceptions.hpp"
+#include "rcljava_common/signatures.hpp"
 
 @[for include in member_includes]@
 #include "@(include)"

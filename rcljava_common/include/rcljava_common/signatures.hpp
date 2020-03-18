@@ -11,8 +11,8 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
-#ifndef RCLJAVA_COMMON__SIGNATURES_H_
-#define RCLJAVA_COMMON__SIGNATURES_H_
+#ifndef RCLJAVA_COMMON__SIGNATURES_HPP_
+#define RCLJAVA_COMMON__SIGNATURES_HPP_
 #include <jni.h>
 
 #include <string>
@@ -29,4 +29,4 @@ using destroy_ros_message_signature = void (*)(void *);
 }  // namespace signatures
 }  // namespace rcljava_common
 
-#endif  // RCLJAVA_COMMON__SIGNATURES_H_
+#endif  // RCLJAVA_COMMON__SIGNATURES_HPP_
