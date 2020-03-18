@@ -1,113 +1,29 @@
 repositories:
-  eProsima/Fast-CDR:
+  ament/ament_java:
     type: git
-    url: https://github.com/eProsima/Fast-CDR.git
-    version: v1.0.7
-  eProsima/Fast-RTPS:
-    type: git
-    url: https://github.com/eProsima/Fast-RTPS.git
-    version: 7a0b0fe7ca8d2c4ea41e36744c6024c263a6505a
-  ros/class_loader:
-    type: git
-    url: https://github.com/ros/class_loader.git
-    version: 1.1.0
-  ros/console_bridge:
-    type: git
-    url: https://github.com/ros/console_bridge.git
-    version: ad25f7307da76be2857545e7e5c2a20727eee542
-  ros2/console_bridge_vendor:
-    type: git
-    url: https://github.com/ros2/console_bridge_vendor.git
+    url: https://github.com/ros2-java/ament_java.git
     version: master
-  ros2/ament_cmake_ros:
-    type: git
-    url: https://github.com/ros2/ament_cmake_ros.git
-    version: 0.5.0
-  ros2/rcutils:
-    type: git
-    url: https://github.com/ros2/rcutils.git
-    version: 0.5.1
   ros2/common_interfaces:
     type: git
-    url: https://github.com/ros2/common_interfaces.git
-    version: 0.5.0
-  ros2/example_interfaces:
-    type: git
-    url: https://github.com/ros2/example_interfaces.git
-    version: 0.5.0
-  ros2/launch:
-    type: git
-    url: https://github.com/ros2/launch.git
-    version: 0.5.2
-  ros2/libyaml_vendor:
-    type: git
-    url: https://github.com/ros2/libyaml_vendor.git
-    version: 1.0.0
-  ros2/poco_vendor:
-    type: git
-    url: https://github.com/ros2/poco_vendor.git
-    version: 1.1.1
-  ros2/rcl:
-    type: git
-    url: https://github.com/ros2/rcl.git
-    version: 0.5.1
+    url: https://github.com/ros2/common_interfaces
+    version: dashing
   ros2/rcl_interfaces:
     type: git
     url: https://github.com/ros2/rcl_interfaces.git
-    version: db27f0e8619460848d80c1442f7fec0c56ee63e5
-  ros2/rclpy:
-    type: git
-    url: https://github.com/ros2/rclpy.git
-    version: 0.5.3
-  ros2/rmw:
-    type: git
-    url: https://github.com/ros2/rmw.git
-    version: 0.5.0
-  ros2/rmw_fastrtps:
-    type: git
-    url: https://github.com/ros2/rmw_fastrtps.git
-    version: 0.5.1
-  ros2/rmw_implementation:
-    type: git
-    url: https://github.com/ros2/rmw_implementation.git
-    version: 0.5.1
-  ros2/rmw_opensplice:
-    type: git
-    url: https://github.com/ros2/rmw_opensplice.git
-    version: 0.5.2
-  ros2/rosidl_typesupport_opensplice:
-    type: git
-    url: https://github.com/ros2/rosidl_typesupport_opensplice.git
-    version: 0.5.0
-  ros2/ros2cli:
-    type: git
-    url: https://github.com/ros2/ros2cli.git
-    version: 0.5.3
-  ros2/rosidl:
-    type: git
-    url: https://github.com/ros2/rosidl.git
-    version: 0.5.1
-  ros2/rosidl_dds:
-    type: git
-    url: https://github.com/ros2/rosidl_dds.git
-    version: 0.5.0
+    version: dashing
   ros2/rosidl_defaults:
     type: git
-    url: https://github.com/ros2/rosidl_defaults.git
-    version: 0.5.0
-  ros2/rosidl_python:
+    url: https://github.com/ros2/rosidl_defaults
+    version: dashing
+  ros2/unique_identifier_msgs:
     type: git
-    url: https://github.com/ros2/rosidl_python.git
-    version: 0.5.2
-  ros2/rosidl_typesupport:
-    type: git
-    url: https://github.com/ros2/rosidl_typesupport.git
-    version: 0.5.0
+    url: https://github.com/ros2/unique_identifier_msgs
+    version: dashing
   ros2_java/ros2_java:
     type: git
-    url: https://github.com/esteve/ros2_java.git
-    version: master
+    url: https://github.com/ros2-java/ros2_java.git
+    version: dashing
   ros2_java/ros2_java_examples:
     type: git
-    url: https://github.com/esteve/ros2_java_examples.git
+    url: https://github.com/ros2-java/ros2_java_examples.git
     version: master
