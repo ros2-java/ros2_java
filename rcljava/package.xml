@@ -19,7 +19,6 @@
   <build_depend>rmw</build_depend>
   <build_depend>rosidl_generator_c</build_depend>
   <build_depend>rosidl_typesupport_c</build_depend>
-  <build_depend>rosidl_typesupport_java</build_depend>
   <build_export_depend>builtin_interfaces</build_export_depend>
   <build_export_depend>rcl_interfaces</build_export_depend>
   <build_export_depend>rmw</build_export_depend>
