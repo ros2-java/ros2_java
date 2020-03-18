@@ -79,5 +79,6 @@ public class TimerTest {
     assertTrue(timer.isCanceled());
 
     assertEquals(4, timerCallback.getCounter());
+    RCLJava.shutdown();
   }
 }
