@@ -99,7 +99,7 @@ Desktop
 ```
 mkdir -p ros2_java_ws/src
 cd ros2_java_ws
-curl -skL https://raw.githubusercontent.com/esteve/ros2_java/master/ros2_java_desktop.repos -o ros2_java_desktop.repos
+curl -skL https://raw.githubusercontent.com/ros2-java/ros2_java/dashing/ros2_java_desktop.repos -o ros2_java_desktop.repos
 vcs import src < ros2_java_desktop.repos
 . ../ament_ws/install_isolated/local_setup.sh
 ament build --symlink-install --isolated
@@ -144,7 +144,7 @@ export ANDROID_TOOLCHAIN_NAME=arm-linux-androideabi-clang
 # pull and build ros2 for android
 mkdir -p ${ROS2_ANDROID_WORKSPACE}/src
 cd ${ROS2_ANDROID_WORKSPACE}
-wget https://raw.githubusercontent.com/esteve/ros2_java/master/ros2_java_android.repos
+wget https://raw.githubusercontent.com/ros2-java/ros2_java/dashing/ros2_java_desktop.repos
 vcs import ${ROS2_ANDROID_WORKSPACE}/src < ros2_java_android.repos
 source ${AMENT_WORKSPACE}/install_isolated/local_setup.sh
 ament build --isolated --skip-packages test_msgs \
