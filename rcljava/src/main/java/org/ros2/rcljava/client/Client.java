@@ -15,6 +15,7 @@
 
 package org.ros2.rcljava.client;
 
+import java.time.Duration;
 import java.util.concurrent.Future;
 
 import org.ros2.rcljava.concurrent.RCLFuture;
@@ -36,6 +37,35 @@ public interface Client<T extends ServiceDefinition> extends Disposable {
 
   <U extends MessageDefinition, V extends MessageDefinition> Future<V> asyncSendRequest(
       final U request, final Consumer<Future<V>> callback);
+
+  /**
+   * Check if the service server is available.
+   *
+   * @return true if the client can talk to the service, false otherwise.
+   */
+  boolean isServiceAvailable();
+
+  /**
+   * Wait for the service server to be available.
+   *
+   * Blocks until the service is available or the ROS context is invalidated.
+   *
+   * @return true if the service is available, false if the ROS context was shutdown.
+   */
+  boolean waitForService();
+
+  /**
+   * Wait for the service server to be available.
+   *
+   * Blocks until the service is available or a timeout occurs.
+   * Also returns if the ROS context is invalidated.
+   *
+   * @param timeout Time to wait for the service to be available.
+   *   A zero value causes this method to check if the service is available and return immediately.
+   *   A negative value is treated as an infinite timeout.
+   * @return true if the service is available, false otherwise.
+   */
+  boolean waitForService(Duration timeout);
 
   String getServiceName();
 }

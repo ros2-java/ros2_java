@@ -37,6 +37,16 @@ JNICALL Java_org_ros2_rcljava_client_ClientImpl_nativeSendClientRequest(
 JNIEXPORT void
 JNICALL Java_org_ros2_rcljava_client_ClientImpl_nativeDispose(JNIEnv *, jclass, jlong, jlong);
 
+/*
+ * Class:     org_ros2_rcljava_client_ClientImpl
+ * Method:    nativeIsServiceAvailable
+ * Signature: (JJ)Z
+ */
+JNIEXPORT jboolean
+JNICALL Java_org_ros2_rcljava_client_ClientImpl_nativeIsServiceAvailable(
+  JNIEnv *, jclass, jlong, jlong);
+
+
 #ifdef __cplusplus
 }
 #endif

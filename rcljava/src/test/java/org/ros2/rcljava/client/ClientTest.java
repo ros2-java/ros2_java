@@ -26,9 +26,12 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 
 import java.lang.ref.WeakReference;
+import java.time.Duration;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
 
 import org.ros2.rcljava.RCLJava;
 import org.ros2.rcljava.concurrent.RCLFuture;
@@ -81,10 +84,10 @@ public class ClientTest {
 
   @Test
   public final void testAdd() throws Exception {
-    RCLFuture<rcljava.srv.AddTwoInts_Response> future =
+    RCLFuture<rcljava.srv.AddTwoInts_Response> consumerFuture =
         new RCLFuture<rcljava.srv.AddTwoInts_Response>(new WeakReference<Node>(node));
 
-    TestClientConsumer clientConsumer = new TestClientConsumer(future);
+    TestClientConsumer clientConsumer = new TestClientConsumer(consumerFuture);
 
     Service<rcljava.srv.AddTwoInts> service = node.<rcljava.srv.AddTwoInts>createService(
         rcljava.srv.AddTwoInts.class, "add_two_ints", clientConsumer);
@@ -96,12 +99,19 @@ public class ClientTest {
     Client<rcljava.srv.AddTwoInts> client =
         node.<rcljava.srv.AddTwoInts>createClient(rcljava.srv.AddTwoInts.class, "add_two_ints");
 
-    while (RCLJava.ok() && !future.isDone()) {
-      client.asyncSendRequest(request);
-      RCLJava.spinOnce(node);
-    }
+    assertTrue(client.waitForService(Duration.ofSeconds(10)));
 
-    assertEquals(5, future.get().getSum());
+    Future<rcljava.srv.AddTwoInts_Response> responseFuture = client.asyncSendRequest(request);
+
+    rcljava.srv.AddTwoInts_Response response = responseFuture.get(10, TimeUnit.SECONDS);
+
+    // Check that the message was received by the service
+    assertTrue(consumerFuture.isDone());
+
+    // Check the contents of the response
+    assertEquals(5, response.getSum());
+
+    // Cleanup
     client.dispose();
     assertEquals(0, client.getHandle());
     service.dispose();

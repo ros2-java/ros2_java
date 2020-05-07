@@ -15,11 +15,15 @@
 
 package org.ros2.rcljava.client;
 
+import java.time.Duration;
 import java.lang.ref.WeakReference;
+import java.lang.InterruptedException;
+import java.lang.Long;
 import java.util.AbstractMap;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
 
 import org.ros2.rcljava.RCLJava;
 import org.ros2.rcljava.common.JNIUtils;
@@ -137,6 +141,58 @@ public class ClientImpl<T extends ServiceDefinition> implements Client<T> {
    */
   public final long getHandle() {
     return this.handle;
+  }
+
+  private static native boolean nativeIsServiceAvailable(long nodeHandle, long handle);
+
+  /**
+   * {@inheritDoc}
+   */
+  public boolean isServiceAvailable() {
+    Node node = this.nodeReference.get();
+    if (node == null) {
+      return false;
+    }
+    return nativeIsServiceAvailable(node.getHandle(), this.handle);
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  public final boolean waitForService() {
+    return waitForService(Duration.ofNanos(-1));
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  public final boolean waitForService(Duration timeout) {
+    long timeoutNano = timeout.toNanos();
+    if (0L == timeoutNano) {
+      return isServiceAvailable();
+    }
+    long startTime = System.nanoTime();
+    long timeToWait = (timeoutNano >= 0L) ? timeoutNano : Long.MAX_VALUE;
+    while (RCLJava.ok() && timeToWait > 0L) {
+      // TODO(jacobperron): Wake up whenever graph changes instead of sleeping for a fixed duration
+      try {
+        TimeUnit.MILLISECONDS.sleep(10);
+      } catch (InterruptedException ex) {
+        Thread.currentThread().interrupt();
+        return false;
+      }
+
+      if (isServiceAvailable()) {
+        return true;
+      }
+
+      // If timeout is negative, timeToWait will always be greater than zero
+      if (timeoutNano > 0L) {
+        timeToWait = timeoutNano - (System.nanoTime() - startTime);
+      }
+    }
+
+    return false;
   }
 
   public String getServiceName() {

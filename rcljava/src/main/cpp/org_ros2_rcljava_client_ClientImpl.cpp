@@ -19,6 +19,7 @@
 #include <string>
 
 #include "rcl/error_handling.h"
+#include "rcl/graph.h"
 #include "rcl/node.h"
 #include "rcl/rcl.h"
 #include "rmw/rmw.h"
@@ -95,4 +96,30 @@ Java_org_ros2_rcljava_client_ClientImpl_nativeDispose(
     rcl_reset_error();
     rcljava_throw_rclexception(env, ret, msg);
   }
+}
+
+JNIEXPORT jboolean JNICALL
+Java_org_ros2_rcljava_client_ClientImpl_nativeIsServiceAvailable(
+  JNIEnv * env, jclass, jlong node_handle, jlong client_handle)
+{
+  rcl_node_t * node = reinterpret_cast<rcl_node_t *>(node_handle);
+  assert(node != NULL);
+  rcl_client_t * client = reinterpret_cast<rcl_client_t *>(client_handle);
+  assert(client != NULL);
+
+  bool is_ready;
+  rcl_ret_t ret = rcl_service_server_is_available(node, client, &is_ready);
+  if (RCL_RET_NODE_INVALID == ret) {
+    if (node && !rcl_context_is_valid(node->context)) {
+      // context is shutdown, do a soft failure
+      return false;
+    }
+  }
+  if (ret != RCL_RET_OK) {
+    std::string msg =
+      "Failed to check if service is available: " + std::string(rcl_get_error_string().str);
+    rcl_reset_error();
+    rcljava_throw_rclexception(env, ret, msg);
+  }
+  return is_ready;
 }
