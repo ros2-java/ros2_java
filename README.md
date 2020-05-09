@@ -144,7 +144,7 @@ export ANDROID_TOOLCHAIN_NAME=arm-linux-androideabi-clang
 # pull and build ros2 for android
 mkdir -p ${ROS2_ANDROID_WORKSPACE}/src
 cd ${ROS2_ANDROID_WORKSPACE}
-wget https://raw.githubusercontent.com/ros2-java/ros2_java/dashing/ros2_java_desktop.repos
+wget https://raw.githubusercontent.com/ros2-java/ros2_java/dashing/ros2_java_android.repos
 vcs import ${ROS2_ANDROID_WORKSPACE}/src < ros2_java_android.repos
 source ${AMENT_WORKSPACE}/install_isolated/local_setup.sh
 ament build --isolated --skip-packages test_msgs \
