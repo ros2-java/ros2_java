@@ -38,6 +38,10 @@ if(BUILD_TESTING)
   find_package(ament_lint_auto REQUIRED)
   ament_lint_auto_find_test_dependencies()
 
+  # TODO(jacobperron): This fixes generating messages with wstrings.
+  # Figure out why this is needed as of Foxy, and how we can remove this workaround
+  set(CMAKE_JAVA_COMPILE_FLAGS "-encoding" "ISO-8859-1")
+
   include(cmake/register_java.cmake)
   include(cmake/rosidl_generator_java_get_typesupports.cmake)
 
