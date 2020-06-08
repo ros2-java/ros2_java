@@ -85,6 +85,7 @@ public class ServiceImpl<T extends ServiceDefinition> implements Service<T> {
   public final void dispose() {
     Node node = this.nodeReference.get();
     if (node != null) {
+      node.removeService(this);
       nativeDispose(node.getHandle(), this.handle);
       this.handle = 0;
     }
