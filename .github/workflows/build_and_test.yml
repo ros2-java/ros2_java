@@ -1,6 +1,6 @@
 name: CI
 
-on: [push]
+on: [push, pull_request]
 
 jobs:
   linux_build_and_test:
@@ -11,10 +11,10 @@ jobs:
       run: |
         sudo apt update -qq
         sudo apt install -y default-jdk
-    - uses: ros-tooling/setup-ros@3b3f060
+    - uses: ros-tooling/setup-ros@b1c8132
       with:
         required-ros-distributions: dashing
-    - uses: ros-tooling/action-ros-ci@242ffcc
+    - uses: ros-tooling/action-ros-ci@658ebdf
       with:
         package-name: rosidl_generator_java rcljava_common rcljava
         source-ros-binary-installation: dashing
@@ -28,11 +28,12 @@ jobs:
         java-version: '11.0.6' # The JDK version to make available on the path.
         java-package: jdk
         architecture: x64
-    - uses: ros-tooling/setup-ros@3b3f060
+    - uses: ros-tooling/setup-ros@b1c8132
       with:
         required-ros-distributions: dashing
-    - uses: ros-tooling/action-ros-ci@242ffcc
+    - uses: ros-tooling/action-ros-ci@658ebdf
       with:
+        colcon-extra-args: --merge-install
         package-name: rosidl_generator_java rcljava_common rcljava
         vcs-repo-file-url: |
             https://raw.githubusercontent.com/ros2/ros2/dashing/ros2.repos
