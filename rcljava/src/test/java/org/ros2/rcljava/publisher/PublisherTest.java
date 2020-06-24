@@ -33,6 +33,14 @@ public class PublisherTest {
     assertEquals(node.getHandle(), publisher.getNodeReference().get().getHandle());
     assertNotEquals(0, publisher.getNodeReference().get().getHandle());
     assertNotEquals(0, publisher.getHandle());
+    assertEquals(1, node.getPublishers().size());
+
+    // We expect that calling dispose should result in a zero handle
+    // and the reference is dropped from the Node
+    publisher.dispose();
+    assertEquals(0, publisher.getHandle());
+    assertEquals(0, node.getPublishers().size());
+
     RCLJava.shutdown();
   }
 }
