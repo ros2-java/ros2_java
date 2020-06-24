@@ -25,7 +25,7 @@ import org.ros2.rcljava.node.Node;
 
 public class PublisherTest {
   @Test
-  public final void testCreate() {
+  public final void testCreateAndDispose() {
     RCLJava.rclJavaInit();
     Node node = RCLJava.createNode("test_node");
     Publisher<std_msgs.msg.String> publisher =
