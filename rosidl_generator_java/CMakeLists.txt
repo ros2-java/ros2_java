@@ -31,6 +31,10 @@ if(BUILD_TESTING)
   find_package(rosidl_generator_c REQUIRED)
   find_package(test_interface_files REQUIRED)
 
+  # Disable flake8 linter
+  # TODO(jacobperron): Re-enable after https://github.com/ament/ament_lint/pull/252
+  set(ament_cmake_flake8_FOUND TRUE)
+
   find_package(ament_lint_auto REQUIRED)
   ament_lint_auto_find_test_dependencies()
 
