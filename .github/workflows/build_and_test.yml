@@ -11,7 +11,7 @@ jobs:
       run: |
         sudo apt update -qq
         sudo apt install -y default-jdk
-    - uses: ros-tooling/setup-ros@b1c8132
+    - uses: ros-tooling/setup-ros@0.0.24
       with:
         required-ros-distributions: dashing
     - uses: ros-tooling/action-ros-ci@658ebdf
@@ -28,7 +28,7 @@ jobs:
         java-version: '11.0.6' # The JDK version to make available on the path.
         java-package: jdk
         architecture: x64
-    - uses: ros-tooling/setup-ros@b1c8132
+    - uses: ros-tooling/setup-ros@0.0.24
       with:
         required-ros-distributions: dashing
     - uses: ros-tooling/action-ros-ci@658ebdf
