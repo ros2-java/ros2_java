@@ -14,7 +14,7 @@ jobs:
     - uses: ros-tooling/setup-ros@0.0.24
       with:
         required-ros-distributions: dashing
-    - uses: ros-tooling/action-ros-ci@658ebdf
+    - uses: clalancette/action-ros-ci@0a0aea3
       with:
         package-name: rosidl_generator_java rcljava_common rcljava
         source-ros-binary-installation: dashing
@@ -31,7 +31,7 @@ jobs:
     - uses: ros-tooling/setup-ros@0.0.24
       with:
         required-ros-distributions: dashing
-    - uses: ros-tooling/action-ros-ci@658ebdf
+    - uses: clalancette/action-ros-ci@0a0aea3
       with:
         colcon-extra-args: --merge-install
         package-name: rosidl_generator_java rcljava_common rcljava
