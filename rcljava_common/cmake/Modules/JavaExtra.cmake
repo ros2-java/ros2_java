@@ -127,7 +127,7 @@ function(ament_add_junit_tests TARGET_NAME)
 
   message("CHRIS: Separator: '${SEPARATOR}'")
   message("CHRIS: ARG_APPEND_LIBRARY_DIRS: '${ARG_APPEND_LIBRARY_DIRS}'")
-  string(REPLACE ";" ${SEPARATOR} _library_paths "${ARG_APPEND_LIBRARY_DIRS}")
+  string(REPLACE ";" "${SEPARATOR}" _library_paths "${ARG_APPEND_LIBRARY_DIRS}")
 
   if(ARG_ENV)
     set(ARG_ENV "ENV" ${ARG_ENV})
