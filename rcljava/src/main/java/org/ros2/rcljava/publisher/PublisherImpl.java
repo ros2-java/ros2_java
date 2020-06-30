@@ -117,6 +117,7 @@ public class PublisherImpl<T extends MessageDefinition> implements Publisher<T> 
   public final void dispose() {
     Node node = this.nodeReference.get();
     if (node != null) {
+      node.removePublisher(this);
       nativeDispose(node.getHandle(), this.handle);
       this.handle = 0;
     }

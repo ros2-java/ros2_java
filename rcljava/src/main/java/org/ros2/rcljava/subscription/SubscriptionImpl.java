@@ -129,6 +129,7 @@ public class SubscriptionImpl<T extends MessageDefinition> implements Subscripti
   public final void dispose() {
     Node node = this.nodeReference.get();
     if (node != null) {
+      node.removeSubscription(this);
       nativeDispose(node.getHandle(), this.handle);
       this.handle = 0;
     }

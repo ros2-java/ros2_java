@@ -122,6 +122,55 @@ public interface Node extends Disposable {
   <T extends ServiceDefinition> Client<T> createClient(final Class<T> serviceType,
       final String serviceName) throws NoSuchFieldException, IllegalAccessException;
 
+  /**
+   * Remove a Subscription created by this Node.
+   *
+   * Calling this method effectively invalidates the passed @{link Subscription}.
+   * If the subscription was not created by this Node, then nothing happens.
+   *
+   * @param subscription The object to remove from this node.
+   * @return true if the subscription was removed, false if the subscription was already
+   *   removed or was never created by this Node.
+   */
+  boolean removeSubscription(final Subscription subscription);
+
+  /**
+   * Remove a Publisher created by this Node.
+   *
+   * Calling this method effectively invalidates the passed @{link Publisher}.
+   * If the publisher was not created by this Node, then nothing happens.
+   *
+   * @param publisher The object to remove from this node.
+   * @return true if the publisher was removed, false if the publisher was already
+   *   removed or was never created by this Node.
+   */
+  boolean removePublisher(final Publisher publisher);
+
+  /**
+   * Remove a Service created by this Node.
+   *
+   * Calling this method effectively invalidates the passed @{link Service}.
+   * If the service was not created by this Node, then nothing happens.
+   *
+   * @param service The object to remove from this node.
+   * @return true if the service was removed, false if the service was already
+   *   removed or was never created by this Node.
+   */
+  boolean removeService(final Service service);
+
+  /**
+   * Remove a Client created by this Node.
+   *
+   * Calling this method effectively invalidates the passed @{link Client}.
+   * If the client was not created by this Node, then nothing happens.
+   *
+   * @param client The object to remove from this node.
+   * @return true if the client was removed, false if the client was already
+   *   removed or was never created by this Node.
+   */
+  boolean removeClient(final Client client);
+
+
   WallTimer createWallTimer(final long period, final TimeUnit unit, final Callback callback);
 
   String getName();

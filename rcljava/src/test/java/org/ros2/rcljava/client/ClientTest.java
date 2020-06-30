@@ -111,10 +111,16 @@ public class ClientTest {
     // Check the contents of the response
     assertEquals(5, response.getSum());
 
-    // Cleanup
+    assertEquals(1, node.getClients().size());
+    assertEquals(1, node.getServices().size());
+
+    // We expect that calling dispose should result in a zero handle
+    // and the reference is dropped from the Node
     client.dispose();
     assertEquals(0, client.getHandle());
+    assertEquals(0, node.getClients().size());
     service.dispose();
     assertEquals(0, service.getHandle());
+    assertEquals(0, node.getServices().size());
   }
 }

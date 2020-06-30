@@ -224,6 +224,20 @@ public class NodeImpl implements Node {
   /**
    * {@inheritDoc}
    */
+  public boolean removeSubscription(final Subscription subscription) {
+    return this.subscriptions.remove(subscription);
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  public boolean removePublisher(final Publisher publisher) {
+    return this.publishers.remove(publisher);
+  }
+
+  /**
+   * {@inheritDoc}
+   */
   public final Collection<Subscription> getSubscriptions() {
     return this.subscriptions;
   }
@@ -299,6 +313,20 @@ public class NodeImpl implements Node {
 
   private static native <T extends ServiceDefinition> long nativeCreateClientHandle(
       long handle, Class<T> cls, String serviceName, long qosProfileHandle);
+
+  /**
+   * {@inheritDoc}
+   */
+  public boolean removeService(final Service service) {
+    return this.services.remove(service);
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  public boolean removeClient(final Client client) {
+    return this.clients.remove(client);
+  }
 
   /**
    * {@inheritDoc}
