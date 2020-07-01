@@ -40,73 +40,77 @@ The current set of features include:
 - Clients and services
 - Timers
 - Composition (i.e. more than one node per process)
-- Time handling (system and steady, ROS time not yet supported https://github.com/ros2/ros2/issues/350)
+- Time handling (system and steady, ROS time not yet supported)
 - Support for Android
 - Parameters services and clients (both asynchronous and synchronous)
 
 Sounds great, how can I try this out?
 -------------------------------------
 
+Install dependencies
+
 > Note: While the following instructions use a Linux shell the same can be done on other platforms like Windows with slightly adjusted commands.
+
+1. [Install ROS 2](https://index.ros.org/doc/ros2/Installation).
+
+1. Install Java and a JDK.
+
+On Ubuntu, you can install OpenJDK with:
+
+    sudo apt install default-jdk
+
+1. Install Gradle.
+Make sure you have Gradle 3.2 (or later) installed.
+
+*Ubuntu Bionic or later*
+
+    sudo apt install gradle
+
+*macOS*
+
+    brew install gradle
+
+> If run into compatibily issues between gradle 3.x and Java 9, try using Java 8:
 >
-> For Windows and Mac, first follow the steps for installing prerequisites on the binary installation page: https://index.ros.org/doc/ros2/Installation
->
-> Stop and return here when you reach the "Downloading ROS 2" section.
+>     brew tap caskroom/versions
+>     brew cask install java8
+>     export JAVA_HOME=/Library/Java/JavaVirtualMachines/1.8.0.jdk/Contents/Home
 
-Download the ament repositories in a separate workspace:
+*Windows*
 
-```
-mkdir -p ament_ws/src
-cd ament_ws
-curl -skL https://raw.githubusercontent.com/ros2-java/ament_java/master/ament_java.repos -o ament_java.repos
-vcs import src < ament_java.repos
-src/ament/ament_tools/scripts/ament.py build --symlink-install --isolated
-```
+    choco install gradle
 
-> Note: On Windows, use `python src/ament/ament_tools/scripts/ament.py build`, as `*.py` scripts must be prefixed with `python`, `--symlink-install` is not supported due to a bug in Python symlinks, and `--isolated` creates paths that are too long.
-> Additionally, you may need to call `call "C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\VC\Auxiliary\Build\vcvars64.bat"` if you have not run from a VS 2017 terminal.
+1. Install build tools:
 
-We need to split the build process between Ament and the rest of `ros2_java` workspace so that the additional build type for Gradle projects is picked up by Ament.
+    sudo apt install curl python3-colcon-common-extensions python3-pip python3-vctool
 
-Make sure you have Gradle 3.2 (or later) installed. Ubuntu 16.04 ships with Gradle 2.10, you can install a more recent version of Gradle from the following PPA:
+1. Install Gradle extensions for colcon:
 
-```
-$ sudo add-apt-repository ppa:cwchien/gradle
-$ sudo apt install -y gradle
-```
-For OSX, use homebrew command to install gradle:
-
-```
-$ brew install gradle
-```
-
-For OSX users, there some compatibily issues have been reported between gradle 3.x and Java 9. Currently only the combination of Gradle 3.x + Java 8 has been tested successfully. Make sure to use install and use Java 8 for the building process:
-
-```
-$ brew tap caskroom/versions
-$ brew cask install java8
-$ export JAVA_HOME=/Library/Java/JavaVirtualMachines/1.8.0.jdk/Contents/Home
-```
-
-> Note: On Windows, you may use `choco install -y gradle`
-
-The following sections deal with building the `ros2_java` codebase for the desktop Java runtime and for Android.
+    python3 -m pip install -U git+https://github.com/colcon/colcon-gradle
+    python3 -m pip install --no-deps -U git+https://github.com/colcon/colcon-ros-gradle
 
 Desktop
 -------
 
-```
-mkdir -p ros2_java_ws/src
-cd ros2_java_ws
-curl -skL https://raw.githubusercontent.com/ros2-java/ros2_java/dashing/ros2_java_desktop.repos -o ros2_java_desktop.repos
-vcs import src < ros2_java_desktop.repos
-. ../ament_ws/install_isolated/local_setup.sh
-ament build --symlink-install --isolated
-```
+Download and Build ROS 2 Java
 
-> On Windows, if you would like to use OpenSplice, call `call "C:\opensplice67\HDE\x86_64.win64\release.bat"` before building.
+1. Source your ROS 2 installation, for example:
 
-Now you can just run a bunch of examples, head over to https://github.com/ros2-java/ros2_java_examples for more information.
+    source /opt/ros/dashing/setup.bash
+
+1. Download the ROS 2 Java repositories into a workspace:
+
+    mkdir -p ros2_java_ws/src
+    cd ros2_java_ws
+    curl -skL https://raw.githubusercontent.com/ros2-java/ros2_java/dashing/ros2_java_desktop.repos | vcs import src
+
+1. **Linux only** Install ROS dependencies:
+
+    rosdep install --from-paths src -y -i --skip-keys "ament_tools"
+
+1. Build desktop packages:
+
+    colcon build --symlink-install
 
 Android
 -------
