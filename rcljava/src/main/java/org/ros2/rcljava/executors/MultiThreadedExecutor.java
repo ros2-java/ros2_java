@@ -56,7 +56,15 @@ public class MultiThreadedExecutor implements Executor {
   }
 
   public void spinSome() {
-    this.baseExecutor.spinSome();
+    this.spinSome(0);
+  }
+
+  public void spinSome(long maxDurationNs) {
+    this.baseExecutor.spinSome(maxDurationNs);
+  }
+
+  public void spinAll(long maxDurationNs) {
+    this.baseExecutor.spinAll(maxDurationNs);
   }
 
   public void spin() {

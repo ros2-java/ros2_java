@@ -328,17 +328,44 @@ public class BaseExecutor {
     return null;
   }
 
-  protected void spinSome() {
-    AnyExecutable anyExecutable = getNextExecutable();
-    if (anyExecutable == null) {
-      waitForWork(0);
-      do {
-        anyExecutable = getNextExecutable();
-        if (anyExecutable != null) {
-          executeAnyExecutable(anyExecutable);
-        }
-      } while (anyExecutable != null);
+  private boolean maxDurationNotElapsed(long maxDurationNs, long startNs) {
+    long nowNs = System.nanoTime();
+    if (maxDurationNs == 0) {
+      // told to spin forever if need be
+      return true;
+    } else if (nowNs - startNs < maxDurationNs) {
+      // told to spin only for some maximum amount of time
+      return true;
     }
+    // spun too long
+    return false;
+  }
+
+  private void spinSomeImpl(long maxDurationNs, boolean exhaustive) {
+    long startNs = System.nanoTime();
+    boolean workAvailable = false;
+    while (RCLJava.ok() && maxDurationNotElapsed(maxDurationNs, startNs)) {
+      if (!workAvailable) {
+        waitForWork(0);
+      }
+      AnyExecutable anyExecutable = getNextExecutable();
+      if (anyExecutable != null) {
+        executeAnyExecutable(anyExecutable);
+      } else {
+        if (!workAvailable || !exhaustive) {
+          break;
+        }
+        workAvailable = false;
+      }
+    }
+  }
+
+  protected void spinSome(long maxDurationNs) {
+    spinSomeImpl(maxDurationNs, false);
+  }
+
+  protected void spinAll(long maxDurationNs) {
+    spinSomeImpl(maxDurationNs, true);
   }
 
   protected void spinOnce(long timeout) {
