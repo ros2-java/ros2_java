@@ -15,10 +15,10 @@ This is a set of projects (bindings, code generator, examples and more) that ena
 applications for the JVM and Android.
 
 Besides this repository itself, there's also:
-- https://github.com/esteve/ament_java, which adds support for Gradle to Ament
-- https://github.com/esteve/ament_gradle_plugin, a Gradle plugin that makes it easier to use ROS2 in Java and Android project. The Gradle plugin can be installed from Gradle Central https://plugins.gradle.org/plugin/org.ros2.tools.gradle
-- https://github.com/esteve/ros2_java_examples, examples for the Java Runtime Environment
-- https://github.com/esteve/ros2_android_examples, examples for Android
+- https://github.com/ros2-java/ament_java, which adds support for Gradle to Ament
+- https://github.com/ros2-java/ament_gradle_plugin, a Gradle plugin that makes it easier to use ROS2 in Java and Android project. The Gradle plugin can be installed from Gradle Central https://plugins.gradle.org/plugin/org.ros2.tools.gradle
+- https://github.com/ros2-java/ros2_java_examples, examples for the Java Runtime Environment
+- https://github.com/ros2-java/ros2_android_examples, examples for Android
 
 Is this Java only?
 ------------------
@@ -58,7 +58,7 @@ Download the ament repositories in a separate workspace:
 ```
 mkdir -p ament_ws/src
 cd ament_ws
-curl -skL https://raw.githubusercontent.com/esteve/ament_java/master/ament_java.repos -o ament_java.repos
+curl -skL https://raw.githubusercontent.com/ros2-java/ament_java/master/ament_java.repos -o ament_java.repos
 vcs import src < ament_java.repos
 src/ament/ament_tools/scripts/ament.py build --symlink-install --isolated
 ```
@@ -106,7 +106,7 @@ ament build --symlink-install --isolated
 
 > On Windows, if you would like to use OpenSplice, call `call "C:\opensplice67\HDE\x86_64.win64\release.bat"` before building.
 
-Now you can just run a bunch of examples, head over to https://github.com/esteve/ros2_java_examples for more information.
+Now you can just run a bunch of examples, head over to https://github.com/ros2-java/ros2_java_examples for more information.
 
 Android
 -------
@@ -130,7 +130,7 @@ ROS2_ANDROID_WORKSPACE=${ROOT_DIR}/ros2_android_ws
 # pull and build ament
 mkdir -p ${AMENT_WORKSPACE}/src
 cd ${AMENT_WORKSPACE}
-curl https://raw.githubusercontent.com/esteve/ament_java/master/ament_java.repos
+curl https://raw.githubusercontent.com/ros2-java/ament_java/master/ament_java.repos
 vcs import ${AMENT_WORKSPACE}/src < ament_java.repos
 src/ament/ament_tools/scripts/ament.py build --symlink-install --isolated
 
@@ -165,4 +165,4 @@ ament build --isolated --skip-packages test_msgs \
   -Pament.android_stl=gnustl_shared -Pament.android_abi=$ANDROID_ABI -Pament.android_ndk=$ANDROID_NDK --
 ```
 
-You can find more information about the Android examples at https://github.com/esteve/ros2_android_examples
+You can find more information about the Android examples at https://github.com/ros2-java/ros2_android_examples
