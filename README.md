@@ -4,10 +4,9 @@ ROS2 for Java
 Build status
 ------------
 
-| Target | Status |
-|----------|--------|
-| **Ubuntu Xenial (OpenJDK)** | [![Build Status](http://vsts-matrix-badges.herokuapp.com/repos/ros2-java/ros2-java/1/branches/master/1)](https://dev.azure.com/ros2-java/ros2-java/_build?definitionId=1) |
-| **Ubuntu Xenial (Android)** | [![Build Status](http://vsts-matrix-badges.herokuapp.com/repos/ros2-java/ros2-java/1/branches/master/2)](https://dev.azure.com/ros2-java/ros2-java/_build?definitionId=1) |
+| Target                                    | Status        |
+|-------------------------------------------|---------------|
+| **ROS Dashing - Ubuntu Bionic (OpenJDK)** | ![Build Status](https://github.com/ros2-java/ros2_java/workflows/CI/badge.svg?branch=dashing) |
 
 Introduction
 ------------
