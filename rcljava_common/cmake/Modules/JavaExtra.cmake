@@ -102,6 +102,8 @@ function(ament_add_junit_tests TARGET_NAME)
 
   ament_export_jars(${exported_jars})
 
+  normalize_path(JUNIT_JAR "${JUNIT_JAR}")
+  normalize_path(HAMCREST_JAR "${HAMCREST_JAR}")
   set(${TARGET_NAME}_jar_dependencies "${JUNIT_JAR}${SEPARATOR}${HAMCREST_JAR}")
 
   add_jar("${TARGET_NAME}_jar"
@@ -119,17 +121,23 @@ function(ament_add_junit_tests TARGET_NAME)
     PROPERTY "JAR_FILE"
   )
 
+  normalize_path(_jar_test_file "${_jar_test_file}")
   #set(${TARGET_NAME}_jar_dependencies "${${TARGET_NAME}_jar_dependencies}${SEPARATOR}${_jar_test_file}")
   string(APPEND ${TARGET_NAME}_jar_dependencies "${SEPARATOR}${_jar_test_file}")
   foreach(_jar_dep ${ARG_INCLUDE_JARS})
     #set(${TARGET_NAME}_jar_dependencies "${${TARGET_NAME}_jar_dependencies}${SEPARATOR}${_jar_dep}")
+    normalize_path(_jar_dep "${_jar_dep}")
     string(APPEND ${TARGET_NAME}_jar_dependencies "${SEPARATOR}${_jar_dep}")
   endforeach()
 
+  #string(REPLACE ";" "${SEPARATOR}" _library_paths "${ARG_APPEND_LIBRARY_DIRS}")
+  foreach(_lib "${ARG_APPEND_LIBRARY_DIRS}")
+    normalize_path(_lib "${_lib}")
+    string(APPEND _library_paths "${SEPARATOR}${_lib}")
+  endforeach()
   message("CHRIS: Separator: '${SEPARATOR}'")
   message("CHRIS: ARG_APPEND_LIBRARY_DIRS: '${ARG_APPEND_LIBRARY_DIRS}'")
   message("CHRIS: jar_dependencies: '${${TARGET_NAME}_jar_dependencies}'")
-  string(REPLACE ";" "${SEPARATOR}" _library_paths "${ARG_APPEND_LIBRARY_DIRS}")
   message("CHRIS: _library_paths: '${_library_paths}'")
 
   if(ARG_ENV)
