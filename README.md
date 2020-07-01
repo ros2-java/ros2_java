@@ -48,59 +48,59 @@ The current set of features include:
 
 1. Install Java and a JDK.
 
-On Ubuntu, you can install OpenJDK with:
+  On Ubuntu, you can install OpenJDK with:
 
-    sudo apt install default-jdk
+        sudo apt install default-jdk
 
 1. Install Gradle.
 Make sure you have Gradle 3.2 (or later) installed.
 
-*Ubuntu Bionic or later*
+  *Ubuntu Bionic or later*
 
-    sudo apt install gradle
+        sudo apt install gradle
 
-*macOS*
+  *macOS*
 
-    brew install gradle
+        brew install gradle
 
-> If run into compatibily issues between gradle 3.x and Java 9, try using Java 8:
->
->     brew tap caskroom/versions
->     brew cask install java8
->     export JAVA_HOME=/Library/Java/JavaVirtualMachines/1.8.0.jdk/Contents/Home
+  Note: if run into compatibily issues between gradle 3.x and Java 9, try using Java 8,
 
-*Windows*
+        brew tap caskroom/versions
+        brew cask install java8
+        export JAVA_HOME=/Library/Java/JavaVirtualMachines/1.8.0.jdk/Contents/Home
 
-    choco install gradle
+  *Windows*
+
+        choco install gradle
 
 1. Install build tools:
 
-    sudo apt install curl python3-colcon-common-extensions python3-pip python3-vctool
+        sudo apt install curl python3-colcon-common-extensions python3-pip python3-vctool
 
 1. Install Gradle extensions for colcon:
 
-    python3 -m pip install -U git+https://github.com/colcon/colcon-gradle
-    python3 -m pip install --no-deps -U git+https://github.com/colcon/colcon-ros-gradle
+        python3 -m pip install -U git+https://github.com/colcon/colcon-gradle
+        python3 -m pip install --no-deps -U git+https://github.com/colcon/colcon-ros-gradle
 
 ### Download and Build ROS 2 Java for Desktop
 
 1. Source your ROS 2 installation, for example:
 
-    source /opt/ros/dashing/setup.bash
+        source /opt/ros/dashing/setup.bash
 
 1. Download the ROS 2 Java repositories into a workspace:
 
-    mkdir -p ros2_java_ws/src
-    cd ros2_java_ws
-    curl -skL https://raw.githubusercontent.com/ros2-java/ros2_java/dashing/ros2_java_desktop.repos | vcs import src
+        mkdir -p ros2_java_ws/src
+        cd ros2_java_ws
+        curl -skL https://raw.githubusercontent.com/ros2-java/ros2_java/dashing/ros2_java_desktop.repos | vcs import src
 
 1. **Linux only** Install ROS dependencies:
 
-    rosdep install --from-paths src -y -i --skip-keys "ament_tools"
+        rosdep install --from-paths src -y -i --skip-keys "ament_tools"
 
 1. Build desktop packages:
 
-    colcon build --symlink-install
+        colcon build --symlink-install
 
 ### Download and Build ROS 2 Java for Android
 
