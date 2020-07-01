@@ -48,28 +48,28 @@ The current set of features include:
 
 1. Install Java and a JDK.
 
-  On Ubuntu, you can install OpenJDK with:
+    On Ubuntu, you can install OpenJDK with:
 
         sudo apt install default-jdk
 
 1. Install Gradle.
 Make sure you have Gradle 3.2 (or later) installed.
 
-  *Ubuntu Bionic or later*
+    *Ubuntu Bionic or later*
 
         sudo apt install gradle
 
-  *macOS*
+    *macOS*
 
         brew install gradle
 
-  Note: if run into compatibily issues between gradle 3.x and Java 9, try using Java 8,
+    Note: if run into compatibily issues between gradle 3.x and Java 9, try using Java 8,
 
         brew tap caskroom/versions
         brew cask install java8
         export JAVA_HOME=/Library/Java/JavaVirtualMachines/1.8.0.jdk/Contents/Home
 
-  *Windows*
+    *Windows*
 
         choco install gradle
 
