@@ -1,15 +1,12 @@
-ROS 2 Java client library
-=========================
+# ROS 2 Java client library
 
-Build status
-------------
+### Build status
 
 | Target                                    | Status        |
 |-------------------------------------------|---------------|
 | **ROS Dashing - Ubuntu Bionic (OpenJDK)** | ![Build Status](https://github.com/ros2-java/ros2_java/workflows/CI/badge.svg?branch=dashing) |
 
-Introduction
-------------
+## Introduction
 
 This is a set of projects (bindings, code generator, examples and more) that enables developers to write ROS 2
 applications for the JVM and Android.
@@ -20,18 +17,15 @@ Besides this repository itself, there's also:
 - https://github.com/ros2-java/ros2_java_examples, examples for the Java Runtime Environment
 - https://github.com/ros2-java/ros2_android_examples, examples for Android
 
-Is this Java only?
-------------------
+### Is this Java only?
 
 No, any language that targets the JVM can be used to write ROS 2 applications.
 
-Including Android?
-------------------
+### Including Android?
 
 Yep! Make sure to use Fast-RTPS as your DDS vendor and at least [this revision](https://github.com/eProsima/Fast-RTPS/commit/5301ef203d45528a083821c3ba582164d782360b).
 
-Features
---------
+### Features
 
 The current set of features include:
 - Generation of all builtin and complex ROS types, including arrays, strings, nested types, constants, etc.
@@ -44,10 +38,9 @@ The current set of features include:
 - Support for Android
 - Parameters services and clients (both asynchronous and synchronous)
 
-Sounds great, how can I try this out?
--------------------------------------
+## Sounds great, how can I try this out?
 
-Install dependencies
+### Install dependencies
 
 > Note: While the following instructions use a Linux shell the same can be done on other platforms like Windows with slightly adjusted commands.
 
@@ -89,10 +82,7 @@ Make sure you have Gradle 3.2 (or later) installed.
     python3 -m pip install -U git+https://github.com/colcon/colcon-gradle
     python3 -m pip install --no-deps -U git+https://github.com/colcon/colcon-ros-gradle
 
-Desktop
--------
-
-Download and Build ROS 2 Java
+### Download and Build ROS 2 Java for Desktop
 
 1. Source your ROS 2 installation, for example:
 
@@ -112,8 +102,9 @@ Download and Build ROS 2 Java
 
     colcon build --symlink-install
 
-Android
--------
+### Download and Build ROS 2 Java for Android
+
+> TODO: This section needs updated instructions for ROS 2 Dashing and newer
 
 The Android setup is slightly more complex, you'll need the SDK and NDK installed, and an Android device where you can run the examples.
 
