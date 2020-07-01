@@ -1,5 +1,5 @@
-ROS2 for Java
-=============
+ROS 2 Java client library
+=========================
 
 Build status
 ------------
@@ -11,19 +11,19 @@ Build status
 Introduction
 ------------
 
-This is a set of projects (bindings, code generator, examples and more) that enables developers to write ROS2
+This is a set of projects (bindings, code generator, examples and more) that enables developers to write ROS 2
 applications for the JVM and Android.
 
 Besides this repository itself, there's also:
 - https://github.com/ros2-java/ament_java, which adds support for Gradle to Ament
-- https://github.com/ros2-java/ament_gradle_plugin, a Gradle plugin that makes it easier to use ROS2 in Java and Android project. The Gradle plugin can be installed from Gradle Central https://plugins.gradle.org/plugin/org.ros2.tools.gradle
+- https://github.com/ros2-java/ament_gradle_plugin, a Gradle plugin that makes it easier to use ROS 2 in Java and Android project. The Gradle plugin can be installed from Gradle Central https://plugins.gradle.org/plugin/org.ros2.tools.gradle
 - https://github.com/ros2-java/ros2_java_examples, examples for the Java Runtime Environment
 - https://github.com/ros2-java/ros2_android_examples, examples for Android
 
 Is this Java only?
 ------------------
 
-No, any language that targets the JVM can be used to write ROS2 applications.
+No, any language that targets the JVM can be used to write ROS 2 applications.
 
 Including Android?
 ------------------
@@ -48,8 +48,8 @@ Sounds great, how can I try this out?
 -------------------------------------
 
 > Note: While the following instructions use a Linux shell the same can be done on other platforms like Windows with slightly adjusted commands.
-> 
-> For Windows and Mac, first follow the steps for installing prerequisites on the binary installation page: https://github.com/ros2/ros2/wiki/Installation
+>
+> For Windows and Mac, first follow the steps for installing prerequisites on the binary installation page: https://index.ros.org/doc/ros2/Installation
 >
 > Stop and return here when you reach the "Downloading ROS 2" section.
 
@@ -86,7 +86,7 @@ For OSX users, there some compatibily issues have been reported between gradle 3
 $ brew tap caskroom/versions
 $ brew cask install java8
 $ export JAVA_HOME=/Library/Java/JavaVirtualMachines/1.8.0.jdk/Contents/Home
-``` 
+```
 
 > Note: On Windows, you may use `choco install -y gradle`
 
