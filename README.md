@@ -131,7 +131,7 @@ ROS2_ANDROID_WORKSPACE=${ROOT_DIR}/ros2_android_ws
 # pull and build ament
 mkdir -p ${AMENT_WORKSPACE}/src
 cd ${AMENT_WORKSPACE}
-wget https://raw.githubusercontent.com/esteve/ament_java/master/ament_java.repos
+curl https://raw.githubusercontent.com/esteve/ament_java/master/ament_java.repos
 vcs import ${AMENT_WORKSPACE}/src < ament_java.repos
 src/ament/ament_tools/scripts/ament.py build --symlink-install --isolated
 
@@ -144,7 +144,7 @@ export ANDROID_TOOLCHAIN_NAME=arm-linux-androideabi-clang
 # pull and build ros2 for android
 mkdir -p ${ROS2_ANDROID_WORKSPACE}/src
 cd ${ROS2_ANDROID_WORKSPACE}
-wget https://raw.githubusercontent.com/ros2-java/ros2_java/dashing/ros2_java_android.repos
+curl https://raw.githubusercontent.com/ros2-java/ros2_java/dashing/ros2_java_android.repos
 vcs import ${ROS2_ANDROID_WORKSPACE}/src < ros2_java_android.repos
 source ${AMENT_WORKSPACE}/install_isolated/local_setup.sh
 ament build --isolated --skip-packages test_msgs \
