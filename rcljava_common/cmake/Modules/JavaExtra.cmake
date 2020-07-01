@@ -131,7 +131,7 @@ function(ament_add_junit_tests TARGET_NAME)
   endforeach()
 
   #string(REPLACE ";" "${SEPARATOR}" _library_paths "${ARG_APPEND_LIBRARY_DIRS}")
-  foreach(_lib "${ARG_APPEND_LIBRARY_DIRS}")
+  foreach(_lib ${ARG_APPEND_LIBRARY_DIRS})
     normalize_path(_lib "${_lib}")
     string(APPEND _library_paths "${SEPARATOR}${_lib}")
   endforeach()
