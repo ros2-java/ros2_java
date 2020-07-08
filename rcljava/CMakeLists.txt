@@ -284,6 +284,11 @@ if(BUILD_TESTING)
   list_append_unique(_deps_library_dirs ${CMAKE_CURRENT_BINARY_DIR}/rosidl_generator_java/rcljava/msg/)
   list_append_unique(_deps_library_dirs ${CMAKE_CURRENT_BINARY_DIR}/rosidl_generator_java/rcljava/srv/)
 
+  message("CHRIS: rcljava_common_JARS: ${rcljava_common_JARS}")
+  message("CHRIS: rcljava_test_msgs_JARS: ${rcljava_test_msgs_JARS}")
+  message("CHRIS: std_msgs_JARS: ${std_msgs_JARS}")
+  message("CHRIS: builtin_interfaces_JARS: ${builtin_interfaces_JARS}")
+  message("CHRIS: rcl_interfaces_JARS: ${rcl_interfaces_JARS}")
   foreach(testsuite ${${PROJECT_NAME}_testsuites})
     ament_add_junit_tests("${PROJECT_NAME}_tests_${testsuite}"
       TIMEOUT 90

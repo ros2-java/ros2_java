@@ -37,6 +37,8 @@ function(ament_add_junit_tests TARGET_NAME)
     "${ARG_UNPARSED_ARGUMENTS}")
   endif()
 
+  message("CHRIS: INCLUDE_JARS: ${ARG_INCLUDE_JARS}")
+
   set(_source_files ${ARG_SOURCES})
 
   if(WIN32 AND NOT CYGWIN)
@@ -102,8 +104,12 @@ function(ament_add_junit_tests TARGET_NAME)
 
   ament_export_jars(${exported_jars})
 
+  message("CHRIS: JUNIT_JAR before normalize: ${JUNIT_JAR}")
   normalize_path(JUNIT_JAR "${JUNIT_JAR}")
+  message("CHRIS: JUNIT_JAR after normalize: ${JUNIT_JAR}")
+  message("CHRIS: HAMCREST_JAR before normalize: ${HAMCREST_JAR}")
   normalize_path(HAMCREST_JAR "${HAMCREST_JAR}")
+  message("CHRIS: HAMCREST_JAR after normalize: ${HAMCREST_JAR}")
   set(${TARGET_NAME}_jar_dependencies "${JUNIT_JAR}${SEPARATOR}${HAMCREST_JAR}")
 
   add_jar("${TARGET_NAME}_jar"
