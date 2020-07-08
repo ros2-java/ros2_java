@@ -44,8 +44,6 @@ public class SpinTest {
     public void call() {
       this.counter++;
       try {
-        // The timer is configured to wake up after 100 milliseconds, so wait 200
-        // which should be enough to make it trigger.
         Thread.sleep(timeToSleepMs);
       } catch (InterruptedException ex) {
         // We do nothing on exception here; if we didn't wait long enough, then
