@@ -221,6 +221,7 @@ if(BUILD_TESTING)
 
   set(${PROJECT_NAME}_test_sources
     "src/test/java/org/ros2/rcljava/RCLJavaTest.java"
+    "src/test/java/org/ros2/rcljava/SpinTest.java"
     "src/test/java/org/ros2/rcljava/TimeTest.java"
     "src/test/java/org/ros2/rcljava/client/ClientTest.java"
     "src/test/java/org/ros2/rcljava/node/NodeTest.java"
@@ -233,6 +234,7 @@ if(BUILD_TESTING)
 
   set(${PROJECT_NAME}_testsuites
     "org.ros2.rcljava.RCLJavaTest"
+    "org.ros2.rcljava.SpinTest"
     "org.ros2.rcljava.TimeTest"
     "org.ros2.rcljava.client.ClientTest"
     "org.ros2.rcljava.node.NodeTest"
