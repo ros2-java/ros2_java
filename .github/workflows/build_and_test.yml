@@ -33,7 +33,7 @@ jobs:
         required-ros-distributions: dashing
     - uses: clalancette/action-ros-ci@0a0aea3
       with:
-        colcon-extra-args: --merge-install --symlink-install
+        colcon-extra-args: --merge-install
         package-name: rosidl_generator_java rcljava_common rcljava
         vcs-repo-file-url: |
             https://raw.githubusercontent.com/ros2/ros2/dashing/ros2.repos
