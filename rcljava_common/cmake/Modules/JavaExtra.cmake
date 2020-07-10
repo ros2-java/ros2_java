@@ -171,7 +171,7 @@ function(ament_add_junit_tests TARGET_NAME)
     ${TARGET_NAME}
     GENERATE_RESULT_FOR_RETURN_CODE_ZERO
     COMMAND ${Java_JAVA_EXECUTABLE}
-    ${JVMARGS} -classpath "${${TARGET_NAME}_jar_dependencies}" -Djava.library.path="${_library_paths}"
+    ${JVMARGS} -classpath "${${TARGET_NAME}_jar_dependencies}" -Djava.library.path=${_library_paths}
     org.junit.runner.JUnitCore
     ${ARG_TESTS}
     ${ARG_SKIP_TEST}
