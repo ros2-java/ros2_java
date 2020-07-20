@@ -27,6 +27,7 @@ import org.ros2.rcljava.qos.QoSProfile;
 import org.ros2.rcljava.interfaces.Disposable;
 import org.ros2.rcljava.interfaces.MessageDefinition;
 import org.ros2.rcljava.interfaces.ServiceDefinition;
+import org.ros2.rcljava.parameters.ParameterCallback;
 import org.ros2.rcljava.parameters.ParameterType;
 import org.ros2.rcljava.parameters.ParameterVariant;
 import org.ros2.rcljava.publisher.Publisher;
@@ -49,6 +50,8 @@ import java.lang.ref.WeakReference;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -115,7 +118,7 @@ public class NodeImpl implements Node {
 
   private final String name;
 
-  private Object mutex;
+  private Object parametersMutex;
 
   class ParameterAndDescriptor {
     public ParameterVariant parameter;
@@ -124,6 +127,9 @@ public class NodeImpl implements Node {
 
   private Map<String, ParameterAndDescriptor> parameters;
   private boolean allowUndeclaredParameters;
+
+  private Object parameterCallbacksMutex;
+  private List<ParameterCallback> parameterCallbacks;
 
   /**
    * Constructor.
@@ -141,9 +147,11 @@ public class NodeImpl implements Node {
     this.services = new LinkedBlockingQueue<Service>();
     this.clients = new LinkedBlockingQueue<Client>();
     this.timers = new LinkedBlockingQueue<Timer>();
-    this.mutex = new Object();
+    this.parametersMutex = new Object();
     this.parameters = new ConcurrentHashMap<String, ParameterAndDescriptor>();
     this.allowUndeclaredParameters = allowUndeclaredParameters;
+    this.parameterCallbacksMutex = new Object();
+    this.parameterCallbacks = new ArrayList<ParameterCallback>();
   }
 
   /**
@@ -407,84 +415,277 @@ public class NodeImpl implements Node {
     return this.name;
   }
 
-  public List<ParameterVariant> getParameters(List<String> names) {
-    synchronized (mutex) {
-      List<ParameterVariant> results = new ArrayList<ParameterVariant>();
-      for (String name : names) {
-        if (this.parameters.containsKey(name)) {
-            results.add(this.parameters.get(name).parameter);
+  public ParameterVariant declareParameter(ParameterVariant parameter) {
+    return declareParameter(parameter, new rcl_interfaces.msg.ParameterDescriptor().setName(parameter.getName()));
+  }
+
+  public ParameterVariant declareParameter(ParameterVariant parameter, rcl_interfaces.msg.ParameterDescriptor descriptor) {
+    return declareParameters(java.util.Arrays.asList(new ParameterVariant[] {parameter}),
+                             java.util.Arrays.asList(new rcl_interfaces.msg.ParameterDescriptor[] {descriptor})).get(0);
+  }
+
+  public List<ParameterVariant> declareParameters(List<ParameterVariant> parameters, List<rcl_interfaces.msg.ParameterDescriptor> descriptors) {
+    if (parameters.size() != descriptors.size()) {
+      throw new IllegalArgumentException("Parameters length must be equal to descriptors length");
+    }
+
+    synchronized (parameterCallbacksMutex) {
+      for (ParameterCallback cb : this.parameterCallbacks) {
+        rcl_interfaces.msg.SetParametersResult result = cb.callback(parameters);
+        if (!result.getSuccessful()) {
+          throw new IllegalArgumentException("Failed to declare parameters; rejected by callback");
         }
       }
-      return results;
+    }
+
+    List<ParameterVariant> results = new ArrayList<ParameterVariant>();
+    Iterator<ParameterVariant> itp = parameters.iterator();
+    Iterator<rcl_interfaces.msg.ParameterDescriptor> itpd = descriptors.iterator();
+    synchronized (parametersMutex) {
+      while (itp.hasNext() && itpd.hasNext()) {
+        ParameterVariant parameter = itp.next();
+        rcl_interfaces.msg.ParameterDescriptor descriptor = itpd.next();
+
+        if (this.parameters.containsKey(parameter.getName())) {
+          throw new IllegalArgumentException(String.format("Parameter '%s' is already declared", parameter.getName()));
+        }
+
+        ParameterAndDescriptor pandd = new ParameterAndDescriptor();
+        pandd.parameter = parameter;
+        pandd.descriptor = descriptor;
+
+        this.parameters.put(parameter.getName(), pandd);
+        results.add(parameter);
+      }
+    }
+
+    return results;
+  }
+
+  public void undeclareParameter(String name) {
+    synchronized (parametersMutex) {
+      if (!this.parameters.containsKey(name)) {
+        throw new IllegalArgumentException(String.format("Parameter '%s' is not declared", name));
+      }
+
+      this.parameters.remove(name);
     }
   }
 
-  public List<ParameterType> getParameterTypes(List<String> names) {
-    synchronized (mutex) {
-      List<ParameterType> results = new ArrayList<ParameterType>();
+  public boolean hasParameter(String name) {
+    synchronized (parametersMutex) {
+      return this.parameters.containsKey(name);
+    }
+  }
+
+  public List<ParameterVariant> getParameters(List<String> names) {
+    List<ParameterVariant> results = new ArrayList<ParameterVariant>();
+
+    synchronized (parametersMutex) {
       for (String name : names) {
         if (this.parameters.containsKey(name)) {
-          results.add(this.parameters.get(name).parameter.getType());
+          results.add(this.parameters.get(name).parameter);
+        } else if (this.allowUndeclaredParameters) {
+          results.add(new ParameterVariant(name));
         } else {
-          results.add(ParameterType.fromByte(rcl_interfaces.msg.ParameterType.PARAMETER_NOT_SET));
+          throw new IllegalArgumentException(String.format("Parameter '%s' is not declared", name));
         }
       }
-      return results;
     }
+
+    return results;
+  }
+
+  public ParameterVariant getParameter(String name) {
+    return getParameters(java.util.Arrays.asList(new String[] {name})).get(0);
+  }
+
+  public ParameterVariant getParameterOr(String name, ParameterVariant alternateValue) {
+    synchronized (parametersMutex) {
+      if (this.parameters.containsKey(name)) {
+        return this.parameters.get(name).parameter;
+      }
+    }
+
+    return alternateValue;
+  }
+
+  public Map<String, ParameterVariant> getParametersByPrefix(String prefix) {
+    String new_prefix;
+    if (prefix.length() > 0) {
+      new_prefix = prefix.concat(separator);
+    } else {
+      new_prefix = prefix;
+    }
+
+    Map<String, ParameterVariant> results = new HashMap<String, ParameterVariant>();
+    synchronized (parametersMutex) {
+      for (Map.Entry<String, ParameterAndDescriptor> entry : this.parameters.entrySet()) {
+        if (entry.getKey().startsWith(new_prefix)) {
+          results.put(entry.getKey().substring(new_prefix.length()), entry.getValue().parameter);
+        }
+      }
+    }
+
+    return results;
+  }
+
+  private rcl_interfaces.msg.SetParametersResult internalSetParametersAtomically(
+      List<ParameterVariant> parameters) {
+    rcl_interfaces.msg.SetParametersResult result = new rcl_interfaces.msg.SetParametersResult();
+
+    synchronized (parameterCallbacksMutex) {
+      for (ParameterCallback cb : this.parameterCallbacks) {
+        result = cb.callback(parameters);
+        if (!result.getSuccessful()) {
+          return result;
+        }
+      }
+    }
+
+    // Walk through the list of new parameters, checking if they have been
+    // declared.  If they haven't, and we are not allowing undeclared
+    // parameters, throw an exception.  If they haven't and we are allowing
+    // undeclared parameters, collect the names so we can default initialize
+    // them in the parameter list before setting them to the new value.  We
+    // do this multi-stage thing so that all of the parameters are set, or
+    // none of them.
+    List<String> parametersToDeclare = new ArrayList<String>();
+    List<String> parametersToUndeclare = new ArrayList<String>();
+    for (ParameterVariant parameter : parameters) {
+      if (this.parameters.containsKey(parameter.getName())) {
+        if (parameter.getType() == ParameterType.PARAMETER_NOT_SET) {
+          parametersToUndeclare.add(parameter.getName());
+        }
+      } else {
+        if (this.allowUndeclaredParameters) {
+          parametersToDeclare.add(parameter.getName());
+        } else {
+          throw new IllegalArgumentException(String.format("Parameter '%s' is not declared", parameter.getName()));
+        }
+      }
+    }
+
+    // Check to make sure that a parameter isn't both trying to be declared
+    // and undeclared simultaneously.
+    for (String name : parametersToDeclare) {
+      if (parametersToUndeclare.contains(name)) {
+        throw new IllegalArgumentException(String.format("Cannot both declare and undeclare the same parameter name '%s'", name));
+      }
+    }
+
+    // Undeclare any parameters that have their type set to NOT_SET
+    for (String name : parametersToUndeclare) {
+      if (!hasParameter(name)) {
+        throw new IllegalArgumentException(String.format("Parameter '%s' is not declared", name));
+      }
+
+      this.parameters.remove(name);
+    }
+
+    for (String name : parametersToDeclare) {
+      this.parameters.put(name, new ParameterAndDescriptor());
+    }
+
+    for (ParameterVariant parameter : parameters) {
+      // We already dealt with unsetting parameters above, so skip them
+      if (parameter.getType() == ParameterType.PARAMETER_NOT_SET) {
+        continue;
+      }
+      this.parameters.get(parameter.getName()).parameter = parameter;
+    }
+
+    result.setSuccessful(true);
+    return result;
+  }
+
+  public rcl_interfaces.msg.SetParametersResult setParameter(ParameterVariant parameter) {
+    return this.setParametersAtomically(java.util.Arrays.asList(new ParameterVariant[] {parameter}));
   }
 
   public List<rcl_interfaces.msg.SetParametersResult> setParameters(
       List<ParameterVariant> parameters) {
     List<rcl_interfaces.msg.SetParametersResult> results =
         new ArrayList<rcl_interfaces.msg.SetParametersResult>();
-    for (ParameterVariant p : parameters) {
-      rcl_interfaces.msg.SetParametersResult result =
-          this.setParametersAtomically(java.util.Arrays.asList(new ParameterVariant[] {p}));
-      results.add(result);
+
+    synchronized (parametersMutex) {
+      for (ParameterVariant parameter : parameters) {
+        rcl_interfaces.msg.SetParametersResult result =
+            this.internalSetParametersAtomically(java.util.Arrays.asList(new ParameterVariant[] {parameter}));
+        results.add(result);
+      }
     }
+
     return results;
   }
 
   public rcl_interfaces.msg.SetParametersResult setParametersAtomically(
       List<ParameterVariant> parameters) {
-    synchronized (mutex) {
-      rcl_interfaces.msg.SetParametersResult result = new rcl_interfaces.msg.SetParametersResult();
-      for (ParameterVariant p : parameters) {
-        ParameterAndDescriptor pandd = new ParameterAndDescriptor();
-        pandd.parameter = p;
-
-        rcl_interfaces.msg.ParameterDescriptor parameterDescriptor =
-            new rcl_interfaces.msg.ParameterDescriptor();
-        parameterDescriptor.setName(p.getName());
-        parameterDescriptor.setType(p.getType().getValue());
-
-        this.parameters.put(p.getName(), pandd);
-      }
-      result.setSuccessful(true);
-      return result;
+    synchronized (parametersMutex) {
+      return internalSetParametersAtomically(parameters);
     }
+  }
+
+  public void addOnSetParametersCallback(ParameterCallback cb) {
+    synchronized (parameterCallbacksMutex) {
+      this.parameterCallbacks.add(0, cb);
+    }
+  }
+
+  public void removeOnSetParametersCallback(ParameterCallback cb) {
+    synchronized (parameterCallbacksMutex) {
+      this.parameterCallbacks.remove(cb);
+    }
+  }
+
+  public rcl_interfaces.msg.ParameterDescriptor describeParameter(String name) {
+    return this.describeParameters(java.util.Arrays.asList(new String[] {name})).get(0);
   }
 
   public List<rcl_interfaces.msg.ParameterDescriptor> describeParameters(
       List<String> names) {
-    synchronized (mutex) {
-      List<rcl_interfaces.msg.ParameterDescriptor> results =
-          new ArrayList<rcl_interfaces.msg.ParameterDescriptor>();
+    List<rcl_interfaces.msg.ParameterDescriptor> results =
+        new ArrayList<rcl_interfaces.msg.ParameterDescriptor>();
+
+    synchronized (parametersMutex) {
       for (String name : names) {
         if (this.parameters.containsKey(name)) {
           results.add(this.parameters.get(name).descriptor);
+        } else if (this.allowUndeclaredParameters) {
+          results.add(new rcl_interfaces.msg.ParameterDescriptor().setName(name));
+        } else {
+          throw new IllegalArgumentException(String.format("Parameter '%s' is not declared", name));
         }
       }
-      return results;
     }
+
+    return results;
+  }
+
+  public List<ParameterType> getParameterTypes(List<String> names) {
+    List<ParameterType> results = new ArrayList<ParameterType>();
+
+    synchronized (parametersMutex) {
+      for (String name : names) {
+        if (this.parameters.containsKey(name)) {
+          results.add(this.parameters.get(name).parameter.getType());
+        } else if (this.allowUndeclaredParameters) {
+          results.add(ParameterType.fromByte(rcl_interfaces.msg.ParameterType.PARAMETER_NOT_SET));
+        } else {
+          throw new IllegalArgumentException(String.format("Parameter '%s' is not declared", name));
+        }
+      }
+    }
+
+    return results;
   }
 
   public rcl_interfaces.msg.ListParametersResult listParameters(
       List<String> prefixes, long depth) {
-    synchronized (mutex) {
-      rcl_interfaces.msg.ListParametersResult result =
-          new rcl_interfaces.msg.ListParametersResult();
+    rcl_interfaces.msg.ListParametersResult result =
+        new rcl_interfaces.msg.ListParametersResult();
 
+    synchronized (parametersMutex) {
       for (Map.Entry<String, ParameterAndDescriptor> entry : this.parameters.entrySet()) {
         boolean getAll =
             (prefixes.size() == 0)
@@ -492,18 +693,21 @@ public class NodeImpl implements Node {
                    || ((entry.getKey().length() - entry.getKey().replace(separator, "").length())
                           < depth));
         boolean prefixMatches = false;
-        for (String prefix : prefixes) {
-          if (entry.getKey() == prefix) {
-            prefixMatches = true;
-            break;
-          } else if (entry.getKey().startsWith(prefix + separator)) {
-            int length = prefix.length();
-            String substr = entry.getKey().substring(length);
-            prefixMatches = (depth == rcl_interfaces.srv.ListParameters_Request.DEPTH_RECURSIVE)
-                || ((entry.getKey().length() - entry.getKey().replace(separator, "").length())
-                                < depth);
+        if (!getAll) {
+          for (String prefix : prefixes) {
+            if (entry.getKey() == prefix) {
+              prefixMatches = true;
+              break;
+            } else if (entry.getKey().startsWith(prefix + separator)) {
+              int length = prefix.length();
+              String substr = entry.getKey().substring(length);
+              prefixMatches = (depth == rcl_interfaces.srv.ListParameters_Request.DEPTH_RECURSIVE)
+                  || ((entry.getKey().length() - entry.getKey().replace(separator, "").length())
+                                  < depth);
+            }
           }
         }
+
         if (getAll || prefixMatches) {
           result.getNames().add(entry.getKey());
           int lastSeparator = entry.getKey().lastIndexOf(separator);
