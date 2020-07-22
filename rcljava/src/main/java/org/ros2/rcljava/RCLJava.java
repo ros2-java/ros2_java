@@ -217,7 +217,7 @@ public final class RCLJava {
    *     structure.
    */
   public static Node createNode(final String nodeName) {
-    return createNode(nodeName, "", RCLJava.getDefaultContext());
+    return createNode(nodeName, "", RCLJava.getDefaultContext(), false);
   }
 
   /**
@@ -229,8 +229,12 @@ public final class RCLJava {
    *     structure.
    */
   public static Node createNode(final String nodeName, final String namespace, final Context context) {
+    return createNode(nodeName, namespace, context, false);
+  }
+
+  public static Node createNode(final String nodeName, final String namespace, final Context context, final boolean allowUndeclaredParameters) {
     long nodeHandle = nativeCreateNodeHandle(nodeName, namespace, context.getHandle());
-    Node node = new NodeImpl(nodeHandle, nodeName, context);
+    Node node = new NodeImpl(nodeHandle, nodeName, context, allowUndeclaredParameters);
     nodes.add(node);
     return node;
   }

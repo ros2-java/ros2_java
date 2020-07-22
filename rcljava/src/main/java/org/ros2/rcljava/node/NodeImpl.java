@@ -123,6 +123,7 @@ public class NodeImpl implements Node {
   }
 
   private Map<String, ParameterAndDescriptor> parameters;
+  private boolean allowUndeclaredParameters;
 
   /**
    * Constructor.
@@ -130,7 +131,7 @@ public class NodeImpl implements Node {
    * @param handle A pointer to the underlying ROS2 node structure. Must not
    *     be zero.
    */
-  public NodeImpl(final long handle, final String name, final Context context) {
+  public NodeImpl(final long handle, final String name, final Context context, final boolean allowUndeclaredParameters) {
     this.clock = new Clock(ClockType.SYSTEM_TIME);
     this.handle = handle;
     this.name = name;
@@ -142,6 +143,7 @@ public class NodeImpl implements Node {
     this.timers = new LinkedBlockingQueue<Timer>();
     this.mutex = new Object();
     this.parameters = new ConcurrentHashMap<String, ParameterAndDescriptor>();
+    this.allowUndeclaredParameters = allowUndeclaredParameters;
   }
 
   /**
