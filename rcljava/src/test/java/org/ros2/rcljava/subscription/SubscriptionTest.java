@@ -18,6 +18,7 @@ package org.ros2.rcljava.subscription;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotEquals;
 
+import org.junit.BeforeClass;
 import org.junit.Test;
 
 import org.ros2.rcljava.RCLJava;
@@ -25,6 +26,12 @@ import org.ros2.rcljava.consumers.Consumer;
 import org.ros2.rcljava.node.Node;
 
 public class SubscriptionTest {
+  @BeforeClass
+  public static void setupOnce() throws Exception {
+    // Just to quiet down warnings
+    org.apache.log4j.BasicConfigurator.configure();
+  }
+
   @Test
   public final void testCreateAndDispose() {
     RCLJava.rclJavaInit();

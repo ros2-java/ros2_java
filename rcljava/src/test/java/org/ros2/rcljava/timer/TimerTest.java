@@ -24,6 +24,7 @@ import java.lang.ref.WeakReference;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 
+import org.junit.BeforeClass;
 import org.junit.Test;
 
 import org.ros2.rcljava.RCLJava;
@@ -53,6 +54,12 @@ public class TimerTest {
     public int getCounter() {
       return this.counter;
     }
+  }
+
+  @BeforeClass
+  public static void setupOnce() throws Exception {
+    // Just to quiet down warnings
+    org.apache.log4j.BasicConfigurator.configure();
   }
 
   @Test

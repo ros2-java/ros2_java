@@ -18,9 +18,16 @@ package org.ros2.rcljava;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.assertFalse;
 
+import org.junit.BeforeClass;
 import org.junit.Test;
 
 public class RCLJavaTest {
+  @BeforeClass
+  public static void setupOnce() throws Exception {
+    // Just to quiet down warnings
+    org.apache.log4j.BasicConfigurator.configure();
+  }
+
   @Test
   public final void testInitShutdown() {
     assertFalse(RCLJava.ok());

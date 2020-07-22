@@ -58,6 +58,9 @@ public class SpinTest {
 
   @BeforeClass
   public static void setupOnce() throws Exception {
+    // Just to quiet down warnings
+    org.apache.log4j.BasicConfigurator.configure();
+
     RCLJava.rclJavaInit();
   }
 

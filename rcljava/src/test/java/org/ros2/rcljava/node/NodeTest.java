@@ -86,19 +86,10 @@ public class NodeTest {
 
   @BeforeClass
   public static void setupOnce() throws Exception {
+    // Just to quiet down warnings
+    org.apache.log4j.BasicConfigurator.configure();
+
     RCLJava.rclJavaInit();
-    try
-    {
-      // Configure log4j. Doing this dynamically so that Android does not complain about missing
-      // the log4j JARs, SLF4J uses Android's native logging mechanism instead.
-      Class c = Class.forName("org.apache.log4j.BasicConfigurator");
-      Method m = c.getDeclaredMethod("configure", (Class<?>[]) null);
-      Object o = m.invoke(null, (Object[]) null);
-    }
-    catch (Exception e)
-    {
-      e.printStackTrace();
-    }
   }
 
   public class TestConsumer<T> implements Consumer<T> {
