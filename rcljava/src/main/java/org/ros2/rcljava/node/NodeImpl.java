@@ -117,7 +117,12 @@ public class NodeImpl implements Node {
 
   private Object mutex;
 
-  private Map<String, ParameterVariant> parameters;
+  class ParameterAndDescriptor {
+    public ParameterVariant parameter;
+    public rcl_interfaces.msg.ParameterDescriptor descriptor;
+  }
+
+  private Map<String, ParameterAndDescriptor> parameters;
 
   /**
    * Constructor.
@@ -136,7 +141,7 @@ public class NodeImpl implements Node {
     this.clients = new LinkedBlockingQueue<Client>();
     this.timers = new LinkedBlockingQueue<Timer>();
     this.mutex = new Object();
-    this.parameters = new ConcurrentHashMap<String, ParameterVariant>();
+    this.parameters = new ConcurrentHashMap<String, ParameterAndDescriptor>();
   }
 
   /**
@@ -404,9 +409,9 @@ public class NodeImpl implements Node {
     synchronized (mutex) {
       List<ParameterVariant> results = new ArrayList<ParameterVariant>();
       for (String name : names) {
-        for (Map.Entry<String, ParameterVariant> entry : this.parameters.entrySet()) {
+        for (Map.Entry<String, ParameterAndDescriptor> entry : this.parameters.entrySet()) {
           if (name.equals(entry.getKey())) {
-            results.add(entry.getValue());
+            results.add(entry.getValue().parameter);
           }
         }
       }
@@ -418,9 +423,9 @@ public class NodeImpl implements Node {
     synchronized (mutex) {
       List<ParameterType> results = new ArrayList<ParameterType>();
       for (String name : names) {
-        for (Map.Entry<String, ParameterVariant> entry : this.parameters.entrySet()) {
+        for (Map.Entry<String, ParameterAndDescriptor> entry : this.parameters.entrySet()) {
           if (name.equals(entry.getKey())) {
-            results.add(entry.getValue().getType());
+            results.add(entry.getValue().parameter.getType());
           } else {
             results.add(ParameterType.fromByte(rcl_interfaces.msg.ParameterType.PARAMETER_NOT_SET));
           }
@@ -447,7 +452,15 @@ public class NodeImpl implements Node {
     synchronized (mutex) {
       rcl_interfaces.msg.SetParametersResult result = new rcl_interfaces.msg.SetParametersResult();
       for (ParameterVariant p : parameters) {
-        this.parameters.put(p.getName(), p);
+        ParameterAndDescriptor pandd = new ParameterAndDescriptor();
+        pandd.parameter = p;
+
+        rcl_interfaces.msg.ParameterDescriptor parameterDescriptor =
+            new rcl_interfaces.msg.ParameterDescriptor();
+        parameterDescriptor.setName(p.getName());
+        parameterDescriptor.setType(p.getType().getValue());
+
+        this.parameters.put(p.getName(), pandd);
       }
       result.setSuccessful(true);
       return result;
@@ -460,13 +473,9 @@ public class NodeImpl implements Node {
       List<rcl_interfaces.msg.ParameterDescriptor> results =
           new ArrayList<rcl_interfaces.msg.ParameterDescriptor>();
       for (String name : names) {
-        for (Map.Entry<String, ParameterVariant> entry : this.parameters.entrySet()) {
+        for (Map.Entry<String, ParameterAndDescriptor> entry : this.parameters.entrySet()) {
           if (name.equals(entry.getKey())) {
-            rcl_interfaces.msg.ParameterDescriptor parameterDescriptor =
-                new rcl_interfaces.msg.ParameterDescriptor();
-            parameterDescriptor.setName(entry.getKey());
-            parameterDescriptor.setType(entry.getValue().getType().getValue());
-            results.add(parameterDescriptor);
+            results.add(entry.getValue().descriptor);
           }
         }
       }
@@ -480,7 +489,7 @@ public class NodeImpl implements Node {
       rcl_interfaces.msg.ListParametersResult result =
           new rcl_interfaces.msg.ListParametersResult();
 
-      for (Map.Entry<String, ParameterVariant> entry : this.parameters.entrySet()) {
+      for (Map.Entry<String, ParameterAndDescriptor> entry : this.parameters.entrySet()) {
         boolean getAll =
             (prefixes.size() == 0)
             && ((depth == rcl_interfaces.srv.ListParameters_Request.DEPTH_RECURSIVE)
