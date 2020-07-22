@@ -409,10 +409,8 @@ public class NodeImpl implements Node {
     synchronized (mutex) {
       List<ParameterVariant> results = new ArrayList<ParameterVariant>();
       for (String name : names) {
-        for (Map.Entry<String, ParameterAndDescriptor> entry : this.parameters.entrySet()) {
-          if (name.equals(entry.getKey())) {
-            results.add(entry.getValue().parameter);
-          }
+        if (this.parameters.containsKey(name)) {
+            results.add(this.parameters.get(name).parameter);
         }
       }
       return results;
@@ -423,12 +421,10 @@ public class NodeImpl implements Node {
     synchronized (mutex) {
       List<ParameterType> results = new ArrayList<ParameterType>();
       for (String name : names) {
-        for (Map.Entry<String, ParameterAndDescriptor> entry : this.parameters.entrySet()) {
-          if (name.equals(entry.getKey())) {
-            results.add(entry.getValue().parameter.getType());
-          } else {
-            results.add(ParameterType.fromByte(rcl_interfaces.msg.ParameterType.PARAMETER_NOT_SET));
-          }
+        if (this.parameters.containsKey(name)) {
+          results.add(this.parameters.get(name).parameter.getType());
+        } else {
+          results.add(ParameterType.fromByte(rcl_interfaces.msg.ParameterType.PARAMETER_NOT_SET));
         }
       }
       return results;
@@ -473,10 +469,8 @@ public class NodeImpl implements Node {
       List<rcl_interfaces.msg.ParameterDescriptor> results =
           new ArrayList<rcl_interfaces.msg.ParameterDescriptor>();
       for (String name : names) {
-        for (Map.Entry<String, ParameterAndDescriptor> entry : this.parameters.entrySet()) {
-          if (name.equals(entry.getKey())) {
-            results.add(entry.getValue().descriptor);
-          }
+        if (this.parameters.containsKey(name)) {
+          results.add(this.parameters.get(name).descriptor);
         }
       }
       return results;
