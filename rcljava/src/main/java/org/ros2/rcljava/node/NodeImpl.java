@@ -61,6 +61,7 @@ import java.util.concurrent.TimeUnit;
  */
 public class NodeImpl implements Node {
   private static final Logger logger = LoggerFactory.getLogger(NodeImpl.class);
+  private static final String separator = ".";
 
   static {
     try {
@@ -479,7 +480,6 @@ public class NodeImpl implements Node {
       rcl_interfaces.msg.ListParametersResult result =
           new rcl_interfaces.msg.ListParametersResult();
 
-      String separator = ".";
       for (Map.Entry<String, ParameterVariant> entry : this.parameters.entrySet()) {
         boolean getAll =
             (prefixes.size() == 0)
