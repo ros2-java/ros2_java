@@ -52,6 +52,12 @@ public class ParameterVariant {
     this.value.setType(ParameterType.PARAMETER_NOT_SET.getValue());
   }
 
+  public ParameterVariant(final String name) {
+    this.name = name;
+    this.value = new rcl_interfaces.msg.ParameterValue();
+    this.value.setType(ParameterType.PARAMETER_NOT_SET.getValue());
+  }
+
   public ParameterVariant(final String name, final boolean boolValue) {
     this.name = name;
     this.value = new rcl_interfaces.msg.ParameterValue();
