@@ -35,7 +35,7 @@ JNICALL Java_org_ros2_rcljava_RCLJava_nativeCreateContextHandle(JNIEnv *, jclass
  */
 JNIEXPORT jlong
 JNICALL Java_org_ros2_rcljava_RCLJava_nativeCreateNodeHandle(
-  JNIEnv *, jclass, jstring, jstring, jlong);
+  JNIEnv *, jclass, jstring, jstring, jlong, jobject, jboolean, jboolean);
 
 /*
  * Class:     org_ros2_rcljava_RCLJava

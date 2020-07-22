@@ -46,28 +46,81 @@ Java_org_ros2_rcljava_RCLJava_nativeCreateContextHandle(JNIEnv *, jclass)
 
 JNIEXPORT jlong JNICALL
 Java_org_ros2_rcljava_RCLJava_nativeCreateNodeHandle(
-  JNIEnv * env, jclass, jstring jnode_name, jstring jnamespace, jlong context_handle)
+  JNIEnv * env, jclass, jstring jnode_name, jstring jnamespace, jlong context_handle,
+  jobject cli_args, jboolean use_global_arguments, jboolean enable_rosout)
 {
   const char * node_name = env->GetStringUTFChars(jnode_name, 0);
   const char * node_namespace = env->GetStringUTFChars(jnamespace, 0);
 
   rcl_context_t * context = reinterpret_cast<rcl_context_t *>(context_handle);
 
-  rcl_node_t * node = static_cast<rcl_node_t *>(malloc(sizeof(rcl_node_t)));
-  *node = rcl_get_zero_initialized_node();
+  // TODO(clalancette): we could probably make this faster by just doing these
+  // method lookups during some initialization time.  But we'd have to add a lot
+  // more infrastructure for that, and we don't expect to call
+  // 'nativeCreateNodeHandle' that often, so I think this is OK for now.
+  jclass java_util_ArrayList =
+    static_cast<jclass>(env->NewGlobalRef(env->FindClass("java/util/ArrayList")));
+  jmethodID java_util_ArrayList_size = env->GetMethodID(java_util_ArrayList, "size", "()I");
+  jmethodID java_util_ArrayList_get = env->GetMethodID(
+    java_util_ArrayList, "get", "(I)Ljava/lang/Object;");
 
-  rcl_node_options_t default_options = rcl_node_get_default_options();
-  rcl_ret_t ret = rcl_node_init(node, node_name, node_namespace, context, &default_options);
-  env->ReleaseStringUTFChars(jnode_name, node_name);
-  env->ReleaseStringUTFChars(jnamespace, node_namespace);
+  rcl_arguments_t arguments = rcl_get_zero_initialized_arguments();
+  char ** argv = NULL;
+  jint argc = env->CallIntMethod(cli_args, java_util_ArrayList_size);
+  argv = static_cast<char **>(malloc(argc * sizeof(char *)));
+  for (jint i = 0; i < argc; ++i) {
+    jstring element =
+      static_cast<jstring>(env->CallObjectMethod(cli_args, java_util_ArrayList_get, i));
+    argv[i] = const_cast<char *>(env->GetStringUTFChars(element, nullptr));
+  }
+  rcl_ret_t ret = rcl_parse_arguments(argc, argv, rcl_get_default_allocator(), &arguments);
+  for (jint i = 0; i < argc; ++i) {
+    jstring element =
+      static_cast<jstring>(env->CallObjectMethod(cli_args, java_util_ArrayList_get, i));
+    env->ReleaseStringUTFChars(element, argv[i]);
+  }
+  free(argv);
   if (ret != RCL_RET_OK) {
-    std::string msg = "Failed to create node: " + std::string(rcl_get_error_string().str);
+    std::string msg = "Failed to parse node arguments: " + std::string(rcl_get_error_string().str);
     rcl_reset_error();
     rcljava_throw_rclexception(env, ret, msg);
     return 0;
   }
-  jlong node_handle = reinterpret_cast<jlong>(node);
-  return node_handle;
+
+  rcl_node_t * node = static_cast<rcl_node_t *>(malloc(sizeof(rcl_node_t)));
+  *node = rcl_get_zero_initialized_node();
+
+  rcl_node_options_t options = rcl_node_get_default_options();
+  options.use_global_arguments = use_global_arguments;
+  options.arguments = arguments;
+  options.enable_rosout = enable_rosout;
+  ret = rcl_node_init(node, node_name, node_namespace, context, &options);
+  if (ret != RCL_RET_OK) {
+    std::string msg = "Failed to create node: " + std::string(rcl_get_error_string().str);
+    rcl_reset_error();
+    free(node);
+    if (rcl_arguments_fini(&arguments) != RCL_RET_OK) {
+      // We are already throwing an exception, just ignore the return here
+    }
+    rcljava_throw_rclexception(env, ret, msg);
+    return 0;
+  }
+
+  ret = rcl_arguments_fini(&arguments);
+  if (ret != RCL_RET_OK) {
+    // We failed to cleanup
+    std::string msg = "Failed to cleanup after creating node: " + std::string(
+      rcl_get_error_string().str);
+    rcl_reset_error();
+    if (rcl_node_fini(node) != RCL_RET_OK) {
+      // We are already throwing an exception, just ignore the return here
+    }
+    free(node);
+    rcljava_throw_rclexception(env, ret, msg);
+    return 0;
+  }
+
+  return reinterpret_cast<jlong>(node);
 }
 
 JNIEXPORT jstring JNICALL

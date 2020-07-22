@@ -18,6 +18,7 @@ package org.ros2.rcljava;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Map;
 import java.util.concurrent.ConcurrentSkipListMap;
@@ -160,7 +161,7 @@ public final class RCLJava {
    * @param contextHandle Pointer to a context (rcl_context_t) with which to associated the node.
    * @return A pointer to the underlying ROS2 node structure.
    */
-  private static native long nativeCreateNodeHandle(String nodeName, String namespace, long contextHandle);
+  private static native long nativeCreateNodeHandle(String nodeName, String namespace, long contextHandle, ArrayList<String> arguments, boolean useGlobalArguments, boolean enableRosout);
 
   /**
    * @return The identifier of the currently active RMW implementation via the
@@ -217,7 +218,7 @@ public final class RCLJava {
    *     structure.
    */
   public static Node createNode(final String nodeName) {
-    return createNode(nodeName, "", RCLJava.getDefaultContext(), false);
+    return createNode(nodeName, "", RCLJava.getDefaultContext(), true, true, new ArrayList<String>(), false);
   }
 
   /**
@@ -229,11 +230,11 @@ public final class RCLJava {
    *     structure.
    */
   public static Node createNode(final String nodeName, final String namespace, final Context context) {
-    return createNode(nodeName, namespace, context, false);
+    return createNode(nodeName, namespace, context, true, true, new ArrayList<String>(), false);
   }
 
-  public static Node createNode(final String nodeName, final String namespace, final Context context, final boolean allowUndeclaredParameters) {
-    long nodeHandle = nativeCreateNodeHandle(nodeName, namespace, context.getHandle());
+  public static Node createNode(final String nodeName, final String namespace, final Context context, final boolean useGlobalArguments, final boolean enableRosout, final ArrayList<String> cliArgs, final boolean allowUndeclaredParameters) {
+    long nodeHandle = nativeCreateNodeHandle(nodeName, namespace, context.getHandle(), cliArgs, useGlobalArguments, enableRosout);
     Node node = new NodeImpl(nodeHandle, context, allowUndeclaredParameters);
     nodes.add(node);
     return node;

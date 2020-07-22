@@ -65,7 +65,7 @@ public class NodeUndeclaredParametersTest {
 
   @Before
   public void setUp() {
-    node = RCLJava.createNode("test_node", "", RCLJava.getDefaultContext(), true);
+    node = RCLJava.createNode("test_node", "", RCLJava.getDefaultContext(), true, true, new ArrayList<String>(), true);
   }
 
   @After
