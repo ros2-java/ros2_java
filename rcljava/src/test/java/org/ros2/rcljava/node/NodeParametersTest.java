@@ -26,7 +26,11 @@ import org.junit.Before;
 import org.junit.Test;
 
 import org.ros2.rcljava.RCLJava;
+import org.ros2.rcljava.parameters.InvalidParametersException;
+import org.ros2.rcljava.parameters.InvalidParameterValueException;
+import org.ros2.rcljava.parameters.ParameterAlreadyDeclaredException;
 import org.ros2.rcljava.parameters.ParameterCallback;
+import org.ros2.rcljava.parameters.ParameterNotDeclaredException;
 import org.ros2.rcljava.parameters.ParameterType;
 import org.ros2.rcljava.parameters.ParameterVariant;
 
@@ -83,23 +87,28 @@ public class NodeParametersTest {
     assertTrue(returnp.asBool());
   }
 
-  @Test(expected = IllegalArgumentException.class)
+  @Test(expected = ParameterAlreadyDeclaredException.class)
   public final void testDeclareParameterTwice() {
     ParameterVariant p = new ParameterVariant("foo", true);
     node.declareParameter(p);
     node.declareParameter(p);
   }
 
-  @Test(expected = IllegalArgumentException.class)
+  @Test(expected = InvalidParameterValueException.class)
   public final void testDeclareCallbackRejected() {
     class MyCB implements ParameterCallback {
       public rcl_interfaces.msg.SetParametersResult callback(List<ParameterVariant> parameters) {
-        return new rcl_interfaces.msg.SetParametersResult().setSuccessful(false);
+        return new rcl_interfaces.msg.SetParametersResult().setSuccessful(false).setReason("reason");
       }
     }
 
     node.addOnSetParametersCallback(new MyCB());
     node.declareParameter(new ParameterVariant("foo.bar", true));
+  }
+
+  @Test(expected = InvalidParametersException.class)
+  public final void testDeclareParameterInvalidName() {
+    node.declareParameter(new ParameterVariant());
   }
 
   @Test
@@ -133,7 +142,7 @@ public class NodeParametersTest {
     assertFalse(node.hasParameter("foo"));
   }
 
-  @Test(expected = IllegalArgumentException.class)
+  @Test(expected = ParameterNotDeclaredException.class)
   public final void testUndeclareParameterDoesNotExist() {
     node.undeclareParameter("foo");
   }
@@ -158,7 +167,7 @@ public class NodeParametersTest {
     assertEquals("foo", param.getName());
   }
 
-  @Test(expected = IllegalArgumentException.class)
+  @Test(expected = ParameterNotDeclaredException.class)
   public final void testGetParameterNotDeclared() {
     ParameterVariant param = node.getParameter("foo");
   }
@@ -199,7 +208,7 @@ public class NodeParametersTest {
     assertFalse(node.getParameter("foo.bar").asBool());
   }
 
-  @Test(expected = IllegalArgumentException.class)
+  @Test(expected = ParameterNotDeclaredException.class)
   public final void testSetParameterNotDeclared() {
     node.setParameter(new ParameterVariant("foo.bar", false));
   }
@@ -214,7 +223,12 @@ public class NodeParametersTest {
     assertFalse(node.hasParameter("foo.bar"));
   }
 
-  @Test(expected = IllegalArgumentException.class)
+  @Test(expected = InvalidParametersException.class)
+  public final void testSetParameterInvalidName() {
+    node.setParameter(new ParameterVariant());
+  }
+
+  @Test(expected = ParameterNotDeclaredException.class)
   public final void testSetParameterNotSetInvalidName() {
     node.setParameter(new ParameterVariant("unset"));
   }
@@ -250,7 +264,7 @@ public class NodeParametersTest {
 
     try {
         List<rcl_interfaces.msg.SetParametersResult> result = node.setParameters(params);
-    } catch (IllegalArgumentException e) {
+    } catch (ParameterNotDeclaredException e) {
     }
     assertTrue(node.hasParameter("foo.bar"));
     assertFalse(node.getParameter("foo.bar").asBool());  // Got updated
@@ -275,7 +289,7 @@ public class NodeParametersTest {
 
     try {
       node.setParametersAtomically(params);
-    } catch (IllegalArgumentException e) {
+    } catch (ParameterNotDeclaredException e) {
     }
     assertTrue(node.hasParameter("foo.bar"));
     assertTrue(node.getParameter("foo.bar").asBool());  // Didn't get updated because of failure
@@ -294,7 +308,7 @@ public class NodeParametersTest {
     assertEquals("description", newdesc.getDescription());
   }
 
-  @Test(expected = IllegalArgumentException.class)
+  @Test(expected = ParameterNotDeclaredException.class)
   public final void testDescribeParameterNotDeclared() {
     node.describeParameter("foo.bar");
   }
@@ -323,8 +337,8 @@ public class NodeParametersTest {
     assertEquals(ParameterType.PARAMETER_BOOL, types.get(0));
   }
 
-  @Test(expected = IllegalArgumentException.class)
-  public final void testGetParameterTypesUndeclared() {
+  @Test(expected = ParameterNotDeclaredException.class)
+  public final void testGetParameterTypesNotDeclared() {
     node.declareParameter(new ParameterVariant("foo.bar", true));
     node.getParameterTypes(new ArrayList<String>(Arrays.asList("foo.bar", "unset")));
   }

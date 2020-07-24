@@ -27,7 +27,11 @@ import org.ros2.rcljava.qos.QoSProfile;
 import org.ros2.rcljava.interfaces.Disposable;
 import org.ros2.rcljava.interfaces.MessageDefinition;
 import org.ros2.rcljava.interfaces.ServiceDefinition;
+import org.ros2.rcljava.parameters.InvalidParametersException;
+import org.ros2.rcljava.parameters.InvalidParameterValueException;
+import org.ros2.rcljava.parameters.ParameterAlreadyDeclaredException;
 import org.ros2.rcljava.parameters.ParameterCallback;
+import org.ros2.rcljava.parameters.ParameterNotDeclaredException;
 import org.ros2.rcljava.parameters.ParameterType;
 import org.ros2.rcljava.parameters.ParameterVariant;
 import org.ros2.rcljava.publisher.Publisher;
@@ -429,11 +433,17 @@ public class NodeImpl implements Node {
       throw new IllegalArgumentException("Parameters length must be equal to descriptors length");
     }
 
+    for (ParameterVariant parameter : parameters) {
+      if (parameter.getName().length() == 0) {
+        throw new InvalidParametersException("Parameter name must not be empty");
+      }
+    }
+
     synchronized (parameterCallbacksMutex) {
       for (ParameterCallback cb : this.parameterCallbacks) {
         rcl_interfaces.msg.SetParametersResult result = cb.callback(parameters);
         if (!result.getSuccessful()) {
-          throw new IllegalArgumentException("Failed to declare parameters; rejected by callback");
+          throw new InvalidParameterValueException(String.format("Parameters were rejected by callback: %s", result.getReason()));
         }
       }
     }
@@ -447,7 +457,7 @@ public class NodeImpl implements Node {
         rcl_interfaces.msg.ParameterDescriptor descriptor = itpd.next();
 
         if (this.parameters.containsKey(parameter.getName())) {
-          throw new IllegalArgumentException(String.format("Parameter '%s' is already declared", parameter.getName()));
+          throw new ParameterAlreadyDeclaredException(String.format("Parameter '%s' is already declared", parameter.getName()));
         }
 
         ParameterAndDescriptor pandd = new ParameterAndDescriptor();
@@ -465,7 +475,7 @@ public class NodeImpl implements Node {
   public void undeclareParameter(String name) {
     synchronized (parametersMutex) {
       if (!this.parameters.containsKey(name)) {
-        throw new IllegalArgumentException(String.format("Parameter '%s' is not declared", name));
+        throw new ParameterNotDeclaredException(String.format("Parameter '%s' is not declared", name));
       }
 
       this.parameters.remove(name);
@@ -488,7 +498,7 @@ public class NodeImpl implements Node {
         } else if (this.allowUndeclaredParameters) {
           results.add(new ParameterVariant(name));
         } else {
-          throw new IllegalArgumentException(String.format("Parameter '%s' is not declared", name));
+          throw new ParameterNotDeclaredException(String.format("Parameter '%s' is not declared", name));
         }
       }
     }
@@ -534,6 +544,12 @@ public class NodeImpl implements Node {
       List<ParameterVariant> parameters) {
     rcl_interfaces.msg.SetParametersResult result = new rcl_interfaces.msg.SetParametersResult();
 
+    for (ParameterVariant parameter : parameters) {
+      if (parameter.getName().length() == 0) {
+        throw new InvalidParametersException("Parameter name must not be empty");
+      }
+    }
+
     synchronized (parameterCallbacksMutex) {
       for (ParameterCallback cb : this.parameterCallbacks) {
         result = cb.callback(parameters);
@@ -561,7 +577,7 @@ public class NodeImpl implements Node {
         if (this.allowUndeclaredParameters) {
           parametersToDeclare.add(parameter.getName());
         } else {
-          throw new IllegalArgumentException(String.format("Parameter '%s' is not declared", parameter.getName()));
+          throw new ParameterNotDeclaredException(String.format("Parameter '%s' is not declared", parameter.getName()));
         }
       }
     }
@@ -654,7 +670,7 @@ public class NodeImpl implements Node {
         } else if (this.allowUndeclaredParameters) {
           results.add(new rcl_interfaces.msg.ParameterDescriptor().setName(name));
         } else {
-          throw new IllegalArgumentException(String.format("Parameter '%s' is not declared", name));
+          throw new ParameterNotDeclaredException(String.format("Parameter '%s' is not declared", name));
         }
       }
     }
@@ -672,7 +688,7 @@ public class NodeImpl implements Node {
         } else if (this.allowUndeclaredParameters) {
           results.add(ParameterType.fromByte(rcl_interfaces.msg.ParameterType.PARAMETER_NOT_SET));
         } else {
-          throw new IllegalArgumentException(String.format("Parameter '%s' is not declared", name));
+          throw new ParameterNotDeclaredException(String.format("Parameter '%s' is not declared", name));
         }
       }
     }

@@ -177,13 +177,6 @@ public interface Node extends Disposable {
 
   String getName();
 
-  /*
-   * TODO(clalancette): The parameter APIs below all tend to throw
-   * IllegalArgumentException on failure.  We should instead add in custom
-   * exception classes to make it easier for the caller to determine the
-   * cause of the exception.
-   */
-
   /**
    * Declare and initialize a parameter, return the effective value.
    *
@@ -208,7 +201,7 @@ public interface Node extends Disposable {
    * This method, if successful, will result in any callback registered with
    * addOnSetParametersCallback to be called.
    * If that callback prevents the initial value for the parameter from being
-   * set then an IllegalArgumentException is thrown.
+   * set then an InvalidParameterValueException is thrown.
    *
    * The returned reference will remain valid until the parameter is
    * undeclared.
@@ -216,10 +209,9 @@ public interface Node extends Disposable {
    * @param parameter The parameter to declare.
    * @param descriptor The descriptor to declare.
    * @return The parameter.
-   * @throws IllegalArgumentException if parameter has already been declared.
-   * @throws rclcpp::exceptions::InvalidParametersException if a parameter
-   *   name is invalid.
-   * @throws IllegalArgumentException if initial value fails to be set.
+   * @throws InvalidParametersException if the parameter name is invalid.
+   * @throws ParameterAlreadyDeclaredException if parameter has already been declared.
+   * @throws InvalidParameterValueException if initial value fails to be set.
    */
   ParameterVariant declareParameter(ParameterVariant parameter, rcl_interfaces.msg.ParameterDescriptor descriptor);
 
@@ -235,15 +227,17 @@ public interface Node extends Disposable {
    * This method, if successful, will result in any callback registered with
    * addOnSetParametersCallback to be called, once for each parameter.
    * If that callback prevents the initial value for any parameter from being
-   * set then an IllegalArgumentException is thrown.
+   * set then an InvalidParameterValueException is thrown.
    *
    * @param parameters The parameters to set.
    * @param descriptors The descriptors to set.
    * @return The list of parameters that were declared.
    * @throws IllegalArgumentException if the parameters list and descriptors
    *   list are not the same length.
-   * @throws IllegalArgumentException if any parameter in the list has already
+   * @throws InvalidParametersException if any of the parameter names is invalid.
+   * @throws ParameterAlreadyDeclaredException if any parameter in the list has already
    *   been declared.
+   * @throws InvalidParameterValueException if any of the initial values fail to be set.
    */
   List<ParameterVariant> declareParameters(List<ParameterVariant> parameters, List<rcl_interfaces.msg.ParameterDescriptor> descriptors);
 
@@ -254,7 +248,7 @@ public interface Node extends Disposable {
    * addOnSetParametersCallback to be called.
    *
    * @param name The name of the parameter to be undeclared.
-   * @throws IllegalArgumentException if the parameter
+   * @throws ParameterNotDeclaredException if the parameter
    *   has not been declared.
    */
   void undeclareParameter(String name);
@@ -270,17 +264,17 @@ public interface Node extends Disposable {
   /**
    * Return a list of parameters by the given list of parameter names.
    *
-   * This method will throw an IllegalArgumentException if any of the requested
+   * This method will throw a ParameterNotDeclaredException if any of the requested
    * parameters have not been declared and undeclared parameters are not
    * allowed.
    *
    * If undeclared parameters are allowed and the parameter has not been
-   * declared, then the returned rclcpp::Parameter will be default initialized
+   * declared, then the returned ParameterVariant will be default initialized
    * and therefore have the type ParameterType::PARAMETER_NOT_SET.
    *
    * @param names The names of the parameters to be retrieved.
    * @return The parameters that were retrieved.
-   * @throws IllegalArgumentException if any of the parameters have not been
+   * @throws ParameterNotDeclaredException if any of the parameters have not been
    *   declared and undeclared parameters are not allowed.
    */
   List<ParameterVariant> getParameters(List<String> names);
@@ -292,7 +286,7 @@ public interface Node extends Disposable {
    *
    * @param name The names of the parameters to be retrieved.
    * @return The parameter that was retrieved.
-   * @throws IllegalArgumentException if the parameter has not been declared
+   * @throws ParameterNotDeclaredException if the parameter has not been declared
    *   and undeclared parameters are not allowed.
    */
   ParameterVariant getParameter(String name);
@@ -300,7 +294,7 @@ public interface Node extends Disposable {
   /**
    * Return the named parameter value, or the "alternativeValue" if not set.
    *
-   * This method will not throw IllegalArgumentException if a parameter is
+   * This method will not throw ParameterNotDeclaredException if a parameter is
    * not declared.
    * Instead, it will return the alternativeValue.
    *
@@ -336,7 +330,7 @@ public interface Node extends Disposable {
    * Set the given parameter and then return result of the set action.
    *
    * If the parameter has not been declared and undeclared parameters are not
-   * allowed, this function will throw an IllegalArgumentException.
+   * allowed, this function will throw a ParameterNotDeclaredException.
    *
    * If undeclared parameters are allowed, then the parameter is implicitly
    * declared with the default parameter meta data before being set.
@@ -354,7 +348,8 @@ public interface Node extends Disposable {
    *
    * @param parameter The parameter to be set.
    * @return The result of the set action.
-   * @throws IllegalArgumentException if the parameter
+   * @throws InvalidParametersException if parameter name is invalid.
+   * @throws ParameterNotDeclaredException if the parameter
    *   has not been declared and undeclared parameters are not allowed.
    */
   rcl_interfaces.msg.SetParametersResult setParameter(ParameterVariant parameter);
@@ -367,7 +362,7 @@ public interface Node extends Disposable {
    *
    * Like setParameter, if any of the parameters to be set have not first been
    * declared, and undeclared parameters are not allowed (the default), then
-   * this method will throw an IllegalArgumentException.
+   * this method will throw a ParameterNotDeclaredException.
    *
    * If setting a parameter fails due to not being declared, then the
    * parameters which have already been set will stay set, and no attempt will
@@ -389,7 +384,8 @@ public interface Node extends Disposable {
    *
    * @param parameters The list of parameters to be set.
    * @return The results for each set action as a list.
-   * @throws IllegalArgumentException if any parameter has not been declared
+   * @throws InvalidParametersException if any parameter name is invalid.
+   * @throws ParameterNotDeclaredException if any parameter has not been declared
    *   and undeclared parameters are not allowed.
    */
   List<rcl_interfaces.msg.SetParametersResult> setParameters(List<ParameterVariant> parameters);
@@ -400,8 +396,8 @@ public interface Node extends Disposable {
    * In contrast to setParameters, either all of the parameters are set or none
    * of them are set.
    *
-   * Like setParameter and setParameters, this method may throw an
-   * IllegalArgumentException if any of the parameters to be set have not first
+   * Like setParameter and setParameters, this method will throw a
+   * ParameterNotDeclaredException if any of the parameters to be set have not first
    * been declared.
    * If the exception is thrown then none of the parameters will have been set.
    *
@@ -419,7 +415,8 @@ public interface Node extends Disposable {
    *
    * @param parameters The list of parameters to be set.
    * @return The aggregate result of setting all the parameters atomically.
-   * @throws IllegalArgumentException if any parameter has not been declared
+   * @throws InvalidParametersException if any parameter name is invalid.
+   * @throws ParameterNotDeclaredException if any parameter has not been declared
    *   and undeclared parameters are not allowed.
    */
   rcl_interfaces.msg.SetParametersResult setParametersAtomically(List<ParameterVariant> parameters);
@@ -467,7 +464,7 @@ public interface Node extends Disposable {
   /**
    * Return the parameter descriptor for the given parameter name.
    *
-   * This method will throw an IllegalArgumentException if the requested
+   * This method will throw an ParameterNotDeclaredException if the requested
    * parameter has not been declared and undeclared parameters are not allowed.
    *
    * If undeclared parameters are allowed, then a default initialized
@@ -475,7 +472,7 @@ public interface Node extends Disposable {
    *
    * @param name The name of the parameter to describe.
    * @return The descriptor for the given parameter name.
-   * @throws IllegalArgumentException if the parameter has not been declared
+   * @throws ParameterNotDeclaredException if the parameter has not been declared
    *   and undeclared parameters are not allowed.
    */
   rcl_interfaces.msg.ParameterDescriptor describeParameter(String name);
@@ -483,7 +480,7 @@ public interface Node extends Disposable {
   /**
    * Return a List of parameter descriptors, one for each of the given names.
    *
-   * This method will throw an IllegalArgumentException if any of the requested
+   * This method will throw an ParameterNotDeclaredException if any of the requested
    * parameters have not been declared and undeclared parameters are not allowed.
    *
    * If undeclared parameters are allowed, then a default initialized
@@ -493,7 +490,7 @@ public interface Node extends Disposable {
    *
    * @param names The list of parameter names to describe.
    * @return A list of parameter descriptors, one for each parameter given.
-   * @throws IllegalArgumentException if any of the parameters have not been
+   * @throws ParameterNotDeclaredException if any of the parameters have not been
    *   declared and undeclared parameters are not allowed.
    */
   List<rcl_interfaces.msg.ParameterDescriptor> describeParameters(List<String> names);
@@ -501,15 +498,15 @@ public interface Node extends Disposable {
   /**
    * Return a list of parameter types, one for each of the given names.
    *
-   * This method will throw an IllegalArgumentException if any of the requested
+   * This method will throw an ParameterNotDeclaredException if any of the requested
    * parameters have not been declared and undeclared parameters are not allowed.
    *
    * If undeclared parameters are allowed, then the default type
-   * rclcpp::ParameterType::PARAMETER_NOT_SET will be returned.
+   * ParameterType::PARAMETER_NOT_SET will be returned.
    *
    * @param names The list of parameter names to get the types.
    * @return A list of parameter types, one for each parameter given.
-   * @throws IllegalArgumentException if any of the parameters have not been
+   * @throws ParameterNotDeclaredException if any of the parameters have not been
    *   declared and undeclared parameters are not allowed.
    */
   List<ParameterType> getParameterTypes(List<String> names);
