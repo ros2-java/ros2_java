@@ -102,6 +102,11 @@ Make sure you have Gradle 3.2 (or later) installed.
 
         colcon build --symlink-install
 
+    *Note, on Windows we have to use `--merge-install`*
+
+        colcon build --merge-install
+
+
 ### Download and Build ROS 2 Java for Android
 
 > TODO: This section needs updated instructions for ROS 2 Dashing and newer
