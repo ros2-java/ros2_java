@@ -34,7 +34,7 @@ The current set of features include:
 - Clients and services
 - Timers
 - Composition (i.e. more than one node per process)
-- Time handling (system and steady, ROS time not yet supported)
+- Time handling (system and steady, ROS time not yet supported https://github.com/ros2-java/ros2_java/issues/122)
 - Support for Android
 - Parameters services and clients (both asynchronous and synchronous)
 
