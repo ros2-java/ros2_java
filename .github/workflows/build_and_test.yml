@@ -26,9 +26,19 @@ jobs:
       run: |
         sudo apt-get update -qq
         sudo apt-get install -y default-jdk
-    - uses: ros-tooling/setup-ros@0.0.14
-      with:
-        required-ros-distributions: dashing
+    - name: Setup locale for ROS 2
+      run: |
+        sudo locale-gen en_US en_US.UTF-8
+        sudo update-locale LC_ALL=en_US.UTF-8 LANG=en_US.UTF-8
+        export LANG=en_US.UTF-8
+    - name: Setup sources for ROS 2
+      run: |
+        sudo apt-get update && sudo apt-get install -y curl gnupg2 lsb-release
+        curl -s https://raw.githubusercontent.com/ros/rosdistro/master/ros.asc | sudo apt-key add -
+        sudo sh -c 'echo "deb [arch=$(dpkg --print-architecture)] http://packages.ros.org/ros2/ubuntu $(lsb_release -cs) main" > /etc/apt/sources.list.d/ros2-latest.list'
+    - name: Install colcon
+      run: |
+        sudo apt-get update && sudo apt-get install -y python3-colcon3-common-extensions
     - name: Fetch VCS repo file
       run: |
         mkdir -p ros2_java_ws/src
