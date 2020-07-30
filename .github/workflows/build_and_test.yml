@@ -62,7 +62,7 @@ jobs:
           --packages-up-to rcljava \
           --cmake-args \
           -DPYTHON_EXECUTABLE=${PYTHON3_EXEC} \
-          -DCMAKE_TOOLCHAIN_FILE=$ANDROID_NDK/build/cmake/android.toolchain.cmake \
+          -DCMAKE_TOOLCHAIN_FILE=${ANDROID_NDK}/build/cmake/android.toolchain.cmake \
           -DANDROID_FUNCTION_LEVEL_LINKING=OFF \
           -DANDROID_NATIVE_API_LEVEL=${ANDROID_NATIVE_API_LEVEL} \
           -DANDROID_TOOLCHAIN_NAME=${ANDROID_TOOLCHAIN_NAME} \
@@ -70,4 +70,5 @@ jobs:
           -DANDROID_ABI=${ANDROID_ABI} \
           -DANDROID_NDK=${ANDROID_NDK} \
           -DTHIRDPARTY=ON \
-          -DCOMPILE_EXAMPLES=OFF
+          -DCOMPILE_EXAMPLES=OFF \
+          -DCMAKE_FIND_ROOT_PATH="${PWD}/install"
