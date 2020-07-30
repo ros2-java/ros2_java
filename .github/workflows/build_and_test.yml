@@ -34,7 +34,7 @@ jobs:
     - name: Setup sources for ROS 2
       run: |
         sudo apt-get update && sudo apt-get install -y curl gnupg2 lsb-release
-        curl -s https://raw.githubusercontent.com/ros/rosdistro/master/ros.asc | sudo apt-key add -
+        curl -sL https://raw.githubusercontent.com/ros/rosdistro/master/ros.asc | sudo apt-key add -
         sudo sh -c 'echo "deb [arch=$(dpkg --print-architecture)] http://packages.ros.org/ros2/ubuntu $(lsb_release -cs) main" > /etc/apt/sources.list.d/ros2-latest.list'
     - name: Install colcon
       run: |
@@ -43,13 +43,18 @@ jobs:
       run: |
         mkdir -p ros2_java_ws/src
         cd ros2_java_ws
-        curl -skL https://raw.githubusercontent.com/ros2-java/ros2_java/jacob/android_instructions/ros2_java_android.repos | vcs import src
+        curl -sL https://raw.githubusercontent.com/ros2-java/ros2_java/jacob/android_instructions/ros2_java_android.repos | vcs import src
+    - name: Install Android NDK
+      run: |
+        curl -LO https://dl.google.com/android/repository/android-ndk-r21d-linux-x86_64.zip
+        unzip android-ndk-r21d-linux-x86_64.zip
     - name: Build ros2_java for Android
       run: |
         export PYTHON3_EXEC="$( which python3 )"
         export ANDROID_ABI=armeabi-v7a
         export ANDROID_NATIVE_API_LEVEL=android-21
         export ANDROID_TOOLCHAIN_NAME=arm-linux-androideabi-clang
+        export ANDROID_NDK=${PWD}/android-ndk-r21d
 
         cd ros2_java_ws
         colcon build \
