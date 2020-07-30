@@ -42,7 +42,9 @@ jobs:
         export ANDROID_TOOLCHAIN_NAME=arm-linux-androideabi-clang
 
         cd ros2_java_ws
-        colcon build --packages-skip test_msgs \
+        colcon build \
+          --packages-skip test_msgs \
+          --packages-up-to rcljava \
           --cmake-args \
           -DPYTHON_EXECUTABLE=${PYTHON3_EXEC} \
           -DCMAKE_TOOLCHAIN_FILE=$ANDROID_NDK/build/cmake/android.toolchain.cmake \
