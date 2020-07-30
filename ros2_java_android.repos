@@ -45,8 +45,8 @@ repositories:
     version: dashing
   osrf/osrf_testing_tools_cpp:
     type: git
-    url: https://github.com/osrf/osrf_testing_tools_cpp.git
-    version: dashing
+    url: https://github.com/ros2-java/osrf_testing_tools_cpp.git
+    version: dashing-android
   ros-perception/laser_geometry:
     type: git
     url: https://github.com/ros-perception/laser_geometry.git
