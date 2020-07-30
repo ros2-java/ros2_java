@@ -8,8 +8,8 @@ jobs:
     steps:
     - name: Install Java
       run: |
-        sudo apt update -qq
-        sudo apt install -y default-jdk
+        sudo apt-get update -qq
+        sudo apt-get install -y default-jdk
     - uses: ros-tooling/setup-ros@0.0.14
       with:
         required-ros-distributions: dashing
@@ -18,3 +18,39 @@ jobs:
         package-name: rosidl_generator_java rcljava_common rcljava
         source-ros-binary-installation: dashing
         vcs-repo-file-url: https://raw.githubusercontent.com/ros2-java/ros2_java/dashing/ros2_java_desktop.repos
+
+  build_android:
+    runs-on: ubuntu-18.04
+    steps:
+    - name: Install Java
+      run: |
+        sudo apt-get update -qq
+        sudo apt-get install -y default-jdk
+    - uses: ros-tooling/setup-ros@0.0.14
+      with:
+        required-ros-distributions: dashing
+    - name: Fetch VCS repo file
+      run: |
+        mkdir -p ros2_java_ws/src
+        cd ros2_java_ws
+        curl -skL https://raw.githubusercontent.com/ros2-java/ros2_java/jacob/android_instructions/ros2_android_desktop.repos | vcs import src
+    - name: Build ros2_java for Android
+      run: |
+        export PYTHON3_EXEC="$( which python3 )"
+        export ANDROID_ABI=armeabi-v7a
+        export ANDROID_NATIVE_API_LEVEL=android-21
+        export ANDROID_TOOLCHAIN_NAME=arm-linux-androideabi-clang
+
+        cd ros2_java_ws
+        colcon build --packages-skip test_msgs \
+          --cmake-args \
+          -DPYTHON_EXECUTABLE=${PYTHON3_EXEC} \
+          -DCMAKE_TOOLCHAIN_FILE=$ANDROID_NDK/build/cmake/android.toolchain.cmake \
+          -DANDROID_FUNCTION_LEVEL_LINKING=OFF \
+          -DANDROID_NATIVE_API_LEVEL=${ANDROID_NATIVE_API_LEVEL} \
+          -DANDROID_TOOLCHAIN_NAME=${ANDROID_TOOLCHAIN_NAME} \
+          -DANDROID_STL=c++_shared \
+          -DANDROID_ABI=${ANDROID_ABI} \
+          -DANDROID_NDK=${ANDROID_NDK} \
+          -DTHIRDPARTY=ON \
+          -DCOMPILE_EXAMPLES=OFF
