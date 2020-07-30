@@ -61,6 +61,7 @@ jobs:
           --packages-skip test_msgs \
           --packages-up-to rcljava \
           --cmake-args \
+          -DBUILD_TESTING=OFF \
           -DPYTHON_EXECUTABLE=${PYTHON3_EXEC} \
           -DCMAKE_TOOLCHAIN_FILE=${ANDROID_NDK}/build/cmake/android.toolchain.cmake \
           -DANDROID_FUNCTION_LEVEL_LINKING=OFF \
