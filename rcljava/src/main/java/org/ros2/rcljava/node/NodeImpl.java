@@ -120,8 +120,6 @@ public class NodeImpl implements Node {
    */
   private final Collection<Timer> timers;
 
-  private final String name;
-
   private Object parametersMutex;
 
   class ParameterAndDescriptor {
@@ -141,10 +139,9 @@ public class NodeImpl implements Node {
    * @param handle A pointer to the underlying ROS2 node structure. Must not
    *     be zero.
    */
-  public NodeImpl(final long handle, final String name, final Context context, final boolean allowUndeclaredParameters) {
+  public NodeImpl(final long handle, final Context context, final boolean allowUndeclaredParameters) {
     this.clock = new Clock(ClockType.SYSTEM_TIME);
     this.handle = handle;
-    this.name = name;
     this.context = context;
     this.publishers = new LinkedBlockingQueue<Publisher>();
     this.subscriptions = new LinkedBlockingQueue<Subscription>();
@@ -157,6 +154,20 @@ public class NodeImpl implements Node {
     this.parameterCallbacksMutex = new Object();
     this.parameterCallbacks = new ArrayList<ParameterCallback>();
   }
+
+  /**
+   * Get the ROS 2 node name.
+   * @param handle A pointer to the underlying ROS2 node structure.
+   * @return The name of the node.
+   */
+  private static native String nativeGetName(long handle);
+
+  /**
+   * Get the ROS 2 node namespace.
+   * @param handle A pointer to the underlying ROS2 node structure.
+   * @return The namespace of the node.
+   */
+  private static native String nativeGetNamespace(long handle);
 
   /**
    * Create a ROS2 publisher (rcl_publisher_t) and return a pointer to
@@ -416,7 +427,11 @@ public class NodeImpl implements Node {
    * {@inheritDoc}
    */
   public final String getName() {
-    return this.name;
+    return nativeGetName(this.handle);
+  }
+
+  public final String getNamespace() {
+    return nativeGetNamespace(this.handle);
   }
 
   public ParameterVariant declareParameter(ParameterVariant parameter) {

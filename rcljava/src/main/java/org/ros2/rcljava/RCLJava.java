@@ -234,7 +234,7 @@ public final class RCLJava {
 
   public static Node createNode(final String nodeName, final String namespace, final Context context, final boolean allowUndeclaredParameters) {
     long nodeHandle = nativeCreateNodeHandle(nodeName, namespace, context.getHandle());
-    Node node = new NodeImpl(nodeHandle, nodeName, context, allowUndeclaredParameters);
+    Node node = new NodeImpl(nodeHandle, context, allowUndeclaredParameters);
     nodes.add(node);
     return node;
   }

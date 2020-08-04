@@ -31,6 +31,20 @@
 
 using rcljava_common::exceptions::rcljava_throw_rclexception;
 
+JNIEXPORT jstring JNICALL
+Java_org_ros2_rcljava_node_NodeImpl_nativeGetName(
+  JNIEnv * env, jclass, jlong node_handle)
+{
+  return env->NewStringUTF(rcl_node_get_name(reinterpret_cast<rcl_node_t *>(node_handle)));
+}
+
+JNIEXPORT jstring JNICALL
+Java_org_ros2_rcljava_node_NodeImpl_nativeGetNamespace(
+  JNIEnv * env, jclass, jlong node_handle)
+{
+  return env->NewStringUTF(rcl_node_get_namespace(reinterpret_cast<rcl_node_t *>(node_handle)));
+}
+
 JNIEXPORT jlong JNICALL
 Java_org_ros2_rcljava_node_NodeImpl_nativeCreatePublisherHandle(
   JNIEnv * env, jclass, jlong node_handle, jclass jmessage_class, jstring jtopic,

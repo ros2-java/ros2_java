@@ -20,6 +20,25 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
+
+/*
+ * Class:     org_ros2_rcljava_node_NodeImpl
+ * Method:    nativeGetName
+ * Signature: (J)Ljava/lang/String
+ */
+JNIEXPORT jstring
+JNICALL Java_org_ros2_rcljava_node_NodeImpl_nativeGetName(
+  JNIEnv * env, jclass, jlong node_handle);
+
+/*
+ * Class:     org_ros2_rcljava_node_NodeImpl
+ * Method:    nativeGetNamespace
+ * Signature: (J)Ljava/lang/String
+ */
+JNIEXPORT jstring
+JNICALL Java_org_ros2_rcljava_node_NodeImpl_nativeGetNamespace(
+  JNIEnv * env, jclass, jlong node_handle);
+
 /*
  * Class:     org_ros2_rcljava_node_NodeImpl
  * Method:    nativeCreatePublisherHandle

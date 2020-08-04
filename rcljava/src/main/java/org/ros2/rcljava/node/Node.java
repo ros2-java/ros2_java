@@ -175,7 +175,20 @@ public interface Node extends Disposable {
 
   WallTimer createWallTimer(final long period, final TimeUnit unit, final Callback callback);
 
+  /** Get the name of the node.
+   *
+   * @return The name of the node.
+   */
   String getName();
+
+  /** Get the namespace of the node.
+   *
+   * This namespace is the "node's" namespace, and therefore is not affected
+   * by any sub-namespace's that may affect entities created with this instance.
+   *
+   * @return The namespace of the node.
+   */
+  String getNamespace();
 
   /**
    * Declare and initialize a parameter, return the effective value.
