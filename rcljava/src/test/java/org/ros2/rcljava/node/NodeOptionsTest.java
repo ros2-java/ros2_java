@@ -26,6 +26,7 @@ import java.util.Arrays;
 
 import org.ros2.rcljava.RCLJava;
 import org.ros2.rcljava.node.Node;
+import org.ros2.rcljava.node.NodeOptions;
 
 public class NodeOptionsTest {
   @BeforeClass
@@ -43,9 +44,9 @@ public class NodeOptionsTest {
 
   @Test
   public final void testCreateNodeWithArgs() {
-    ArrayList<String> args = new ArrayList<String>(Arrays.asList("--ros-args", "-r", "__ns:=/foo"));
-    //ArrayList<String> args = new ArrayList<String>();
-    Node node = RCLJava.createNode("test_node", "", RCLJava.getDefaultContext(), true, true, args, false);
+    NodeOptions options = new NodeOptions();
+    options.setCliArgs(new ArrayList<String>(Arrays.asList("--ros-args", "-r", "__ns:=/foo")));
+    Node node = RCLJava.createNode("test_node", "", RCLJava.getDefaultContext(), options);
     assertEquals("test_node", node.getName());
     assertEquals("/foo", node.getNamespace());
 

@@ -34,6 +34,7 @@ import org.ros2.rcljava.interfaces.ServiceDefinition;
 import org.ros2.rcljava.node.ComposableNode;
 import org.ros2.rcljava.node.Node;
 import org.ros2.rcljava.node.NodeImpl;
+import org.ros2.rcljava.node.NodeOptions;
 import org.ros2.rcljava.publisher.Publisher;
 import org.ros2.rcljava.qos.QoSProfile;
 import org.ros2.rcljava.service.RMWRequestId;
@@ -218,7 +219,7 @@ public final class RCLJava {
    *     structure.
    */
   public static Node createNode(final String nodeName) {
-    return createNode(nodeName, "", RCLJava.getDefaultContext(), true, true, new ArrayList<String>(), false);
+    return createNode(nodeName, "", RCLJava.getDefaultContext(), new NodeOptions());
   }
 
   /**
@@ -230,12 +231,12 @@ public final class RCLJava {
    *     structure.
    */
   public static Node createNode(final String nodeName, final String namespace, final Context context) {
-    return createNode(nodeName, namespace, context, true, true, new ArrayList<String>(), false);
+    return createNode(nodeName, namespace, context, new NodeOptions());
   }
 
-  public static Node createNode(final String nodeName, final String namespace, final Context context, final boolean useGlobalArguments, final boolean enableRosout, final ArrayList<String> cliArgs, final boolean allowUndeclaredParameters) {
-    long nodeHandle = nativeCreateNodeHandle(nodeName, namespace, context.getHandle(), cliArgs, useGlobalArguments, enableRosout);
-    Node node = new NodeImpl(nodeHandle, context, allowUndeclaredParameters);
+  public static Node createNode(final String nodeName, final String namespace, final Context context, final NodeOptions options) {
+    long nodeHandle = nativeCreateNodeHandle(nodeName, namespace, context.getHandle(), options.getCliArgs(), options.getUseGlobalArguments(), options.getEnableRosout());
+    Node node = new NodeImpl(nodeHandle, context, options.getAllowUndeclaredParameters());
     nodes.add(node);
     return node;
   }

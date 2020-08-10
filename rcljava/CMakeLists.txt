@@ -134,6 +134,7 @@ set(${PROJECT_NAME}_sources
   "src/main/java/org/ros2/rcljava/node/ComposableNode.java"
   "src/main/java/org/ros2/rcljava/node/Node.java"
   "src/main/java/org/ros2/rcljava/node/NodeImpl.java"
+  "src/main/java/org/ros2/rcljava/node/NodeOptions.java"
   "src/main/java/org/ros2/rcljava/parameters/client/AsyncParametersClient.java"
   "src/main/java/org/ros2/rcljava/parameters/client/AsyncParametersClientImpl.java"
   "src/main/java/org/ros2/rcljava/parameters/client/SyncParametersClient.java"
