@@ -63,12 +63,14 @@ bool parse_arguments(JNIEnv * env, jobject cli_args, rcl_arguments_t * arguments
     jstring element =
       static_cast<jstring>(env->CallObjectMethod(cli_args, java_util_ArrayList_get, i));
     argv[i] = env->GetStringUTFChars(element, nullptr);
+    env->DeleteLocalRef(element);
   }
   rcl_ret_t ret = rcl_parse_arguments(argc, &argv[0], rcl_get_default_allocator(), arguments);
   for (jint i = 0; i < argc; ++i) {
     jstring element =
       static_cast<jstring>(env->CallObjectMethod(cli_args, java_util_ArrayList_get, i));
     env->ReleaseStringUTFChars(element, argv[i]);
+    env->DeleteLocalRef(element);
   }
   if (ret != RCL_RET_OK) {
     std::string msg = "Failed to parse node arguments: " + std::string(rcl_get_error_string().str);
