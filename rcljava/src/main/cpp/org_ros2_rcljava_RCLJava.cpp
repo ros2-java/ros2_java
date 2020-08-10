@@ -17,6 +17,7 @@
 #include <cassert>
 #include <cstdlib>
 #include <string>
+#include <vector>
 
 #include "rcl/error_handling.h"
 #include "rcl/node.h"
@@ -44,46 +45,59 @@ Java_org_ros2_rcljava_RCLJava_nativeCreateContextHandle(JNIEnv *, jclass)
   return context_handle;
 }
 
-JNIEXPORT jlong JNICALL
-Java_org_ros2_rcljava_RCLJava_nativeCreateNodeHandle(
-  JNIEnv * env, jclass, jstring jnode_name, jstring jnamespace, jlong context_handle,
-  jobject cli_args, jboolean use_global_arguments, jboolean enable_rosout)
+bool parse_arguments(JNIEnv * env, jobject cli_args, rcl_arguments_t * arguments)
 {
-  const char * node_name = env->GetStringUTFChars(jnode_name, 0);
-  const char * node_namespace = env->GetStringUTFChars(jnamespace, 0);
-
-  rcl_context_t * context = reinterpret_cast<rcl_context_t *>(context_handle);
-
   // TODO(clalancette): we could probably make this faster by just doing these
   // method lookups during some initialization time.  But we'd have to add a lot
   // more infrastructure for that, and we don't expect to call
   // 'nativeCreateNodeHandle' that often, so I think this is OK for now.
-  jclass java_util_ArrayList =
-    static_cast<jclass>(env->NewGlobalRef(env->FindClass("java/util/ArrayList")));
+  jclass java_util_ArrayList = static_cast<jclass>(env->FindClass("java/util/ArrayList"));
   jmethodID java_util_ArrayList_size = env->GetMethodID(java_util_ArrayList, "size", "()I");
   jmethodID java_util_ArrayList_get = env->GetMethodID(
     java_util_ArrayList, "get", "(I)Ljava/lang/Object;");
 
-  rcl_arguments_t arguments = rcl_get_zero_initialized_arguments();
-  char ** argv = NULL;
+  *arguments = rcl_get_zero_initialized_arguments();
   jint argc = env->CallIntMethod(cli_args, java_util_ArrayList_size);
-  argv = static_cast<char **>(malloc(argc * sizeof(char *)));
+  std::vector<const char *> argv(argc);
   for (jint i = 0; i < argc; ++i) {
     jstring element =
       static_cast<jstring>(env->CallObjectMethod(cli_args, java_util_ArrayList_get, i));
-    argv[i] = const_cast<char *>(env->GetStringUTFChars(element, nullptr));
+    argv[i] = env->GetStringUTFChars(element, nullptr);
   }
-  rcl_ret_t ret = rcl_parse_arguments(argc, argv, rcl_get_default_allocator(), &arguments);
+  rcl_ret_t ret = rcl_parse_arguments(argc, &argv[0], rcl_get_default_allocator(), arguments);
   for (jint i = 0; i < argc; ++i) {
     jstring element =
       static_cast<jstring>(env->CallObjectMethod(cli_args, java_util_ArrayList_get, i));
     env->ReleaseStringUTFChars(element, argv[i]);
   }
-  free(argv);
   if (ret != RCL_RET_OK) {
     std::string msg = "Failed to parse node arguments: " + std::string(rcl_get_error_string().str);
     rcl_reset_error();
     rcljava_throw_rclexception(env, ret, msg);
+    return false;
+  }
+
+  return true;
+}
+
+JNIEXPORT jlong JNICALL
+Java_org_ros2_rcljava_RCLJava_nativeCreateNodeHandle(
+  JNIEnv * env, jclass, jstring jnode_name, jstring jnamespace, jlong context_handle,
+  jobject cli_args, jboolean use_global_arguments, jboolean enable_rosout)
+{
+  const char * node_name_tmp = env->GetStringUTFChars(jnode_name, 0);
+  std::string node_name(node_name_tmp);
+  env->ReleaseStringUTFChars(jnode_name, node_name_tmp);
+
+  const char * namespace_tmp = env->GetStringUTFChars(jnamespace, 0);
+  std::string namespace_(namespace_tmp);
+  env->ReleaseStringUTFChars(jnamespace, namespace_tmp);
+
+  rcl_context_t * context = reinterpret_cast<rcl_context_t *>(context_handle);
+
+  rcl_arguments_t arguments;
+  if (!parse_arguments(env, cli_args, &arguments)) {
+    // All of the exception setup was done by parse_arguments, just return here.
     return 0;
   }
 
@@ -94,7 +108,7 @@ Java_org_ros2_rcljava_RCLJava_nativeCreateNodeHandle(
   options.use_global_arguments = use_global_arguments;
   options.arguments = arguments;
   options.enable_rosout = enable_rosout;
-  ret = rcl_node_init(node, node_name, node_namespace, context, &options);
+  rcl_ret_t ret = rcl_node_init(node, node_name.c_str(), namespace_.c_str(), context, &options);
   if (ret != RCL_RET_OK) {
     std::string msg = "Failed to create node: " + std::string(rcl_get_error_string().str);
     rcl_reset_error();
