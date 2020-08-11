@@ -37,7 +37,7 @@ public class InterfacesTest {
       // the log4j JARs, SLF4J uses Android's native logging mechanism instead.
       Class c = Class.forName("org.apache.log4j.BasicConfigurator");
       Method m = c.getDeclaredMethod("configure", (Class<?>[]) null);
-      Object o = m.invoke(null, (Object<?>[]) null);
+      Object o = m.invoke(null, (Object[]) null);
     }
     catch (Exception e)
     {
