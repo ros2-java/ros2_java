@@ -61,7 +61,6 @@ jobs:
         cd ros2_java_ws
         colcon build \
           --packages-ignore cyclonedds rcl_logging_log4cxx rosidl_generator_py \
-          --packages-up-to rcljava \
           --cmake-args \
           -DPYTHON_EXECUTABLE=${PYTHON3_EXEC} \
           -DPYTHON_LIBRARY=${PYTHON3_LIBRARY} \
