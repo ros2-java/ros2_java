@@ -15,6 +15,10 @@ repositories:
     type: git
     url: https://github.com/ament/ament_package.git
     version: dashing
+  ament/googletest:
+    type: git
+    url: https://github.com/ament/googletest.git
+    version: dashing
   ament/uncrustify_vendor:
     type: git
     url: https://github.com/ament/uncrustify_vendor.git
