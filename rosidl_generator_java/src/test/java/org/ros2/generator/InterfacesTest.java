@@ -19,6 +19,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertTrue;
 
+import java.lang.reflect.Method;
 import java.util.concurrent.Callable;
 import java.util.Arrays;
 import java.util.List;
@@ -30,7 +31,18 @@ import org.junit.rules.ExpectedException;
 public class InterfacesTest {
   @BeforeClass
   public static void setupOnce() {
-    org.apache.log4j.BasicConfigurator.configure();
+    try
+    {
+      // Configure log4j. Doing this dynamically so that Android does not complain about missing
+      // the log4j JARs, SLF4J uses Android's native logging mechanism instead.
+      Class c = Class.forName("org.apache.log4j.BasicConfigurator");
+      Method m = c.getDeclaredMethod("configure", null);
+      Object o = m.invoke(null, null);
+    }
+    catch (Exception e)
+    {
+      e.printStackTrace();
+    }
   }
 
   @Rule public ExpectedException thrown = ExpectedException.none();
