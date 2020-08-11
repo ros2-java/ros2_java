@@ -51,6 +51,8 @@ jobs:
     - name: Build ros2_java for Android
       run: |
         export PYTHON3_EXEC="$( which python3 )"
+        export PYTHON3_LIBRARY="$( ${PYTHON3_EXEC} -c 'import os.path; from distutils import sysconfig; print(os.path.realpath(os.path.join(sysconfig.get_config_var("LIBPL"), sysconfig.get_config_var("LDLIBRARY"))))' )"
+        export PYTHON3_INCLUDE_DIR="$( ${PYTHON3_EXEC} -c 'from distutils import sysconfig; print(sysconfig.get_config_var("INCLUDEPY"))' )"
         export ANDROID_ABI=armeabi-v7a
         export ANDROID_NATIVE_API_LEVEL=android-21
         export ANDROID_TOOLCHAIN_NAME=arm-linux-androideabi-clang
@@ -62,6 +64,8 @@ jobs:
           --packages-up-to rcljava \
           --cmake-args \
           -DPYTHON_EXECUTABLE=${PYTHON3_EXEC} \
+          -DPYTHON_LIBRARY=${PYTHON3_LIBRARY} \
+          -DPYTHON_INCLUDE_DIR=${PYTHON3_INCLUDE_DIR} \
           -DCMAKE_TOOLCHAIN_FILE=${ANDROID_NDK}/build/cmake/android.toolchain.cmake \
           -DANDROID_FUNCTION_LEVEL_LINKING=OFF \
           -DANDROID_NATIVE_API_LEVEL=${ANDROID_NATIVE_API_LEVEL} \
