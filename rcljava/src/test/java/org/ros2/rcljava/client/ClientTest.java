@@ -26,6 +26,7 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 
 import java.lang.ref.WeakReference;
+import java.lang.reflect.Method;
 import java.time.Duration;
 
 import java.util.Arrays;
