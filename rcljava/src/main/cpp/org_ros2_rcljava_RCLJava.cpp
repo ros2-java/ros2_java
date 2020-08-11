@@ -51,7 +51,7 @@ bool parse_arguments(JNIEnv * env, jobject cli_args, rcl_arguments_t * arguments
   // method lookups during some initialization time.  But we'd have to add a lot
   // more infrastructure for that, and we don't expect to call
   // 'nativeCreateNodeHandle' that often, so I think this is OK for now.
-  jclass java_util_ArrayList = static_cast<jclass>(env->FindClass("java/util/ArrayList"));
+  jclass java_util_ArrayList = env->FindClass("java/util/ArrayList");
   jmethodID java_util_ArrayList_size = env->GetMethodID(java_util_ArrayList, "size", "()I");
   jmethodID java_util_ArrayList_get = env->GetMethodID(
     java_util_ArrayList, "get", "(I)Ljava/lang/Object;");
@@ -97,14 +97,19 @@ Java_org_ros2_rcljava_RCLJava_nativeCreateNodeHandle(
 
   rcl_context_t * context = reinterpret_cast<rcl_context_t *>(context_handle);
 
+  rcl_node_t * node = static_cast<rcl_node_t *>(malloc(sizeof(rcl_node_t)));
+  if (node == nullptr) {
+    env->ThrowNew(env->FindClass("java/lang/OutOfMemoryError"), "Failed to allocate node");
+    return 0;
+  }
+  *node = rcl_get_zero_initialized_node();
+
   rcl_arguments_t arguments;
   if (!parse_arguments(env, cli_args, &arguments)) {
     // All of the exception setup was done by parse_arguments, just return here.
+    free(node);
     return 0;
   }
-
-  rcl_node_t * node = static_cast<rcl_node_t *>(malloc(sizeof(rcl_node_t)));
-  *node = rcl_get_zero_initialized_node();
 
   rcl_node_options_t options = rcl_node_get_default_options();
   options.use_global_arguments = use_global_arguments;
