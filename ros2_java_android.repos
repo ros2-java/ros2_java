@@ -157,7 +157,7 @@ repositories:
     version: jacob/android_instructions
   ros2_java/ros2_android:
     type: git
-    url: https://github.com/esteve/ros2_android.git
+    url: https://github.com/ros2-java/ros2_android.git
     version: master
   ros2_java/ros2_android_examples:
     type: git
