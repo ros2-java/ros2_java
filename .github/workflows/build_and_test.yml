@@ -13,13 +13,9 @@ jobs:
     - uses: ros-tooling/setup-ros@0.0.14
       with:
         required-ros-distributions: dashing
-    - name: Install colcon extensions for Gradle
-      run: |
-        sudo pip3 install git+git://github.com/colcon/colcon-gradle.git
-        sudo pip3 install git+git://github.com/colcon/colcon-ros-gradle.git
     - uses: ros-tooling/action-ros-ci@8d58122
       with:
-        package-name: rosidl_generator_java rcljava_common rcljava rcljava_examples
+        package-name: rosidl_generator_java rcljava_common rcljava
         source-ros-binary-installation: dashing
         vcs-repo-file-url: https://raw.githubusercontent.com/ros2-java/ros2_java/dashing/ros2_java_desktop.repos
 
