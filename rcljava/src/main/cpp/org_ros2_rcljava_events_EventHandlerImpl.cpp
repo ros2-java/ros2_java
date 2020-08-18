@@ -47,7 +47,8 @@ Java_org_ros2_rcljava_events_EventHandlerImpl_nativeDispose(
 }
 
 JNIEXPORT void JNICALL
-Java_org_ros2_rcljava_events_EventHandlerImpl_nativeTake(JNIEnv *env, jclass, jlong event_handle, jlong event_status_handle)
+Java_org_ros2_rcljava_events_EventHandlerImpl_nativeTake(
+  JNIEnv * env, jclass, jlong event_handle, jlong event_status_handle)
 {
   auto * event = reinterpret_cast<rcl_event_t *>(event_handle);
   if (!event) {

@@ -16,9 +16,13 @@
 package org.ros2.rcljava.publisher;
 
 import java.lang.ref.WeakReference;
+import java.util.function.Supplier;
 
+import org.ros2.rcljava.consumers.Consumer;
 import org.ros2.rcljava.interfaces.Disposable;
 import org.ros2.rcljava.interfaces.MessageDefinition;
+import org.ros2.rcljava.events.EventHandler;
+import org.ros2.rcljava.events.PublisherEventStatus;
 import org.ros2.rcljava.node.Node;
 
 /**
@@ -41,4 +45,23 @@ public interface Publisher<T extends MessageDefinition> extends Disposable {
    * that created this publisher.
    */
   WeakReference<Node> getNodeReference();
+
+  /**
+   * Create an event handler.
+   *
+   * @param <T> A publisher event status type.
+   * @param factory A factory that can instantiate an event status of type T.
+   * @param callback Callback that will be called when the event is triggered.
+   */
+  <T extends PublisherEventStatus> EventHandler<T, Publisher> createEventHandler(
+    Supplier<T> factory, Consumer<T> callback);
+
+  /**
+   * Remove a previously registered event handler.
+   *
+   * @param <T> A publisher event status type.
+   * @param eventHandler An event handler that was registered previously in this object.
+   */
+  <T extends PublisherEventStatus> void removeEventHandler(
+    EventHandler<T, Publisher> eventHandler);
 }

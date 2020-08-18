@@ -24,5 +24,5 @@ public interface SubscriptionEventStatus extends EventStatus {
   /**
    * @return The status event type.
    */
-  int get_subscription_event_type();
+  int getSubscriptionEventType();
 }

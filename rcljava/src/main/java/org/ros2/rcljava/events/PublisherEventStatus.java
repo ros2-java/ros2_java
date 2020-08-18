@@ -24,5 +24,5 @@ public interface PublisherEventStatus extends EventStatus {
   /**
    * @return The status event type.
    */
-  int get_publisher_event_type();
+  int getPublisherEventType();
 }

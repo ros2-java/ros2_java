@@ -30,16 +30,6 @@ import org.ros2.rcljava.events.EventStatus;
  */
 public interface EventHandler<T extends EventStatus, ParentT extends Disposable> extends Disposable {
   /**
-   * @return The event status type.
-   */
-  Class<T> getEventStatusType();
-
-  /**
-   * @return The parent entity type.
-   */
-  Class<ParentT> getParentType();
-
-  /**
    * @return A weak reference to the parent.
    */
   WeakReference<ParentT> getParentReference();

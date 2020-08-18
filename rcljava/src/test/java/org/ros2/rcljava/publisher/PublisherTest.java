@@ -24,6 +24,9 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 
 import org.ros2.rcljava.RCLJava;
+import org.ros2.rcljava.consumers.Consumer;
+import org.ros2.rcljava.events.EventHandler;
+import org.ros2.rcljava.events.publisher_statuses.LivelinessLost;
 import org.ros2.rcljava.node.Node;
 
 public class PublisherTest {
@@ -62,5 +65,21 @@ public class PublisherTest {
     assertEquals(0, node.getPublishers().size());
 
     RCLJava.shutdown();
+  }
+
+  @Test
+  public final void testCreateLivelinessLostEvent() {
+    RCLJava.rclJavaInit();
+    Node node = RCLJava.createNode("test_node");
+    Publisher<std_msgs.msg.String> publisher =
+        node.<std_msgs.msg.String>createPublisher(std_msgs.msg.String.class, "test_topic");
+    EventHandler eventHandler = publisher.createEventHandler(
+      LivelinessLost.factory, new Consumer<LivelinessLost>() {
+        public void accept(final LivelinessLost status) {}
+      }
+    );
+    assertNotEquals(0, eventHandler.getHandle());
+    RCLJava.shutdown();
+    assertEquals(0, eventHandler.getHandle());
   }
 }

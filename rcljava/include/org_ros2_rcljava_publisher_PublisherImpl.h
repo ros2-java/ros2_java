@@ -38,6 +38,15 @@ JNIEXPORT void
 JNICALL Java_org_ros2_rcljava_publisher_PublisherImpl_nativeDispose(
   JNIEnv *, jclass, jlong, jlong);
 
+/*
+ * Class:     org_ros2_rcljava_publisher_PublisherImpl
+ * Method:    nativeCreateEvent
+ * Signature: (JJ)J
+ */
+JNIEXPORT jlong
+JNICALL Java_org_ros2_rcljava_publisher_PublisherImpl_nativeCreateEvent(
+  JNIEnv *, jclass, jlong, jint);
+
 #ifdef __cplusplus
 }
 #endif

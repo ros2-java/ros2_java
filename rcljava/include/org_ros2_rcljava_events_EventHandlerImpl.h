@@ -27,7 +27,8 @@ extern "C" {
  * Signature: (J)V
  */
 JNIEXPORT void
-JNICALL Java_org_ros2_rcljava_events_EventHandlerImpl_nativeDispose(JNIEnv *, jclass, jlong event_handle);
+JNICALL Java_org_ros2_rcljava_events_EventHandlerImpl_nativeDispose(
+  JNIEnv *, jclass, jlong event_handle);
 
 /*
  * Class:     org_ros2_rcljava_events_EventHandlerImpl

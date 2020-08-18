@@ -16,6 +16,7 @@ package org.ros2.rcljava.events;
 
 import java.lang.ref.WeakReference;
 import java.lang.reflect.InvocationTargetException;
+import java.util.function.Supplier;
 
 import org.ros2.rcljava.common.JNIUtils;
 import org.ros2.rcljava.consumers.Consumer;
@@ -53,46 +54,26 @@ implements EventHandler<T, ParentT> {
   /**
    * Constructor.
    *
-   * @param parentType The <code>Class</code> type of the parent.
-   *    It can be either a @{link org.ros2.rcljava.Publisher} or a
-   *    @{link org.ros2.rcljava.Subscription} class.
    * @param parentReference A {@link java.lang.ref.WeakReference} to the
    *     @{link org.ros2.rcljava.Publisher} or @{link org.ros2.rcljava.Subscription}
    *     that created this event handler.
    * @param handle A pointer to the underlying ROS 2 event structure, as an integer.
    *     Must not be zero.
-   * @param eventStatusType The <code>Class</code> of the messages that this
-   *     subscription will receive. We need this because of Java's type erasure,
-   *     which doesn't allow us to use the generic parameter of
-   *     @{link org.ros2.rcljava.Subscription} directly.
+   *     Ownership of the passed `handle` is taken, and this object is responsible
+   *     of disposing it. That can be done using @{link EventHandler#dispose()}.
+   * @param eventStatusFactory Factory of an event status.
    * @param callback The callback function that will be called when the event
    *     is triggered.
    */
   public EventHandlerImpl(
-      final Class<ParentT> parentType,
       final WeakReference<ParentT> parentReference,
       final long handle,
-      final Class<T> eventStatusType,
+      final Supplier<T> eventStatusFactory,
       final Consumer<T> callback) {
-    this.parentType = parentType;
     this.parentReference = parentReference;
     this.handle = handle;
-    this.eventStatusType = eventStatusType;
+    this.eventStatusFactory = eventStatusFactory;
     this.callback = callback;
-  }
-
-  /**
-   * {@inheritDoc}
-   */
-  public final Class<T> getEventStatusType() {
-    return this.eventStatusType;
-  }
-
-  /**
-   * {@inheritDoc}
-   */
-  public final Class<ParentT> getParentType() {
-    return this.parentType;
   }
 
   /**
@@ -120,8 +101,10 @@ implements EventHandler<T, ParentT> {
   /**
    * {@inheritDoc}
    */
-  public final void dispose() {
-    nativeDispose(this.handle);
+  public synchronized final void dispose() {
+    if (this.handle != 0) {
+      nativeDispose(this.handle);
+    }
     this.handle = 0;
   }
 
@@ -137,19 +120,8 @@ implements EventHandler<T, ParentT> {
   /**
    * {@inheritDoc}
    */
-  public final void executeCallback() {
-    T eventStatus = null;
-    try {
-        eventStatus = this.eventStatusType.getDeclaredConstructor().newInstance();
-    } catch (NoSuchMethodException nme) {
-        nme.printStackTrace();
-    } catch (InvocationTargetException ite) {
-        ite.printStackTrace();
-    } catch (InstantiationException ie) {
-        ie.printStackTrace();
-    } catch (IllegalAccessException iae) {
-        iae.printStackTrace();
-    }
+  public synchronized final void executeCallback() {
+    T eventStatus = eventStatusFactory.get();
     long nativeEventStatusHandle = eventStatus.allocateRCLStatusEvent();
     nativeTake(this.handle, nativeEventStatusHandle);
     eventStatus.fromRCLEvent(nativeEventStatusHandle);
@@ -157,8 +129,7 @@ implements EventHandler<T, ParentT> {
     callback.accept(eventStatus);
   }
 
-  private final Class<T> eventStatusType;
-  private final Class<ParentT> parentType;
+  private final Supplier<T> eventStatusFactory;
   private final WeakReference<ParentT> parentReference;
   private long handle;
   private final Consumer<T> callback;
