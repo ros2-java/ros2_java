@@ -16,6 +16,7 @@
 package org.ros2.rcljava.executors;
 
 import org.ros2.rcljava.client.Client;
+import org.ros2.rcljava.events.EventHandler;
 import org.ros2.rcljava.subscription.Subscription;
 import org.ros2.rcljava.service.Service;
 import org.ros2.rcljava.timer.Timer;
@@ -25,4 +26,5 @@ public class AnyExecutable {
   public Subscription subscription;
   public Service service;
   public Client client;
+  public EventHandler eventHandler;
 }

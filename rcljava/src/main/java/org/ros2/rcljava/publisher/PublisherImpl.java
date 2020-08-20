@@ -139,7 +139,15 @@ public class PublisherImpl<T extends MessageDefinition> implements Publisher<T> 
   }
 
   /**
-   * Create a publisher event (rcl_event_t).
+   * {@inheritDoc}
+   */
+  public final
+  Collection<EventHandler> getEventHandlers() {
+    return this.eventHandlers;
+  }
+
+  /**
+   * Create a publisher event (rcl_event_t)
    *
    * The ownership of the created event handle will immediately be transferred to an
    * @{link EventHandlerImpl}, that will be responsible of disposing it.

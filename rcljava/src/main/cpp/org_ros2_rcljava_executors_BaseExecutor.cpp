@@ -276,6 +276,21 @@ Java_org_ros2_rcljava_executors_BaseExecutor_nativeWaitSetAddTimer(
   }
 }
 
+JNIEXPORT void JNICALL
+Java_org_ros2_rcljava_executors_BaseExecutor_nativeWaitSetAddEvent(
+  JNIEnv * env, jclass, jlong wait_set_handle, jlong event_handle)
+{
+  auto * wait_set = reinterpret_cast<rcl_wait_set_t *>(wait_set_handle);
+  auto * event = reinterpret_cast<rcl_event_t *>(event_handle);
+  rcl_ret_t ret = rcl_wait_set_add_event(wait_set, event, nullptr);
+  if (ret != RCL_RET_OK) {
+    std::string msg =
+      "Failed to add event to wait set: " + std::string(rcl_get_error_string().str);
+    rcl_reset_error();
+    rcljava_throw_rclexception(env, ret, msg);
+  }
+}
+
 JNIEXPORT jobject JNICALL
 Java_org_ros2_rcljava_executors_BaseExecutor_nativeTakeRequest(
   JNIEnv * env, jclass, jlong service_handle, jlong jrequest_from_java_converter_handle,
@@ -433,6 +448,14 @@ Java_org_ros2_rcljava_executors_BaseExecutor_nativeWaitSetTimerIsReady(
 {
   rcl_wait_set_t * wait_set = reinterpret_cast<rcl_wait_set_t *>(wait_set_handle);
   return wait_set->timers[index] != nullptr;
+}
+
+JNIEXPORT jboolean JNICALL
+Java_org_ros2_rcljava_executors_BaseExecutor_nativeWaitSetEventIsReady(
+  JNIEnv *, jclass, jlong wait_set_handle, jlong index)
+{
+  rcl_wait_set_t * wait_set = reinterpret_cast<rcl_wait_set_t *>(wait_set_handle);
+  return wait_set->events[index] != nullptr;
 }
 
 JNIEXPORT jboolean JNICALL

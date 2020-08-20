@@ -16,6 +16,7 @@
 package org.ros2.rcljava.publisher;
 
 import java.lang.ref.WeakReference;
+import java.util.Collection;
 import java.util.function.Supplier;
 
 import org.ros2.rcljava.consumers.Consumer;
@@ -64,4 +65,11 @@ public interface Publisher<T extends MessageDefinition> extends Disposable {
    */
   <T extends PublisherEventStatus> void removeEventHandler(
     EventHandler<T, Publisher> eventHandler);
+
+  /**
+   * Get the event handlers that were registered in this Publisher.
+   *
+   * @return The registered event handlers.
+   */
+  Collection<EventHandler> getEventHandlers();
 }
