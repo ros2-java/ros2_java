@@ -27,6 +27,8 @@ import org.ros2.rcljava.RCLJava;
 import org.ros2.rcljava.consumers.Consumer;
 import org.ros2.rcljava.events.EventHandler;
 import org.ros2.rcljava.events.publisher_statuses.LivelinessLost;
+import org.ros2.rcljava.events.publisher_statuses.OfferedQosIncompatible;
+import org.ros2.rcljava.exceptions.RCLException;
 import org.ros2.rcljava.node.Node;
 
 public class PublisherTest {
@@ -75,10 +77,42 @@ public class PublisherTest {
         node.<std_msgs.msg.String>createPublisher(std_msgs.msg.String.class, "test_topic");
     EventHandler eventHandler = publisher.createEventHandler(
       LivelinessLost.factory, new Consumer<LivelinessLost>() {
-        public void accept(final LivelinessLost status) {}
+        public void accept(final LivelinessLost status) {
+          assertEquals(status.totalCount, 0);
+          assertEquals(status.totalCountChange, 0);
+        }
       }
     );
     assertNotEquals(0, eventHandler.getHandle());
+    // force executing the callback, so we check that taking an event works
+    eventHandler.executeCallback();
+    RCLJava.shutdown();
+    assertEquals(0, eventHandler.getHandle());
+  }
+
+  @Test
+  public final void testCreateOfferedQosIncompatibleEvent() {
+    String identifier = RCLJava.getRMWIdentifier();
+    if (identifier.equals("rmw_fastrtps_cpp") || identifier.equals("rmw_fastrtps_dynamic_cpp")) {
+      // event not supported in these implementations
+      return;
+    }
+    RCLJava.rclJavaInit();
+    Node node = RCLJava.createNode("test_node");
+    Publisher<std_msgs.msg.String> publisher =
+        node.<std_msgs.msg.String>createPublisher(std_msgs.msg.String.class, "test_topic");
+    EventHandler eventHandler = publisher.createEventHandler(
+      OfferedQosIncompatible.factory, new Consumer<OfferedQosIncompatible>() {
+        public void accept(final OfferedQosIncompatible status) {
+          assertEquals(status.totalCount, 0);
+          assertEquals(status.totalCountChange, 0);
+          assertEquals(status.lastPolicyKind, OfferedQosIncompatible.PolicyKind.INVALID);
+        }
+      }
+    );
+    assertNotEquals(0, eventHandler.getHandle());
+    // force executing the callback, so we check that taking an event works
+    eventHandler.executeCallback();
     RCLJava.shutdown();
     assertEquals(0, eventHandler.getHandle());
   }

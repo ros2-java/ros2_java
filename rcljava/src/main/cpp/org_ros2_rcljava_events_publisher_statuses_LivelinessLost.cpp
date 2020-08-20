@@ -17,7 +17,7 @@
 #include <jni.h>
 #include <stdlib.h>
 
-#include "rmw/events_statuses/liveliness_lost.h"
+#include "rmw/types.h"
 #include "rcl/event.h"
 #include "rcljava_common/exceptions.hpp"
 
@@ -53,11 +53,11 @@ Java_org_ros2_rcljava_events_publisher_1statuses_LivelinessLost_nativeFromRCLEve
   }
   // TODO(ivanpauno): class and field lookup could be done at startup time
   jclass clazz = env->GetObjectClass(self);
-  jfieldID total_count_fid = env->GetFieldID(clazz, "total_count", "I");
+  jfieldID total_count_fid = env->GetFieldID(clazz, "totalCount", "I");
   if (env->ExceptionCheck()) {
     return;
   }
-  jfieldID total_count_change_fid = env->GetFieldID(clazz, "total_count_change", "I");
+  jfieldID total_count_change_fid = env->GetFieldID(clazz, "totalCountChange", "I");
   if (env->ExceptionCheck()) {
     return;
   }

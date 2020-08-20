@@ -18,6 +18,7 @@ package org.ros2.rcljava;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotEquals;
 
+import java.lang.System;
 import java.lang.reflect.Method;
 import java.util.concurrent.TimeUnit;
 
@@ -27,11 +28,20 @@ import org.junit.Test;
 
 import org.ros2.rcljava.RCLJava;
 import org.ros2.rcljava.concurrent.Callback;
+import org.ros2.rcljava.consumers.Consumer;
+import org.ros2.rcljava.events.EventHandler;
+import org.ros2.rcljava.events.publisher_statuses.OfferedQosIncompatible;
 import org.ros2.rcljava.executors.Executor;
 import org.ros2.rcljava.executors.SingleThreadedExecutor;
 import org.ros2.rcljava.node.ComposableNode;
 import org.ros2.rcljava.node.Node;
 import org.ros2.rcljava.timer.WallTimer;
+import org.ros2.rcljava.publisher.Publisher;
+import org.ros2.rcljava.qos.policies.Durability;
+import org.ros2.rcljava.qos.policies.History;
+import org.ros2.rcljava.qos.policies.Reliability;
+import org.ros2.rcljava.qos.QoSProfile;
+import org.ros2.rcljava.subscription.Subscription;
 
 public class SpinTest {
   public static class TimerCallback implements Callback {
@@ -344,5 +354,62 @@ public class SpinTest {
     }
     executor.spinAll(100*1000*1000);
     assertEquals(1, timerCallback.getCounter());
+  }
+
+  // custom event consumer
+  public static class EventConsumer implements Consumer<OfferedQosIncompatible> {
+    public boolean done = false;
+
+    public void accept(final OfferedQosIncompatible status) {
+      assertEquals(status.totalCount, 1);
+      assertEquals(status.totalCountChange, 1);
+      assertEquals(status.lastPolicyKind, OfferedQosIncompatible.PolicyKind.RELIABILITY);
+      this.done = true;
+    }
+  }
+
+  @Test
+  public final void testSpinEvent() {
+    String identifier = RCLJava.getRMWIdentifier();
+    if (identifier.equals("rmw_fastrtps_cpp") || identifier.equals("rmw_fastrtps_dynamic_cpp")) {
+      // OfferedQosIncompatible event not supported in these implementations
+      return;
+    }
+    final Node node = RCLJava.createNode("test_node_spin_event");
+    Publisher<std_msgs.msg.String> publisher = node.<std_msgs.msg.String>createPublisher(
+          std_msgs.msg.String.class, "test_topic_spin_event", new QoSProfile(
+            History.KEEP_LAST, 1,
+            Reliability.BEST_EFFORT,
+            Durability.VOLATILE,
+            false));
+    // create a OfferedQoSIncompatible event handler with custom event consumer
+    EventConsumer eventConsumer = new EventConsumer();
+    EventHandler eventHandler = publisher.createEventHandler(
+      OfferedQosIncompatible.factory, eventConsumer
+    );
+    // create an incompatible subscription (reliable vs best effort publisher)
+    Subscription<std_msgs.msg.String> subscription = node.<std_msgs.msg.String>createSubscription(
+          std_msgs.msg.String.class, "test_topic_spin_event",
+          new Consumer<std_msgs.msg.String>() {
+            public void accept(final std_msgs.msg.String msg) {}
+          },
+          new QoSProfile(
+            History.KEEP_LAST, 1,
+            Reliability.RELIABLE,
+            Durability.VOLATILE,
+            false));
+    // set up executor
+    ComposableNode composableNode = new ComposableNode() {
+      public Node getNode() {
+        return node;
+      }
+    };
+    Executor executor = new SingleThreadedExecutor();
+    executor.addNode(composableNode);
+    long start = System.currentTimeMillis();
+    do {
+      executor.spinAll((1000 + System.currentTimeMillis() - start) * 1000 * 1000);
+    } while (!eventConsumer.done && System.currentTimeMillis() < start + 1000);
+    assert(eventConsumer.done);
   }
 }
