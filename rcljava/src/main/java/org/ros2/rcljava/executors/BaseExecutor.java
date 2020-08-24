@@ -181,6 +181,11 @@ public class BaseExecutor {
       for (Subscription<MessageDefinition> subscription : node.getNode().getSubscriptions()) {
         this.subscriptionHandles.add(new AbstractMap.SimpleEntry<Long, Subscription>(
             subscription.getHandle(), subscription));
+        Collection<EventHandler> eventHandlers = subscription.getEventHandlers();
+        for (EventHandler eventHandler : eventHandlers) {
+          this.eventHandles.add(new AbstractMap.SimpleEntry<Long, EventHandler>(
+            eventHandler.getHandle(), eventHandler));
+        }
       }
 
       for (Publisher publisher : node.getNode().getPublishers()) {

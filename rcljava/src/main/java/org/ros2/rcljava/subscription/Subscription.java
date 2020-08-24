@@ -16,8 +16,12 @@
 package org.ros2.rcljava.subscription;
 
 import java.lang.ref.WeakReference;
+import java.util.Collection;
+import java.util.function.Supplier;
 
 import org.ros2.rcljava.consumers.Consumer;
+import org.ros2.rcljava.events.EventHandler;
+import org.ros2.rcljava.events.SubscriptionEventStatus;
 import org.ros2.rcljava.interfaces.Disposable;
 import org.ros2.rcljava.interfaces.MessageDefinition;
 import org.ros2.rcljava.node.Node;
@@ -42,4 +46,30 @@ public interface Subscription<T extends MessageDefinition> extends Disposable {
   WeakReference<Node> getNodeReference();
 
   void executeCallback(T message);
+
+  /**
+   * Create an event handler.
+   *
+   * @param <T> A subscription event status type.
+   * @param factory A factory that can instantiate an event status of type T.
+   * @param callback Callback that will be called when the event is triggered.
+   */
+  <T extends SubscriptionEventStatus> EventHandler<T, Subscription> createEventHandler(
+    Supplier<T> factory, Consumer<T> callback);
+
+  /**
+   * Remove a previously registered event handler.
+   *
+   * @param <T> A subscription event status type.
+   * @param eventHandler An event handler that was registered previously in this object.
+   */
+  <T extends SubscriptionEventStatus> void removeEventHandler(
+    EventHandler<T, Subscription> eventHandler);
+
+  /**
+   * Get the event handlers that were registered in this Subscription.
+   *
+   * @return The registered event handlers.
+   */
+  Collection<EventHandler> getEventHandlers();
 }

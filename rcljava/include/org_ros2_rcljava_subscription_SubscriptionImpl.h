@@ -29,6 +29,15 @@ JNIEXPORT void
 JNICALL Java_org_ros2_rcljava_subscription_SubscriptionImpl_nativeDispose(
   JNIEnv *, jclass, jlong, jlong);
 
+/*
+ * Class:     org_ros2_rcljava_subscription_SubscriptionImpl
+ * Method:    nativeCreateEvent
+ * Signature: (JJ)J
+ */
+JNIEXPORT jlong
+JNICALL Java_org_ros2_rcljava_subscription_SubscriptionImpl_nativeCreateEvent(
+  JNIEnv *, jclass, jlong, jint);
+
 #ifdef __cplusplus
 }
 #endif

@@ -19,6 +19,7 @@
 #include <string>
 
 #include "rcl/error_handling.h"
+#include "rcl/event.h"
 #include "rcl/node.h"
 #include "rcl/rcl.h"
 #include "rmw/rmw.h"
@@ -29,6 +30,7 @@
 
 #include "org_ros2_rcljava_subscription_SubscriptionImpl.h"
 
+using rcljava_common::exceptions::rcljava_throw_exception;
 using rcljava_common::exceptions::rcljava_throw_rclexception;
 
 JNIEXPORT void JNICALL
@@ -60,4 +62,32 @@ Java_org_ros2_rcljava_subscription_SubscriptionImpl_nativeDispose(
     rcl_reset_error();
     rcljava_throw_rclexception(env, ret, msg);
   }
+}
+
+JNIEXPORT jlong
+JNICALL Java_org_ros2_rcljava_subscription_SubscriptionImpl_nativeCreateEvent(
+  JNIEnv * env, jclass, jlong subscription_handle, jint event_type)
+{
+  auto * subscription = reinterpret_cast<rcl_subscription_t *>(subscription_handle);
+  if (!subscription) {
+    rcljava_throw_exception(
+      env, "java/lang/IllegalArgumentException", "passed rcl_subscription_t handle is NULL");
+    return 0;
+  }
+  auto * event = static_cast<rcl_event_t *>(malloc(sizeof(rcl_event_t)));
+  if (!event) {
+    rcljava_throw_exception(env, "java/lang/OutOfMemoryError", "failed to allocate rcl_event_t");
+    return 0;
+  }
+  *event = rcl_get_zero_initialized_event();
+  rcl_ret_t ret = rcl_subscription_event_init(
+    event, subscription, static_cast<rcl_subscription_event_type_t>(event_type));
+  if (RCL_RET_OK != ret) {
+    std::string msg = "Failed to create event: " + std::string(rcl_get_error_string().str);
+    rcl_reset_error();
+    rcljava_throw_rclexception(env, ret, msg);
+    free(event);
+    return 0;
+  }
+  return reinterpret_cast<jlong>(event);
 }

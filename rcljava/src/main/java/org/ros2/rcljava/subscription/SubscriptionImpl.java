@@ -16,10 +16,16 @@
 package org.ros2.rcljava.subscription;
 
 import java.lang.ref.WeakReference;
+import java.util.Collection;
+import java.util.concurrent.LinkedBlockingQueue;
+import java.util.function.Supplier;
 
 import org.ros2.rcljava.RCLJava;
 import org.ros2.rcljava.common.JNIUtils;
 import org.ros2.rcljava.consumers.Consumer;
+import org.ros2.rcljava.events.EventHandler;
+import org.ros2.rcljava.events.EventHandlerImpl;
+import org.ros2.rcljava.events.SubscriptionEventStatus;
 import org.ros2.rcljava.interfaces.MessageDefinition;
 import org.ros2.rcljava.node.Node;
 
@@ -68,6 +74,8 @@ public class SubscriptionImpl<T extends MessageDefinition> implements Subscripti
    */
   private final Consumer<T> callback;
 
+  private final Collection<EventHandler> eventHandlers;
+
   /**
    * Constructor.
    *
@@ -90,6 +98,7 @@ public class SubscriptionImpl<T extends MessageDefinition> implements Subscripti
     this.messageType = messageType;
     this.topic = topic;
     this.callback = callback;
+    this.eventHandlers = new LinkedBlockingQueue<EventHandler>();
   }
 
   /**
@@ -114,6 +123,54 @@ public class SubscriptionImpl<T extends MessageDefinition> implements Subscripti
   }
 
   /**
+   * {@inheritDoc}
+   */
+  public final
+  <T extends SubscriptionEventStatus> EventHandler<T, Subscription>
+  createEventHandler(Supplier<T> factory, Consumer<T> callback) {
+    T status = factory.get();
+    long eventHandle = nativeCreateEvent(this.handle, status.getSubscriptionEventType());
+    EventHandler<T, Subscription> eventHandler = new EventHandlerImpl(
+      new WeakReference<Subscription>(this), eventHandle, factory, callback);
+    this.eventHandlers.add(eventHandler);
+    return eventHandler;
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  public final
+  <T extends SubscriptionEventStatus> void removeEventHandler(
+    EventHandler<T, Subscription> eventHandler)
+  {
+    if (!this.eventHandlers.remove(eventHandler)) {
+      throw new IllegalArgumentException(
+        "The passed eventHandler wasn't created by this subscription");
+    }
+    eventHandler.dispose();
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  public final
+  Collection<EventHandler> getEventHandlers() {
+    return this.eventHandlers;
+  }
+
+  /**
+   * Create a subscription event (rcl_event_t)
+   *
+   * The ownership of the created event handle will immediately be transferred to an
+   * @{link EventHandlerImpl}, that will be responsible of disposing it.
+   *
+   * @param handle A pointer to the underlying ROS 2 subscription structure.
+   *     Must not be zero.
+   * @param eventType The rcl event type.
+   */
+  private static native long nativeCreateEvent(long handle, int eventType);
+
+  /**
    * Destroy a ROS2 subscription (rcl_subscription_t).
    *
    * @param nodeHandle A pointer to the underlying ROS2 node structure that
@@ -127,6 +184,10 @@ public class SubscriptionImpl<T extends MessageDefinition> implements Subscripti
    * {@inheritDoc}
    */
   public final void dispose() {
+    for (EventHandler eventHandler : this.eventHandlers) {
+      eventHandler.dispose();
+    }
+    this.eventHandlers.clear();
     Node node = this.nodeReference.get();
     if (node != null) {
       node.removeSubscription(this);
