@@ -13,24 +13,24 @@
 // limitations under the License.
 
 #include <jni.h>
-/* Header for class org_ros2_rcljava_publisher_statuses_OfferedQosIncompatible */
+/* Header for class org_ros2_rcljava_subscription_statuses_RequestedQosIncompatible */
 
-#ifndef ORG_ROS2_RCLJAVA_PUBLISHER_STATUSES_OFFEREDQOSINCOMPATIBLE_H_
-#define ORG_ROS2_RCLJAVA_PUBLISHER_STATUSES_OFFEREDQOSINCOMPATIBLE_H_
+#ifndef ORG_ROS2_RCLJAVA_SUBSCRIPTION_STATUSES_REQUESTEDQOSINCOMPATIBLE_H_
+#define ORG_ROS2_RCLJAVA_SUBSCRIPTION_STATUSES_REQUESTEDQOSINCOMPATIBLE_H_
 #ifdef __cplusplus
 extern "C" {
 #endif
 
 /*
- * Class:     org_ros2_rcljava_publisher_statuses_OfferedQosIncompatible
+ * Class:     org_ros2_rcljava_subscription_statuses_RequestedQosIncompatible
  * Method:    nativeGetEventType
  * Signature: ()I
  */
 JNIEXPORT jint JNICALL
-Java_org_ros2_rcljava_publisher_statuses_OfferedQosIncompatible_nativeGetEventType(
+Java_org_ros2_rcljava_subscription_statuses_RequestedQosIncompatible_nativeGetEventType(
   JNIEnv *, jclass);
 
 #ifdef __cplusplus
 }
 #endif
-#endif  // ORG_ROS2_RCLJAVA_PUBLISHER_STATUSES_OFFEREDQOSINCOMPATIBLE_H_
+#endif  // ORG_ROS2_RCLJAVA_SUBSCRIPTION_STATUSES_REQUESTEDQOSINCOMPATIBLE_H_

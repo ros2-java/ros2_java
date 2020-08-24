@@ -12,37 +12,38 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package org.ros2.rcljava.publisher.statuses;
+package org.ros2.rcljava.subscription.statuses;
 
 import java.util.function.Supplier;
 
 import org.ros2.rcljava.common.JNIUtils;
 import org.ros2.rcljava.detail.QosIncompatibleStatus;
-import org.ros2.rcljava.events.PublisherEventStatus;
+import org.ros2.rcljava.events.SubscriptionEventStatus;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * This class serves as a bridge between rmw_offered_qos_incompatible_event_status_t and RCLJava.
+ * This class serves as a bridge between rmw_requested_qos_incompatible_event_status_t
+ * and RCLJava.
  */
-public class OfferedQosIncompatible
-extends QosIncompatibleStatus implements PublisherEventStatus {
-  public final int getPublisherEventType() {
+public class RequestedQosIncompatible
+extends QosIncompatibleStatus implements SubscriptionEventStatus {
+  public final int getSubscriptionEventType() {
     return nativeGetEventType();
   }
   // TODO(ivanpauno): Remove this when -source 8 can be used (method references for the win)
-  public static final Supplier<OfferedQosIncompatible>
-  factory = new Supplier<OfferedQosIncompatible>() {
-    public OfferedQosIncompatible get() {
-      return new OfferedQosIncompatible();
+  public static final Supplier<RequestedQosIncompatible>
+  factory = new Supplier<RequestedQosIncompatible>() {
+    public RequestedQosIncompatible get() {
+      return new RequestedQosIncompatible();
     }
   };
 
-  private static final Logger logger = LoggerFactory.getLogger(OfferedQosIncompatible.class);
+  private static final Logger logger = LoggerFactory.getLogger(RequestedQosIncompatible.class);
   static {
     try {
-      JNIUtils.loadImplementation(OfferedQosIncompatible.class);
+      JNIUtils.loadImplementation(RequestedQosIncompatible.class);
     } catch (UnsatisfiedLinkError ule) {
       logger.error("Native code library failed to load.\n" + ule);
       System.exit(1);

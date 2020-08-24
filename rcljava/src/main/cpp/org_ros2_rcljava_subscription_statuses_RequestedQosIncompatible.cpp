@@ -12,25 +12,15 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#include "org_ros2_rcljava_subscription_statuses_RequestedQosIncompatible.h"
+
 #include <jni.h>
-/* Header for class org_ros2_rcljava_publisher_statuses_OfferedQosIncompatible */
 
-#ifndef ORG_ROS2_RCLJAVA_PUBLISHER_STATUSES_OFFEREDQOSINCOMPATIBLE_H_
-#define ORG_ROS2_RCLJAVA_PUBLISHER_STATUSES_OFFEREDQOSINCOMPATIBLE_H_
-#ifdef __cplusplus
-extern "C" {
-#endif
+#include "rcl/event.h"
 
-/*
- * Class:     org_ros2_rcljava_publisher_statuses_OfferedQosIncompatible
- * Method:    nativeGetEventType
- * Signature: ()I
- */
 JNIEXPORT jint JNICALL
-Java_org_ros2_rcljava_publisher_statuses_OfferedQosIncompatible_nativeGetEventType(
-  JNIEnv *, jclass);
-
-#ifdef __cplusplus
+Java_org_ros2_rcljava_subscription_statuses_RequestedQosIncompatible_nativeGetEventType(
+  JNIEnv *, jclass)
+{
+  return RCL_SUBSCRIPTION_REQUESTED_INCOMPATIBLE_QOS;
 }
-#endif
-#endif  // ORG_ROS2_RCLJAVA_PUBLISHER_STATUSES_OFFEREDQOSINCOMPATIBLE_H_
