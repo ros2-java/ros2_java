@@ -15,7 +15,7 @@ jobs:
         required-ros-distributions: dashing
     - uses: ros-tooling/action-ros-ci@8d58122
       with:
-        package-name: rosidl_generator_java rcljava_common rcljava rcljava_examples
+        package-name: rosidl_generator_java rcljava_common rcljava
         source-ros-binary-installation: dashing
         vcs-repo-file-url: https://raw.githubusercontent.com/ros2-java/ros2_java/dashing/ros2_java_desktop.repos
 
@@ -25,7 +25,7 @@ jobs:
     - name: Install Java
       run: |
         sudo apt-get update -qq
-        sudo apt-get install -y default-jdk
+        sudo apt-get install -y default-jdk gradle
     - name: Setup locale for ROS 2
       run: |
         sudo locale-gen en_US en_US.UTF-8
@@ -41,7 +41,6 @@ jobs:
         sudo apt-get update && sudo apt-get install -y python3-colcon-common-extensions python3-vcstool python3-lark-parser python3-dev
     - name: Install colcon extensions for Gradle
       run: |
-        sudo apt-get install -y gradle
         sudo pip3 install git+git://github.com/colcon/colcon-gradle.git
         sudo pip3 install git+git://github.com/colcon/colcon-ros-gradle.git
     - name: Fetch VCS repo file
