@@ -13,51 +13,51 @@
 // limitations under the License.
 
 #include <jni.h>
-/* Header for class org_ros2_rcljava_events_publisher_statuses_OfferedQosIncompatible */
+/* Header for class org_ros2_rcljava_publisher_statuses_OfferedQosIncompatible */
 
-#ifndef ORG_ROS2_RCLJAVA_EVENTS_PUBLISHER_STATUSES_OFFEREDQOSINCOMPATIBLE_H_
-#define ORG_ROS2_RCLJAVA_EVENTS_PUBLISHER_STATUSES_OFFEREDQOSINCOMPATIBLE_H_
+#ifndef ORG_ROS2_RCLJAVA_PUBLISHER_STATUSES_OFFEREDQOSINCOMPATIBLE_H_
+#define ORG_ROS2_RCLJAVA_PUBLISHER_STATUSES_OFFEREDQOSINCOMPATIBLE_H_
 #ifdef __cplusplus
 extern "C" {
 #endif
 
 /*
- * Class:     org_ros2_rcljava_events_publisher_statuses_OfferedQosIncompatible
+ * Class:     org_ros2_rcljava_publisher_statuses_OfferedQosIncompatible
  * Method:    nAllocateRCLStatusEvent
  * Signature: ()J
  */
 JNIEXPORT jlong JNICALL
-Java_org_ros2_rcljava_events_publisher_1statuses_OfferedQosIncompatible_nAllocateRCLStatusEvent(
+Java_org_ros2_rcljava_publisher_statuses_OfferedQosIncompatible_nAllocateRCLStatusEvent(
   JNIEnv *, jclass);
 
 /*
- * Class:     org_ros2_rcljava_events_publisher_statuses_OfferedQosIncompatible
+ * Class:     org_ros2_rcljava_publisher_statuses_OfferedQosIncompatible
  * Method:    nDeallocateRCLStatusEvent
  * Signature: (J)V
  */
 JNIEXPORT void JNICALL
-Java_org_ros2_rcljava_events_publisher_1statuses_OfferedQosIncompatible_nDeallocateRCLStatusEvent(
+Java_org_ros2_rcljava_publisher_statuses_OfferedQosIncompatible_nDeallocateRCLStatusEvent(
   JNIEnv *, jclass, jlong);
 
 /*
- * Class:     org_ros2_rcljava_events_publisher_statuses_OfferedQosIncompatible
+ * Class:     org_ros2_rcljava_publisher_statuses_OfferedQosIncompatible
  * Method:    nFromRCLEvent
  * Signature: (J)V
  */
 JNIEXPORT void JNICALL
-Java_org_ros2_rcljava_events_publisher_1statuses_OfferedQosIncompatible_nFromRCLEvent(
+Java_org_ros2_rcljava_publisher_statuses_OfferedQosIncompatible_nFromRCLEvent(
   JNIEnv *, jobject, jlong);
 
 /*
- * Class:     org_ros2_rcljava_events_publisher_statuses_OfferedQosIncompatible
+ * Class:     org_ros2_rcljava_publisher_statuses_OfferedQosIncompatible
  * Method:    nGetPublisherEventType
  * Signature: ()I
  */
 JNIEXPORT jint JNICALL
-Java_org_ros2_rcljava_events_publisher_1statuses_OfferedQosIncompatible_nGetPublisherEventType(
+Java_org_ros2_rcljava_publisher_statuses_OfferedQosIncompatible_nGetPublisherEventType(
   JNIEnv *, jclass);
 
 #ifdef __cplusplus
 }
 #endif
-#endif  // ORG_ROS2_RCLJAVA_EVENTS_PUBLISHER_STATUSES_OFFEREDQOSINCOMPATIBLE_H_
+#endif  // ORG_ROS2_RCLJAVA_PUBLISHER_STATUSES_OFFEREDQOSINCOMPATIBLE_H_

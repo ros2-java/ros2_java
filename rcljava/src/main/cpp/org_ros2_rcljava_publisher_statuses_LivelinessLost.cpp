@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include "org_ros2_rcljava_events_publisher_statuses_LivelinessLost.h"
+#include "org_ros2_rcljava_publisher_statuses_LivelinessLost.h"
 
 #include <jni.h>
 #include <stdlib.h>
@@ -24,7 +24,7 @@
 using rcljava_common::exceptions::rcljava_throw_exception;
 
 JNIEXPORT jlong JNICALL
-Java_org_ros2_rcljava_events_publisher_1statuses_LivelinessLost_nativeAllocateRCLStatusEvent(
+Java_org_ros2_rcljava_publisher_statuses_LivelinessLost_nativeAllocateRCLStatusEvent(
   JNIEnv * env, jclass)
 {
   void * p = malloc(sizeof(rmw_liveliness_lost_status_t));
@@ -36,14 +36,14 @@ Java_org_ros2_rcljava_events_publisher_1statuses_LivelinessLost_nativeAllocateRC
 }
 
 JNIEXPORT void JNICALL
-Java_org_ros2_rcljava_events_publisher_1statuses_LivelinessLost_nativeDeallocateRCLStatusEvent(
+Java_org_ros2_rcljava_publisher_statuses_LivelinessLost_nativeDeallocateRCLStatusEvent(
   JNIEnv *, jclass, jlong handle)
 {
   free(reinterpret_cast<void *>(handle));
 }
 
 JNIEXPORT void JNICALL
-Java_org_ros2_rcljava_events_publisher_1statuses_LivelinessLost_nativeFromRCLEvent(
+Java_org_ros2_rcljava_publisher_statuses_LivelinessLost_nativeFromRCLEvent(
   JNIEnv * env, jobject self, jlong handle)
 {
   auto * p = reinterpret_cast<rmw_liveliness_lost_status_t *>(handle);
@@ -66,7 +66,7 @@ Java_org_ros2_rcljava_events_publisher_1statuses_LivelinessLost_nativeFromRCLEve
 }
 
 JNIEXPORT jint JNICALL
-Java_org_ros2_rcljava_events_publisher_1statuses_LivelinessLost_nativeGetPublisherEventType(
+Java_org_ros2_rcljava_publisher_statuses_LivelinessLost_nativeGetPublisherEventType(
   JNIEnv *, jclass)
 {
   return RCL_PUBLISHER_LIVELINESS_LOST;

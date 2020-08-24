@@ -26,8 +26,8 @@ import org.junit.Test;
 import org.ros2.rcljava.RCLJava;
 import org.ros2.rcljava.consumers.Consumer;
 import org.ros2.rcljava.events.EventHandler;
-import org.ros2.rcljava.events.publisher_statuses.LivelinessLost;
-import org.ros2.rcljava.events.publisher_statuses.OfferedQosIncompatible;
+import org.ros2.rcljava.publisher.statuses.LivelinessLost;
+import org.ros2.rcljava.publisher.statuses.OfferedQosIncompatible;
 import org.ros2.rcljava.exceptions.RCLException;
 import org.ros2.rcljava.node.Node;
 

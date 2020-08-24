@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package org.ros2.rcljava.events.publisher_statuses;
+package org.ros2.rcljava.publisher.statuses;
 
 import java.util.function.Supplier;
 
@@ -23,54 +23,43 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * This class serves as a bridge between a rmw_qos_incompatible_event_status_t and RCLJava.
+ * This class serves as a bridge between a rmw_liveliness_lost_status_t and RCLJava.
  */
-public class OfferedQosIncompatible implements PublisherEventStatus {
+public class LivelinessLost implements PublisherEventStatus {
   public int totalCount;
   public int totalCountChange;
-  public PolicyKind lastPolicyKind;
-
-  public enum PolicyKind {
-    INVALID,
-    DURABILITY,
-    DEADLINE,
-    LIVELINESS,
-    RELIABILITY,
-    HISTORY,
-    LIFESPAN;
-  }
 
   public final long allocateRCLStatusEvent() {
-    return nAllocateRCLStatusEvent();
+    return nativeAllocateRCLStatusEvent();
   }
   public final void deallocateRCLStatusEvent(long handle) {
-    nDeallocateRCLStatusEvent(handle);
+    nativeDeallocateRCLStatusEvent(handle);
   }
   public final void fromRCLEvent(long handle) {
-    nFromRCLEvent(handle);
+    nativeFromRCLEvent(handle);
   }
   public final int getPublisherEventType() {
-    return nGetPublisherEventType();
+    return nativeGetPublisherEventType();
   }
   // TODO(ivanpauno): Remove this when -source 8 can be used (method references for the win)
-  public static final Supplier<OfferedQosIncompatible> factory = new Supplier<OfferedQosIncompatible>() {
-    public OfferedQosIncompatible get() {
-      return new OfferedQosIncompatible();
+  public static final Supplier<LivelinessLost> factory = new Supplier<LivelinessLost>() {
+    public LivelinessLost get() {
+      return new LivelinessLost();
     }
   };
 
-  private static final Logger logger = LoggerFactory.getLogger(OfferedQosIncompatible.class);
+  private static final Logger logger = LoggerFactory.getLogger(LivelinessLost.class);
   static {
     try {
-      JNIUtils.loadImplementation(OfferedQosIncompatible.class);
+      JNIUtils.loadImplementation(LivelinessLost.class);
     } catch (UnsatisfiedLinkError ule) {
       logger.error("Native code library failed to load.\n" + ule);
       System.exit(1);
     }
   }
 
-  private static native long nAllocateRCLStatusEvent();
-  private static native void nDeallocateRCLStatusEvent(long handle);
-  private native void nFromRCLEvent(long handle);
-  private static native int nGetPublisherEventType();
+  private static native long nativeAllocateRCLStatusEvent();
+  private static native void nativeDeallocateRCLStatusEvent(long handle);
+  private native void nativeFromRCLEvent(long handle);
+  private static native int nativeGetPublisherEventType();
 }

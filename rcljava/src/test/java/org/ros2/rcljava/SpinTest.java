@@ -30,7 +30,7 @@ import org.ros2.rcljava.RCLJava;
 import org.ros2.rcljava.concurrent.Callback;
 import org.ros2.rcljava.consumers.Consumer;
 import org.ros2.rcljava.events.EventHandler;
-import org.ros2.rcljava.events.publisher_statuses.OfferedQosIncompatible;
+import org.ros2.rcljava.publisher.statuses.OfferedQosIncompatible;
 import org.ros2.rcljava.executors.Executor;
 import org.ros2.rcljava.executors.SingleThreadedExecutor;
 import org.ros2.rcljava.node.ComposableNode;

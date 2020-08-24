@@ -13,51 +13,51 @@
 // limitations under the License.
 
 #include <jni.h>
-/* Header for class org_ros2_rcljava_events_publisher_statuses_LivelinessLost */
+/* Header for class org_ros2_rcljava_publisher_statuses_LivelinessLost */
 
-#ifndef ORG_ROS2_RCLJAVA_EVENTS_PUBLISHER_STATUSES_LIVELINESSLOST_H_
-#define ORG_ROS2_RCLJAVA_EVENTS_PUBLISHER_STATUSES_LIVELINESSLOST_H_
+#ifndef ORG_ROS2_RCLJAVA_PUBLISHER_STATUSES_LIVELINESSLOST_H_
+#define ORG_ROS2_RCLJAVA_PUBLISHER_STATUSES_LIVELINESSLOST_H_
 #ifdef __cplusplus
 extern "C" {
 #endif
 
 /*
- * Class:     org_ros2_rcljava_events_publisher_statuses_LivelinessLost
+ * Class:     org_ros2_rcljava_publisher_statuses_LivelinessLost
  * Method:    nativeAllocateRCLStatusEvent
  * Signature: ()J
  */
 JNIEXPORT jlong JNICALL
-Java_org_ros2_rcljava_events_publisher_1statuses_LivelinessLost_nativeAllocateRCLStatusEvent(
+Java_org_ros2_rcljava_publisher_statuses_LivelinessLost_nativeAllocateRCLStatusEvent(
   JNIEnv *, jclass);
 
 /*
- * Class:     org_ros2_rcljava_events_publisher_statuses_LivelinessLost
+ * Class:     org_ros2_rcljava_publisher_statuses_LivelinessLost
  * Method:    nativeDeallocateRCLStatusEvent
  * Signature: (J)V
  */
 JNIEXPORT void JNICALL
-Java_org_ros2_rcljava_events_publisher_1statuses_LivelinessLost_nativeDeallocateRCLStatusEvent(
+Java_org_ros2_rcljava_publisher_statuses_LivelinessLost_nativeDeallocateRCLStatusEvent(
   JNIEnv *, jclass, jlong);
 
 /*
- * Class:     org_ros2_rcljava_events_publisher_statuses_LivelinessLost
+ * Class:     org_ros2_rcljava_publisher_statuses_LivelinessLost
  * Method:    nativeFromRCLEvent
  * Signature: (J)V
  */
 JNIEXPORT void JNICALL
-Java_org_ros2_rcljava_events_publisher_1statuses_LivelinessLost_nativeFromRCLEvent(
+Java_org_ros2_rcljava_publisher_statuses_LivelinessLost_nativeFromRCLEvent(
   JNIEnv *, jobject, jlong);
 
 /*
- * Class:     org_ros2_rcljava_events_publisher_statuses_LivelinessLost
+ * Class:     org_ros2_rcljava_publisher_statuses_LivelinessLost
  * Method:    nativeGetPublisherEventType
  * Signature: ()I
  */
 JNIEXPORT jint JNICALL
-Java_org_ros2_rcljava_events_publisher_1statuses_LivelinessLost_nativeGetPublisherEventType(
+Java_org_ros2_rcljava_publisher_statuses_LivelinessLost_nativeGetPublisherEventType(
   JNIEnv *, jclass);
 
 #ifdef __cplusplus
 }
 #endif
-#endif  // ORG_ROS2_RCLJAVA_EVENTS_PUBLISHER_STATUSES_LIVELINESSLOST_H_
+#endif  // ORG_ROS2_RCLJAVA_PUBLISHER_STATUSES_LIVELINESSLOST_H_

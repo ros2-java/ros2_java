@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include "org_ros2_rcljava_events_publisher_statuses_OfferedQosIncompatible.h"
+#include "org_ros2_rcljava_publisher_statuses_OfferedQosIncompatible.h"
 
 #include <jni.h>
 #include <stdlib.h>
@@ -25,7 +25,7 @@
 using rcljava_common::exceptions::rcljava_throw_exception;
 
 JNIEXPORT jlong JNICALL
-Java_org_ros2_rcljava_events_publisher_1statuses_OfferedQosIncompatible_nAllocateRCLStatusEvent(
+Java_org_ros2_rcljava_publisher_statuses_OfferedQosIncompatible_nAllocateRCLStatusEvent(
   JNIEnv * env, jclass)
 {
   void * p = malloc(sizeof(rmw_offered_qos_incompatible_event_status_t));
@@ -37,14 +37,14 @@ Java_org_ros2_rcljava_events_publisher_1statuses_OfferedQosIncompatible_nAllocat
 }
 
 JNIEXPORT void JNICALL
-Java_org_ros2_rcljava_events_publisher_1statuses_OfferedQosIncompatible_nDeallocateRCLStatusEvent(
+Java_org_ros2_rcljava_publisher_statuses_OfferedQosIncompatible_nDeallocateRCLStatusEvent(
   JNIEnv *, jclass, jlong handle)
 {
   free(reinterpret_cast<void *>(handle));
 }
 
 JNIEXPORT void JNICALL
-Java_org_ros2_rcljava_events_publisher_1statuses_OfferedQosIncompatible_nFromRCLEvent(
+Java_org_ros2_rcljava_publisher_statuses_OfferedQosIncompatible_nFromRCLEvent(
   JNIEnv * env, jobject self, jlong handle)
 {
   auto * p = reinterpret_cast<rmw_offered_qos_incompatible_event_status_t *>(handle);
@@ -55,7 +55,7 @@ Java_org_ros2_rcljava_events_publisher_1statuses_OfferedQosIncompatible_nFromRCL
   // TODO(ivanpauno): class and field lookup could be done at startup time
   jclass clazz = env->GetObjectClass(self);
   jclass qos_kind_clazz = env->FindClass(
-    "org/ros2/rcljava/events/publisher_statuses/OfferedQosIncompatible$PolicyKind");
+    "org/ros2/rcljava/publisher/statuses/OfferedQosIncompatible$PolicyKind");
   if (env->ExceptionCheck()) {
     return;
   }
@@ -68,7 +68,7 @@ Java_org_ros2_rcljava_events_publisher_1statuses_OfferedQosIncompatible_nFromRCL
     return;
   }
   const char * enum_class_path =
-    "Lorg/ros2/rcljava/events/publisher_statuses/OfferedQosIncompatible$PolicyKind;";
+    "Lorg/ros2/rcljava/publisher/statuses/OfferedQosIncompatible$PolicyKind;";
   jfieldID policy_kind_fid = env->GetFieldID(clazz, "lastPolicyKind", enum_class_path);
   if (env->ExceptionCheck()) {
     return;
@@ -113,7 +113,7 @@ Java_org_ros2_rcljava_events_publisher_1statuses_OfferedQosIncompatible_nFromRCL
 }
 
 JNIEXPORT jint JNICALL
-Java_org_ros2_rcljava_events_publisher_1statuses_OfferedQosIncompatible_nGetPublisherEventType(
+Java_org_ros2_rcljava_publisher_statuses_OfferedQosIncompatible_nGetPublisherEventType(
   JNIEnv *, jclass)
 {
   return RCL_PUBLISHER_OFFERED_INCOMPATIBLE_QOS;
