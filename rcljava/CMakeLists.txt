@@ -153,6 +153,7 @@ set(${PROJECT_NAME}_sources
   "src/main/java/org/ros2/rcljava/publisher/PublisherImpl.java"
   "src/main/java/org/ros2/rcljava/qos/policies/Durability.java"
   "src/main/java/org/ros2/rcljava/qos/policies/History.java"
+  "src/main/java/org/ros2/rcljava/qos/policies/Liveliness.java"
   "src/main/java/org/ros2/rcljava/qos/policies/QoSPolicy.java"
   "src/main/java/org/ros2/rcljava/qos/policies/Reliability.java"
   "src/main/java/org/ros2/rcljava/qos/QoSProfile.java"
@@ -237,6 +238,7 @@ if(BUILD_TESTING)
     # "src/test/java/org/ros2/rcljava/parameters/AsyncParametersClientTest.java"
     # "src/test/java/org/ros2/rcljava/parameters/SyncParametersClientTest.java"
     "src/test/java/org/ros2/rcljava/publisher/PublisherTest.java"
+    "src/test/java/org/ros2/rcljava/qos/QoSProfileTest.java"
     "src/test/java/org/ros2/rcljava/subscription/SubscriptionTest.java"
     "src/test/java/org/ros2/rcljava/timer/TimerTest.java"
   )
@@ -252,6 +254,7 @@ if(BUILD_TESTING)
     "org.ros2.rcljava.node.NodeTest"
     # "org.ros2.rcljava.parameters.SyncParametersClientTest"
     "org.ros2.rcljava.publisher.PublisherTest"
+    "org.ros2.rcljava.qos.QoSProfileTest"
     "org.ros2.rcljava.subscription.SubscriptionTest"
     "org.ros2.rcljava.timer.TimerTest"
   )

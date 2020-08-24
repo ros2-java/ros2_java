@@ -301,18 +301,22 @@ public final class RCLJava {
   }
 
   public static long convertQoSProfileToHandle(final QoSProfile qosProfile) {
-    int history = qosProfile.getHistory().getValue();
-    int depth = qosProfile.getDepth();
-    int reliability = qosProfile.getReliability().getValue();
-    int durability = qosProfile.getDurability().getValue();
-    boolean avoidROSNamespaceConventions = qosProfile.getAvoidROSNamespaceConventions();
-
     return nativeConvertQoSProfileToHandle(
-        history, depth, reliability, durability, avoidROSNamespaceConventions);
+      qosProfile.getHistory().getValue(),
+      qosProfile.getDepth(),
+      qosProfile.getReliability().getValue(),
+      qosProfile.getDurability().getValue(),
+      qosProfile.getDeadline().getSeconds(), qosProfile.getDeadline().getNano(),
+      qosProfile.getLifespan().getSeconds(), qosProfile.getLifespan().getNano(),
+      qosProfile.getLiveliness().getValue(), qosProfile.getLivelinessLeaseDuration().getSeconds(),
+      qosProfile.getLivelinessLeaseDuration().getNano(),
+      qosProfile.getAvoidROSNamespaceConventions());
   }
 
-  private static native long nativeConvertQoSProfileToHandle(int history, int depth,
-      int reliability, int durability, boolean avoidROSNamespaceConventions);
+  private static native long nativeConvertQoSProfileToHandle(
+    int history, int depth, int reliability, int durability, long deadlineSec, int deadlineNanos,
+    long lifespanSec, int lifespanNanos, int liveliness, long livelinessLeaseSec,
+    int livelinessLeaseNanos, boolean avoidROSNamespaceConventions);
 
   public static void disposeQoSProfile(final long qosProfileHandle) {
     nativeDisposeQoSProfile(qosProfileHandle);
