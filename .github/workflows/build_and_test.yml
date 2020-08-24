@@ -15,7 +15,7 @@ jobs:
         required-ros-distributions: dashing
     - uses: ros-tooling/action-ros-ci@8d58122
       with:
-        package-name: rosidl_generator_java rcljava_common rcljava
+        package-name: rosidl_generator_java rcljava_common rcljava rcljava_examples
         source-ros-binary-installation: dashing
         vcs-repo-file-url: https://raw.githubusercontent.com/ros2-java/ros2_java/dashing/ros2_java_desktop.repos
 
