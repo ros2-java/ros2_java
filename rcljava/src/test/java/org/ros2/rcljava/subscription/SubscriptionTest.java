@@ -25,7 +25,9 @@ import org.junit.Test;
 
 import org.ros2.rcljava.RCLJava;
 import org.ros2.rcljava.consumers.Consumer;
+import org.ros2.rcljava.events.EventHandler;
 import org.ros2.rcljava.node.Node;
+import org.ros2.rcljava.subscription.statuses.RequestedQosIncompatible;
 
 public class SubscriptionTest {
   @BeforeClass
@@ -65,5 +67,34 @@ public class SubscriptionTest {
     assertEquals(0, node.getSubscriptions().size());
 
     RCLJava.shutdown();
+  }
+
+  @Test
+  public final void testCreateRequestedQosIncompatibleEvent() {
+    String identifier = RCLJava.getRMWIdentifier();
+    if (identifier.equals("rmw_fastrtps_cpp") || identifier.equals("rmw_fastrtps_dynamic_cpp")) {
+      // event not supported in these implementations
+      return;
+    }
+    RCLJava.rclJavaInit();
+    Node node = RCLJava.createNode("test_node");
+    Subscription<std_msgs.msg.String> subscription = node.<std_msgs.msg.String>createSubscription(
+      std_msgs.msg.String.class, "test_topic", new Consumer<std_msgs.msg.String>() {
+        public void accept(final std_msgs.msg.String msg) {}
+      });
+    EventHandler eventHandler = subscription.createEventHandler(
+      RequestedQosIncompatible.factory, new Consumer<RequestedQosIncompatible>() {
+        public void accept(final RequestedQosIncompatible status) {
+          assertEquals(status.totalCount, 0);
+          assertEquals(status.totalCountChange, 0);
+          assertEquals(status.lastPolicyKind, RequestedQosIncompatible.PolicyKind.INVALID);
+        }
+      }
+    );
+    assertNotEquals(0, eventHandler.getHandle());
+    // force executing the callback, so we check that taking an event works
+    eventHandler.executeCallback();
+    RCLJava.shutdown();
+    assertEquals(0, eventHandler.getHandle());
   }
 }

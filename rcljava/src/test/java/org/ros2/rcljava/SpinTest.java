@@ -42,6 +42,7 @@ import org.ros2.rcljava.qos.policies.History;
 import org.ros2.rcljava.qos.policies.Reliability;
 import org.ros2.rcljava.qos.QoSProfile;
 import org.ros2.rcljava.subscription.Subscription;
+import org.ros2.rcljava.subscription.statuses.RequestedQosIncompatible;
 
 public class SpinTest {
   public static class TimerCallback implements Callback {
@@ -357,7 +358,7 @@ public class SpinTest {
   }
 
   // custom event consumer
-  public static class EventConsumer implements Consumer<OfferedQosIncompatible> {
+  public static class OfferedQosIncompatibleConsumer implements Consumer<OfferedQosIncompatible> {
     public boolean done = false;
 
     public void accept(final OfferedQosIncompatible status) {
@@ -369,35 +370,93 @@ public class SpinTest {
   }
 
   @Test
-  public final void testSpinEvent() {
+  public final void testSpinPublisherEvent() {
     String identifier = RCLJava.getRMWIdentifier();
     if (identifier.equals("rmw_fastrtps_cpp") || identifier.equals("rmw_fastrtps_dynamic_cpp")) {
-      // OfferedQosIncompatible event not supported in these implementations
+      // OfferedQosIncompatible events is not supported in these implementations.
       return;
     }
-    final Node node = RCLJava.createNode("test_node_spin_event");
+    final Node node = RCLJava.createNode("test_node_spin_publisher_event");
     Publisher<std_msgs.msg.String> publisher = node.<std_msgs.msg.String>createPublisher(
-          std_msgs.msg.String.class, "test_topic_spin_event", new QoSProfile(
+          std_msgs.msg.String.class, "test_topic_spin_publisher_event", new QoSProfile(
             History.KEEP_LAST, 1,
             Reliability.BEST_EFFORT,
             Durability.VOLATILE,
             false));
     // create a OfferedQoSIncompatible event handler with custom event consumer
-    EventConsumer eventConsumer = new EventConsumer();
+    OfferedQosIncompatibleConsumer eventConsumer = new OfferedQosIncompatibleConsumer();
     EventHandler eventHandler = publisher.createEventHandler(
       OfferedQosIncompatible.factory, eventConsumer
     );
     // create an incompatible subscription (reliable vs best effort publisher)
     Subscription<std_msgs.msg.String> subscription = node.<std_msgs.msg.String>createSubscription(
-          std_msgs.msg.String.class, "test_topic_spin_event",
-          new Consumer<std_msgs.msg.String>() {
-            public void accept(final std_msgs.msg.String msg) {}
-          },
-          new QoSProfile(
-            History.KEEP_LAST, 1,
-            Reliability.RELIABLE,
-            Durability.VOLATILE,
-            false));
+      std_msgs.msg.String.class, "test_topic_spin_publisher_event",
+      new Consumer<std_msgs.msg.String>() {
+        public void accept(final std_msgs.msg.String msg) {}
+      },
+      new QoSProfile(
+        History.KEEP_LAST, 1,
+        Reliability.RELIABLE,
+        Durability.VOLATILE,
+        false));
+    // set up executor
+    ComposableNode composableNode = new ComposableNode() {
+      public Node getNode() {
+        return node;
+      }
+    };
+    Executor executor = new SingleThreadedExecutor();
+    executor.addNode(composableNode);
+    long start = System.currentTimeMillis();
+    do {
+      executor.spinAll((1000 + System.currentTimeMillis() - start) * 1000 * 1000);
+    } while (!eventConsumer.done && System.currentTimeMillis() < start + 1000);
+    assert(eventConsumer.done);
+  }
+
+  public static class RequestedQosIncompatibleConsumer
+  implements Consumer<RequestedQosIncompatible> {
+    public boolean done = false;
+
+    public void accept(final RequestedQosIncompatible status) {
+      assertEquals(status.totalCount, 1);
+      assertEquals(status.totalCountChange, 1);
+      assertEquals(status.lastPolicyKind, RequestedQosIncompatible.PolicyKind.RELIABILITY);
+      this.done = true;
+    }
+  }
+
+  @Test
+  public final void testSpinSubscriptionEvent() {
+    String identifier = RCLJava.getRMWIdentifier();
+    if (identifier.equals("rmw_fastrtps_cpp") || identifier.equals("rmw_fastrtps_dynamic_cpp")) {
+      // RequestedQosIncompatible events is not supported in these implementations.
+      return;
+    }
+    final Node node = RCLJava.createNode("test_node_spin_subscription_event");
+    // create an incompatible subscription (reliable vs best effort publisher)
+    Subscription<std_msgs.msg.String> subscription = node.<std_msgs.msg.String>createSubscription(
+      std_msgs.msg.String.class, "test_topic_spin_subscription_event",
+      new Consumer<std_msgs.msg.String>() {
+        public void accept(final std_msgs.msg.String msg) {}
+      },
+      new QoSProfile(
+        History.KEEP_LAST, 1,
+        Reliability.RELIABLE,
+        Durability.VOLATILE,
+        false));
+    // create a RequestedQoSIncompatible event handler with custom event consumer
+    RequestedQosIncompatibleConsumer eventConsumer = new RequestedQosIncompatibleConsumer();
+    EventHandler eventHandler = subscription.createEventHandler(
+      RequestedQosIncompatible.factory, eventConsumer
+    );
+    Publisher<std_msgs.msg.String> publisher = node.<std_msgs.msg.String>createPublisher(
+      std_msgs.msg.String.class, "test_topic_spin_subscription_event", new QoSProfile(
+        History.KEEP_LAST, 1,
+        Reliability.BEST_EFFORT,
+        Durability.VOLATILE,
+        false));
+
     // set up executor
     ComposableNode composableNode = new ComposableNode() {
       public Node getNode() {
