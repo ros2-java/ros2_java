@@ -112,10 +112,13 @@ public class PublisherTest {
       }
     );
     assertNotEquals(0, eventHandler.getHandle());
+    assertEquals(1, publisher.getEventHandlers().size());
     // force executing the callback, so we check that taking an event works
     eventHandler.executeCallback();
-    RCLJava.shutdown();
+    eventHandler.dispose();
     assertEquals(0, eventHandler.getHandle());
+    assertEquals(0, publisher.getEventHandlers().size());
+    RCLJava.shutdown();
   }
 
   @Test

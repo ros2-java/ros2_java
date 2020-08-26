@@ -22,6 +22,7 @@ import java.util.function.Supplier;
 
 import org.ros2.rcljava.RCLJava;
 import org.ros2.rcljava.common.JNIUtils;
+import org.ros2.rcljava.consumers.BiConsumer;
 import org.ros2.rcljava.consumers.Consumer;
 import org.ros2.rcljava.events.EventHandler;
 import org.ros2.rcljava.events.EventHandlerImpl;
@@ -128,10 +129,20 @@ public class SubscriptionImpl<T extends MessageDefinition> implements Subscripti
   public final
   <T extends SubscriptionEventStatus> EventHandler<T, Subscription>
   createEventHandler(Supplier<T> factory, Consumer<T> callback) {
+    final WeakReference<Collection<EventHandler>> weakEventHandlers = new WeakReference(
+      this.eventHandlers);
+    Consumer<EventHandler> disposeCallback = new Consumer<EventHandler>() {
+      public void accept(EventHandler eventHandler) {
+        Collection<EventHandler> eventHandlers = weakEventHandlers.get();
+        if (eventHandlers != null) {
+          eventHandlers.remove(eventHandler);
+        }
+      }
+    };
     T status = factory.get();
     long eventHandle = nativeCreateEvent(this.handle, status.getSubscriptionEventType());
     EventHandler<T, Subscription> eventHandler = new EventHandlerImpl(
-      new WeakReference<Subscription>(this), eventHandle, factory, callback);
+      new WeakReference<Subscription>(this), eventHandle, factory, callback, disposeCallback);
     this.eventHandlers.add(eventHandler);
     return eventHandler;
   }
