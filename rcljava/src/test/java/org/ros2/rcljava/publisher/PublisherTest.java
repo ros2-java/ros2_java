@@ -27,6 +27,7 @@ import org.ros2.rcljava.RCLJava;
 import org.ros2.rcljava.consumers.Consumer;
 import org.ros2.rcljava.events.EventHandler;
 import org.ros2.rcljava.publisher.statuses.LivelinessLost;
+import org.ros2.rcljava.publisher.statuses.OfferedDeadlineMissed;
 import org.ros2.rcljava.publisher.statuses.OfferedQosIncompatible;
 import org.ros2.rcljava.exceptions.RCLException;
 import org.ros2.rcljava.node.Node;
@@ -107,6 +108,27 @@ public class PublisherTest {
           assertEquals(status.totalCount, 0);
           assertEquals(status.totalCountChange, 0);
           assertEquals(status.lastPolicyKind, OfferedQosIncompatible.PolicyKind.INVALID);
+        }
+      }
+    );
+    assertNotEquals(0, eventHandler.getHandle());
+    // force executing the callback, so we check that taking an event works
+    eventHandler.executeCallback();
+    RCLJava.shutdown();
+    assertEquals(0, eventHandler.getHandle());
+  }
+
+  @Test
+  public final void testCreateOfferedDeadlineMissedEvent() {
+    RCLJava.rclJavaInit();
+    Node node = RCLJava.createNode("test_node");
+    Publisher<std_msgs.msg.String> publisher =
+        node.<std_msgs.msg.String>createPublisher(std_msgs.msg.String.class, "test_topic");
+    EventHandler eventHandler = publisher.createEventHandler(
+      OfferedDeadlineMissed.factory, new Consumer<OfferedDeadlineMissed>() {
+        public void accept(final OfferedDeadlineMissed status) {
+          assertEquals(status.totalCount, 0);
+          assertEquals(status.totalCountChange, 0);
         }
       }
     );
