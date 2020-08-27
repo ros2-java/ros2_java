@@ -27,6 +27,7 @@ import org.ros2.rcljava.RCLJava;
 import org.ros2.rcljava.consumers.Consumer;
 import org.ros2.rcljava.events.EventHandler;
 import org.ros2.rcljava.node.Node;
+import org.ros2.rcljava.subscription.statuses.RequestedDeadlineMissed;
 import org.ros2.rcljava.subscription.statuses.RequestedQosIncompatible;
 
 public class SubscriptionTest {
@@ -67,6 +68,30 @@ public class SubscriptionTest {
     assertEquals(0, node.getSubscriptions().size());
 
     RCLJava.shutdown();
+  }
+
+  @Test
+  public final void testCreateRequestedDeadlineMissedEvent() {
+    String identifier = RCLJava.getRMWIdentifier();
+    RCLJava.rclJavaInit();
+    Node node = RCLJava.createNode("test_node");
+    Subscription<std_msgs.msg.String> subscription = node.<std_msgs.msg.String>createSubscription(
+      std_msgs.msg.String.class, "test_topic", new Consumer<std_msgs.msg.String>() {
+        public void accept(final std_msgs.msg.String msg) {}
+      });
+    EventHandler eventHandler = subscription.createEventHandler(
+      RequestedDeadlineMissed.factory, new Consumer<RequestedDeadlineMissed>() {
+        public void accept(final RequestedDeadlineMissed status) {
+          assertEquals(status.totalCount, 0);
+          assertEquals(status.totalCountChange, 0);
+        }
+      }
+    );
+    assertNotEquals(0, eventHandler.getHandle());
+    // force executing the callback, so we check that taking an event works
+    eventHandler.executeCallback();
+    RCLJava.shutdown();
+    assertEquals(0, eventHandler.getHandle());
   }
 
   @Test
