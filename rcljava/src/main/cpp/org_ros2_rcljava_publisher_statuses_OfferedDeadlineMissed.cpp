@@ -50,6 +50,7 @@ Java_org_ros2_rcljava_publisher_statuses_OfferedDeadlineMissed_nativeFromRCLEven
   if (!p) {
     rcljava_throw_exception(
       env, "java/lang/IllegalArgumentException", "passed rmw object handle is NULL");
+    return;
   }
   // TODO(ivanpauno): class and field lookup could be done at startup time
   jclass clazz = env->GetObjectClass(self);
