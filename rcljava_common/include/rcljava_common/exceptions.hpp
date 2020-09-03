@@ -19,6 +19,24 @@
 
 #include "rcljava_common/visibility_control.hpp"
 
+/// Execute \a error_statement if an exception has happened.
+/**
+ * \param env a JNIEnv pointer, used to check for exceptions.
+ * \param error_statement statement executed if an exception has happened.
+ */
+#define RCLJAVA_COMMON_EXCEPTION_CHECK_X(env, error_statement) \
+  do { \
+    if (env->ExceptionCheck()) { \
+      error_statement; \
+    } \
+  } while (0)
+
+/// Return from the current function if a java exception has happened.
+/**
+ * \param env a JNIEnv pointer, used to check for exceptions.
+ */
+#define RCLJAVA_COMMON_EXCEPTION_CHECK(env) RCLJAVA_COMMON_EXCEPTION_CHECK_X(env, return )
+
 namespace rcljava_common
 {
 namespace exceptions
