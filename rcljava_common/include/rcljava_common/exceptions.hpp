@@ -41,7 +41,7 @@
 /// and execute \a error_statement in that case.
 /**
  * The rcl error message will be added to \a base_message, and the rcl error state will be reset.
- * 
+ *
  * \param env a JNIEnv pointer, used to throw a java exception from the rcl error.
  * \param ret rcl_ret_t error that will be checked.
  * \param message error message that will be passed to the thrown exception.
@@ -52,9 +52,9 @@
 #define RCLJAVA_COMMON_THROW_FROM_RCL_X(env, ret, base_message, error_statement) \
   do { \
     if (RCL_RET_OK != ret) { \
-      rcljava_common::exception::rcljava_throw_rclexception( \
-        env, ret, static_cast<std::string>(message) + ": " + rcl_get_error_string().str); \
-      rcl_reset_error();
+      rcljava_common::exceptions::rcljava_throw_rclexception( \
+        env, ret, static_cast<std::string>(base_message) + ": " + rcl_get_error_string().str); \
+      rcl_reset_error(); \
       error_statement; \
     } \
   } while (0)
@@ -65,8 +65,8 @@
  * \param ret rcl_ret_t error that will be checked.
  * \param message error message that will be passed to the thrown exception.
  */
-#define RCLJAVA_COMMON_THROW_FROM_RCL(env, ret, message) \
-  RCLJAVA_COMMON_THROW_FROM_RCL_X(env, ret, message, return )
+#define RCLJAVA_COMMON_THROW_FROM_RCL(env, ret, base_message) \
+  RCLJAVA_COMMON_THROW_FROM_RCL_X(env, ret, base_message, return )
 
 namespace rcljava_common
 {
