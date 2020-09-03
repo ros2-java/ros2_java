@@ -37,6 +37,31 @@
  */
 #define RCLJAVA_COMMON_EXCEPTION_CHECK(env) RCLJAVA_COMMON_EXCEPTION_CHECK_X(env, return )
 
+/// Call \ref rcljava_throw_rclexception if \a ret is not RCL_RET_OK,
+/// and execute \a error_statement in that case.
+/**
+ * \param env a JNIEnv pointer, used to throw a java exception from the rcl error.
+ * \param ret rcl_ret_t error that will be checked.
+ * \param message error message that will be passed to the thrown exception.
+ * \param error_statement statement executed if ret was not RCL_RET_OK.
+ */
+#define RCLJAVA_COMMON_THROW_FROM_RCL_X(env, ret, message, error_statement) \
+  do { \
+    if (RCL_RET_OK != ret) { \
+      rcljava_common::exception::rcljava_throw_rclexception(env, ret, message); \
+      error_statement; \
+    } \
+  } while (0)
+
+/// Call \ref rcljava_throw_rclexception if \a ret is not RCL_RET_OK and return.
+/**
+ * \param env a JNIEnv pointer, used to check for exceptions.
+ * \param ret rcl_ret_t error that will be checked.
+ * \param message error message that will be passed to the thrown exception.
+ */
+#define RCLJAVA_COMMON_THROW_FROM_RCL(env, ret, message) \
+  RCLJAVA_COMMON_THROW_FROM_RCL_X(env, ret, message, return )
+
 namespace rcljava_common
 {
 namespace exceptions
