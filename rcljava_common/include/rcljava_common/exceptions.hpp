@@ -63,7 +63,7 @@
 /**
  * \param env a JNIEnv pointer, used to check for exceptions.
  * \param ret rcl_ret_t error that will be checked.
- * \param message error message that will be passed to the thrown exception.
+ * \param base_message error message that will be passed to the thrown exception.
  */
 #define RCLJAVA_COMMON_THROW_FROM_RCL(env, ret, base_message) \
   RCLJAVA_COMMON_THROW_FROM_RCL_X(env, ret, base_message, return )
