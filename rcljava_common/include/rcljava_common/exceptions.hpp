@@ -36,7 +36,7 @@
  * \param env a JNIEnv pointer, used to check for exceptions.
  */
 #define RCLJAVA_COMMON_CHECK_FOR_EXCEPTION(env) \
-  RCLJAVA_COMMON_CHECK_FOR_EXCEPTION_WITH_STATEMENT(env, return )
+  RCLJAVA_COMMON_CHECK_FOR_EXCEPTION_WITH_ERROR_STATEMENT(env, return )
 
 /// Call \ref rcljava_throw_rclexception if \a ret is not RCL_RET_OK,
 /// and execute \a error_statement in that case.
