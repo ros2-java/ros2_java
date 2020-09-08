@@ -44,9 +44,9 @@
  *
  * \param env a JNIEnv pointer, used to throw a java exception from the rcl error.
  * \param ret rcl_ret_t error that will be checked.
- * \param message error message that will be passed to the thrown exception.
- *  The complete error will be "${message}: ${rcl_error_string}".
- *  \a message can be either a `const char *` or as `std::string`.
+ * \param base_message error message that will be passed to the thrown exception.
+ *  The complete error will be "${base_message}: ${rcl_error_string}".
+ *  \a base_message can be either a `const char *` or as `std::string`.
  * \param error_statement statement executed if ret was not RCL_RET_OK.
  */
 #define RCLJAVA_COMMON_THROW_FROM_RCL_X(env, ret, base_message, error_statement) \
