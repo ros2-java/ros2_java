@@ -35,7 +35,8 @@
 /**
  * \param env a JNIEnv pointer, used to check for exceptions.
  */
-#define RCLJAVA_COMMON_CHECK_FOR_EXCEPTION(env) RCLJAVA_COMMON_CHECK_FOR_EXCEPTION_WITH_STATEMENT(env, return )
+#define RCLJAVA_COMMON_CHECK_FOR_EXCEPTION(env) \
+  RCLJAVA_COMMON_CHECK_FOR_EXCEPTION_WITH_STATEMENT(env, return )
 
 /// Call \ref rcljava_throw_rclexception if \a ret is not RCL_RET_OK,
 /// and execute \a error_statement in that case.
@@ -49,7 +50,8 @@
  *  \a base_message can be either a `const char *` or as `std::string`.
  * \param error_statement statement executed if ret was not RCL_RET_OK.
  */
-#define RCLJAVA_COMMON_THROW_FROM_RCL_WITH_ERROR_STATEMENT(env, ret, base_message, error_statement) \
+#define RCLJAVA_COMMON_THROW_FROM_RCL_WITH_ERROR_STATEMENT( \
+    env, ret, base_message, error_statement) \
   do { \
     if (RCL_RET_OK != ret) { \
       rcljava_common::exceptions::rcljava_throw_rclexception( \
