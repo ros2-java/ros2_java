@@ -18,7 +18,8 @@ package org.ros2.rcljava.qos.policies;
 public enum History implements QoSPolicy {
   SYSTEM_DEFAULT(0),
   KEEP_LAST(1),
-  KEEP_ALL(2);
+  KEEP_ALL(2),
+  UNKNOWN(3);
 
   private final int value;
 

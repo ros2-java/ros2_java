@@ -18,7 +18,8 @@ package org.ros2.rcljava.qos.policies;
 public enum Reliability implements QoSPolicy {
   SYSTEM_DEFAULT(0),
   RELIABLE(1),
-  BEST_EFFORT(2);
+  BEST_EFFORT(2),
+  UNKNOWN(3);
 
   private final int value;
 

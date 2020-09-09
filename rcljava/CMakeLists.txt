@@ -66,6 +66,7 @@ set(${PROJECT_NAME}_jni_sources
   "src/main/cpp/org_ros2_rcljava_publisher_statuses_OfferedQosIncompatible.cpp"
   "src/main/cpp/org_ros2_rcljava_node_NodeImpl.cpp"
   "src/main/cpp/org_ros2_rcljava_publisher_PublisherImpl.cpp"
+  "src/main/cpp/org_ros2_rcljava_qos_QoSProfile.cpp"
   "src/main/cpp/org_ros2_rcljava_service_ServiceImpl.cpp"
   "src/main/cpp/org_ros2_rcljava_subscription_SubscriptionImpl.cpp"
   "src/main/cpp/org_ros2_rcljava_subscription_statuses_LivelinessChanged.cpp"

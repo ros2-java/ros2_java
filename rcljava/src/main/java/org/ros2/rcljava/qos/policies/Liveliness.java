@@ -18,7 +18,8 @@ package org.ros2.rcljava.qos.policies;
 public enum Liveliness implements QoSPolicy {
   SYSTEM_DEFAULT(0),
   AUTOMATIC(1),
-  MANUAL_BY_TOPIC(3);
+  MANUAL_BY_TOPIC(3),
+  UNKNOWN(4);
 
   private final int value;
 
