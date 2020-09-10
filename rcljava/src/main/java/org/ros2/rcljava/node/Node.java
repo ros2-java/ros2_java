@@ -24,6 +24,7 @@ import org.ros2.rcljava.client.Client;
 import org.ros2.rcljava.concurrent.Callback;
 import org.ros2.rcljava.consumers.Consumer;
 import org.ros2.rcljava.consumers.TriConsumer;
+import org.ros2.rcljava.graph.NameAndTypes;
 import org.ros2.rcljava.qos.QoSProfile;
 import org.ros2.rcljava.interfaces.Disposable;
 import org.ros2.rcljava.interfaces.MessageDefinition;
@@ -549,4 +550,12 @@ public interface Node extends Disposable {
    * @return rcl_interfaces.msg.ListParametersResult
    */
   rcl_interfaces.msg.ListParametersResult listParameters(List<String> prefixes, long depth);
+
+  /**
+   * Return the topics names and types that were detected in the graph.
+   * See @{link graph#NameAndTypes} for more information about the returned value.
+   *
+   * @return the detected topic names and types.
+   */
+  Collection<NameAndTypes> getTopicNamesAndTypes();
 }

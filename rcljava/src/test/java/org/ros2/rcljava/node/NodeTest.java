@@ -17,6 +17,7 @@ package org.ros2.rcljava.node;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotEquals;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
 import org.junit.After;
@@ -28,7 +29,10 @@ import org.junit.Test;
 import java.lang.ref.WeakReference;
 import java.lang.reflect.Method;
 
+import java.util.concurrent.TimeUnit;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
 
 import org.ros2.rcljava.RCLJava;
@@ -37,6 +41,7 @@ import org.ros2.rcljava.consumers.Consumer;
 import org.ros2.rcljava.executors.Executor;
 import org.ros2.rcljava.executors.MultiThreadedExecutor;
 import org.ros2.rcljava.executors.SingleThreadedExecutor;
+import org.ros2.rcljava.graph.NameAndTypes;
 import org.ros2.rcljava.node.Node;
 import org.ros2.rcljava.publisher.Publisher;
 import org.ros2.rcljava.subscription.Subscription;
@@ -868,5 +873,76 @@ public class NodeTest {
     assertEquals(0, subscriptionOne.getHandle());
     subscriptionTwo.dispose();
     assertEquals(0, subscriptionTwo.getHandle());
+  }
+
+  @Test
+  public final void testGetTopicNamesAndTypes() throws Exception {
+    Publisher<rcljava.msg.UInt32> publisher = node.<rcljava.msg.UInt32>createPublisher(
+      rcljava.msg.UInt32.class, "test_get_topic_names_and_types_one");
+    Publisher<rcljava.msg.UInt32> publisher2 = node.<rcljava.msg.UInt32>createPublisher(
+      rcljava.msg.UInt32.class, "test_get_topic_names_and_types_two");
+    Subscription<rcljava.msg.Empty> subscription = node.<rcljava.msg.Empty>createSubscription(
+      rcljava.msg.Empty.class, "test_get_topic_names_and_types_one",
+      new Consumer<rcljava.msg.Empty>() {
+        public void accept(final rcljava.msg.Empty msg) {}
+      });
+    Subscription<rcljava.msg.Empty> subscription2 = node.<rcljava.msg.Empty>createSubscription(
+      rcljava.msg.Empty.class, "test_get_topic_names_and_types_three",
+      new Consumer<rcljava.msg.Empty>() {
+        public void accept(final rcljava.msg.Empty msg) {}
+      });
+
+    Consumer<Collection<NameAndTypes>> validateNameAndTypes =
+    new Consumer<Collection<NameAndTypes>>() {
+      public void accept(final Collection<NameAndTypes> namesAndTypes) {
+        // TODO(ivanpauno): Using assertj may help a lot here https://assertj.github.io/doc/.
+        assertEquals(namesAndTypes.size(), 3);
+        assertTrue(
+          "topic 'test_get_topic_names_and_types_one' was not discovered",
+          namesAndTypes.contains(
+            new NameAndTypes(
+              "/test_get_topic_names_and_types_one",
+              new ArrayList(Arrays.asList("rcljava/msg/Empty", "rcljava/msg/UInt32")))));
+        assertTrue(
+          "topic 'test_get_topic_names_and_types_two' was not discovered",
+          namesAndTypes.contains(
+            new NameAndTypes(
+              "/test_get_topic_names_and_types_two",
+              new ArrayList(Arrays.asList("rcljava/msg/UInt32")))));
+        assertTrue(
+          "topic 'test_get_topic_names_and_types_three' was not discovered",
+          namesAndTypes.contains(
+            new NameAndTypes(
+              "/test_get_topic_names_and_types_three",
+              new ArrayList(Arrays.asList("rcljava/msg/Empty")))));
+      }
+    };
+
+    long start = System.currentTimeMillis();
+    boolean ok = false;
+    Collection<NameAndTypes> namesAndTypes = null;
+    do {
+      namesAndTypes = this.node.getTopicNamesAndTypes();
+      try {
+        validateNameAndTypes.accept(namesAndTypes);
+        ok = true;
+      } catch (AssertionError err) {
+        // ignore here, it's going to be validated again at the end.
+      }
+      // TODO(ivanpauno): We could wait for the graph guard condition to be triggered if that
+      // would be available.
+      try {
+        TimeUnit.MILLISECONDS.sleep(100);
+      } catch (InterruptedException err) {
+        // ignore
+      }
+    } while (!ok && System.currentTimeMillis() < start + 1000);
+    assertNotNull(namesAndTypes);
+    validateNameAndTypes.accept(namesAndTypes);
+
+    publisher.dispose();
+    publisher2.dispose();
+    subscription.dispose();
+    subscription2.dispose();
   }
 }

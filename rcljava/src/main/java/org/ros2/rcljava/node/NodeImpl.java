@@ -23,6 +23,7 @@ import org.ros2.rcljava.concurrent.Callback;
 import org.ros2.rcljava.consumers.Consumer;
 import org.ros2.rcljava.consumers.TriConsumer;
 import org.ros2.rcljava.contexts.Context;
+import org.ros2.rcljava.graph.NameAndTypes;
 import org.ros2.rcljava.qos.QoSProfile;
 import org.ros2.rcljava.interfaces.Disposable;
 import org.ros2.rcljava.interfaces.MessageDefinition;
@@ -753,4 +754,13 @@ public class NodeImpl implements Node {
       return result;
     }
   }
+
+  public final Collection<NameAndTypes> getTopicNamesAndTypes() {
+    Collection<NameAndTypes> namesAndTypes = new ArrayList();
+    nativeGetTopicNamesAndTypes(this.handle, namesAndTypes);
+    return namesAndTypes;
+  }
+
+  private static native final void nativeGetTopicNamesAndTypes(
+    long handle, Collection<NameAndTypes> namesAndTypes);
 }

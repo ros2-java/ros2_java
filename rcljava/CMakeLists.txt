@@ -141,6 +141,7 @@ set(${PROJECT_NAME}_sources
   "src/main/java/org/ros2/rcljava/events/EventStatus.java"
   "src/main/java/org/ros2/rcljava/events/PublisherEventStatus.java"
   "src/main/java/org/ros2/rcljava/events/SubscriptionEventStatus.java"
+  "src/main/java/org/ros2/rcljava/graph/NameAndTypes.java"
   "src/main/java/org/ros2/rcljava/publisher/statuses/LivelinessLost.java"
   "src/main/java/org/ros2/rcljava/publisher/statuses/OfferedDeadlineMissed.java"
   "src/main/java/org/ros2/rcljava/publisher/statuses/OfferedQosIncompatible.java"

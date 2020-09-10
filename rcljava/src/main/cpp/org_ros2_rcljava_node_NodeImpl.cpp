@@ -19,6 +19,7 @@
 #include <string>
 
 #include "rcl/error_handling.h"
+#include "rcl/graph.h"
 #include "rcl/node.h"
 #include "rcl/rcl.h"
 #include "rmw/rmw.h"
@@ -29,6 +30,7 @@
 
 #include "org_ros2_rcljava_node_NodeImpl.h"
 
+using rcljava_common::exceptions::rcljava_throw_exception;
 using rcljava_common::exceptions::rcljava_throw_rclexception;
 
 JNIEXPORT jstring JNICALL
@@ -237,4 +239,61 @@ Java_org_ros2_rcljava_node_NodeImpl_nativeCreateTimerHandle(
 
   jlong jtimer = reinterpret_cast<jlong>(timer);
   return jtimer;
+}
+
+JNIEXPORT void JNICALL
+Java_org_ros2_rcljava_node_NodeImpl_nativeGetTopicNamesAndTypes(
+  JNIEnv * env, jclass, jlong handle, jobject jnames_and_types)
+{
+  rcl_node_t * node = reinterpret_cast<rcl_node_t *>(handle);
+  if (!node) {
+    rcljava_throw_exception(env, "java/lang/IllegalArgumentException", "node handle is NULL");
+    return;
+  }
+
+  jclass collection_clazz = env->FindClass("java/util/Collection");
+  jmethodID collection_add_mid = env->GetMethodID(
+    collection_clazz, "add", "(Ljava/lang/Object;)Z");
+  RCLJAVA_COMMON_CHECK_FOR_EXCEPTION(env);
+  jclass name_and_types_clazz = env->FindClass("org/ros2/rcljava/graph/NameAndTypes");
+  RCLJAVA_COMMON_CHECK_FOR_EXCEPTION(env);
+  jmethodID name_and_types_init_mid = env->GetMethodID(name_and_types_clazz, "<init>", "()V");
+  RCLJAVA_COMMON_CHECK_FOR_EXCEPTION(env);
+  jfieldID name_fid = env->GetFieldID(name_and_types_clazz, "name", "Ljava/lang/String;");
+  RCLJAVA_COMMON_CHECK_FOR_EXCEPTION(env);
+  jfieldID types_fid = env->GetFieldID(name_and_types_clazz, "types", "Ljava/util/Collection;");
+  RCLJAVA_COMMON_CHECK_FOR_EXCEPTION(env);
+
+  rcl_allocator_t allocator = rcl_get_default_allocator();
+  rcl_names_and_types_t topic_names_and_types = rcl_get_zero_initialized_names_and_types();
+
+  rcl_ret_t ret = rcl_get_topic_names_and_types(
+    node,
+    &allocator,
+    false,
+    &topic_names_and_types);
+  RCLJAVA_COMMON_THROW_FROM_RCL(env, ret, "failed to get topic names and types");
+
+  for (size_t i = 0; i < topic_names_and_types.names.size; i++) {
+    jobject jitem = env->NewObject(name_and_types_clazz, name_and_types_init_mid);
+    RCLJAVA_COMMON_CHECK_FOR_EXCEPTION_WITH_ERROR_STATEMENT(env, goto cleanup);
+    jstring jname = env->NewStringUTF(topic_names_and_types.names.data[i]);
+    RCLJAVA_COMMON_CHECK_FOR_EXCEPTION_WITH_ERROR_STATEMENT(env, goto cleanup);
+    env->SetObjectField(jitem, name_fid, jname);
+    // the default constructor already inits types to an empty ArrayList
+    jobject jtypes = env->GetObjectField(jitem, types_fid);
+    for (size_t j = 0; j < topic_names_and_types.types[i].size; j++) {
+      jstring jtype = env->NewStringUTF(topic_names_and_types.types[i].data[j]);
+      env->CallBooleanMethod(jtypes, collection_add_mid, jtype);
+      RCLJAVA_COMMON_CHECK_FOR_EXCEPTION_WITH_ERROR_STATEMENT(env, goto cleanup);
+    }
+    env->CallBooleanMethod(jnames_and_types, collection_add_mid, jitem);
+    RCLJAVA_COMMON_CHECK_FOR_EXCEPTION_WITH_ERROR_STATEMENT(env, goto cleanup);
+  }
+
+cleanup:
+  ret = rcl_names_and_types_fini(&topic_names_and_types);
+  if (!env->ExceptionCheck() && RCL_RET_OK != ret) {
+    rcljava_throw_rclexception(env, ret, "failed to fini topic names and types structure");
+  }
 }
