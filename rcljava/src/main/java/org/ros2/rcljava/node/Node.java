@@ -24,8 +24,8 @@ import org.ros2.rcljava.client.Client;
 import org.ros2.rcljava.concurrent.Callback;
 import org.ros2.rcljava.consumers.Consumer;
 import org.ros2.rcljava.consumers.TriConsumer;
+import org.ros2.rcljava.graph.EndpointInfo;
 import org.ros2.rcljava.graph.NameAndTypes;
-import org.ros2.rcljava.qos.QoSProfile;
 import org.ros2.rcljava.interfaces.Disposable;
 import org.ros2.rcljava.interfaces.MessageDefinition;
 import org.ros2.rcljava.interfaces.ServiceDefinition;
@@ -33,6 +33,7 @@ import org.ros2.rcljava.parameters.ParameterCallback;
 import org.ros2.rcljava.parameters.ParameterType;
 import org.ros2.rcljava.parameters.ParameterVariant;
 import org.ros2.rcljava.publisher.Publisher;
+import org.ros2.rcljava.qos.QoSProfile;
 import org.ros2.rcljava.service.RMWRequestId;
 import org.ros2.rcljava.service.Service;
 import org.ros2.rcljava.subscription.Subscription;
@@ -558,4 +559,16 @@ public interface Node extends Disposable {
    * @return the detected topic names and types.
    */
   Collection<NameAndTypes> getTopicNamesAndTypes();
+
+  /**
+   * Get information of all publishers in a topic.
+   *
+   * The queried information includes the node that created the publisher, its qos, etc.
+   * For more info, see @{link EndpointInfo}.
+   *
+   * @param topicName The topic name of interest.
+   * @return A collection of `EndpointInfo` instances, describing all publishers in the
+   *    passed topic.
+   */
+  Collection<EndpointInfo> getPublishersInfo(final String topicName);
 }

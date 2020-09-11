@@ -15,6 +15,7 @@
   <build_depend>builtin_interfaces</build_depend>
   <build_depend>rcl_interfaces</build_depend>
   <build_depend>rcl</build_depend>
+  <build_depend>rcpputils</build_depend>
   <build_depend>rmw_implementation_cmake</build_depend>
   <build_depend>rmw</build_depend>
   <build_depend>rosidl_generator_c</build_depend>
@@ -29,6 +30,7 @@
   <exec_depend>builtin_interfaces</exec_depend>
   <exec_depend>rcl_interfaces</exec_depend>
   <exec_depend>rcl</exec_depend>
+  <exec_depend>rcpputils</exec_depend>
   <exec_depend>rmw_implementation_cmake</exec_depend>
   <exec_depend>rmw_implementation</exec_depend>
   <exec_depend>rosidl_runtime_c</exec_depend>

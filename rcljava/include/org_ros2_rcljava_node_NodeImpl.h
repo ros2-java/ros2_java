@@ -101,6 +101,15 @@ JNIEXPORT void
 JNICALL Java_org_ros2_rcljava_node_NodeImpl_nativeGetTopicNamesAndTypes(
   JNIEnv *, jclass, jlong, jobject);
 
+/*
+ * Class:     org_ros2_rcljava_node_NodeImpl
+ * Method:    nativeGetPublishersInfo
+ * Signature: (JLjava/lang/String;Ljava/util/List;)V
+ */
+JNIEXPORT void
+JNICALL Java_org_ros2_rcljava_node_NodeImpl_nativeGetPublishersInfo(
+  JNIEnv *, jclass, jlong, jstring, jobject);
+
 #ifdef __cplusplus
 }
 #endif

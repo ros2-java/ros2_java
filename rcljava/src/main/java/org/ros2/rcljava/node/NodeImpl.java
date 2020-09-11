@@ -23,8 +23,8 @@ import org.ros2.rcljava.concurrent.Callback;
 import org.ros2.rcljava.consumers.Consumer;
 import org.ros2.rcljava.consumers.TriConsumer;
 import org.ros2.rcljava.contexts.Context;
+import org.ros2.rcljava.graph.EndpointInfo;
 import org.ros2.rcljava.graph.NameAndTypes;
-import org.ros2.rcljava.qos.QoSProfile;
 import org.ros2.rcljava.interfaces.Disposable;
 import org.ros2.rcljava.interfaces.MessageDefinition;
 import org.ros2.rcljava.interfaces.ServiceDefinition;
@@ -37,6 +37,7 @@ import org.ros2.rcljava.parameters.ParameterType;
 import org.ros2.rcljava.parameters.ParameterVariant;
 import org.ros2.rcljava.publisher.Publisher;
 import org.ros2.rcljava.publisher.PublisherImpl;
+import org.ros2.rcljava.qos.QoSProfile;
 import org.ros2.rcljava.service.RMWRequestId;
 import org.ros2.rcljava.service.Service;
 import org.ros2.rcljava.service.ServiceImpl;
@@ -763,4 +764,13 @@ public class NodeImpl implements Node {
 
   private static native final void nativeGetTopicNamesAndTypes(
     long handle, Collection<NameAndTypes> namesAndTypes);
+
+  public final Collection<EndpointInfo> getPublishersInfo(final String topicName) {
+    ArrayList<EndpointInfo> returnValue = new ArrayList();
+    nativeGetPublishersInfo(this.handle, topicName, returnValue);
+    return returnValue;
+  }
+
+  private native static final void nativeGetPublishersInfo(
+    final long handle, final String topicName, ArrayList<EndpointInfo> endpointInfo);
 }

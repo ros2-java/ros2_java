@@ -16,6 +16,7 @@
 package org.ros2.rcljava.node;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
@@ -33,7 +34,9 @@ import java.util.concurrent.TimeUnit;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Iterator;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 import org.ros2.rcljava.RCLJava;
 import org.ros2.rcljava.concurrent.RCLFuture;
@@ -41,9 +44,12 @@ import org.ros2.rcljava.consumers.Consumer;
 import org.ros2.rcljava.executors.Executor;
 import org.ros2.rcljava.executors.MultiThreadedExecutor;
 import org.ros2.rcljava.executors.SingleThreadedExecutor;
+import org.ros2.rcljava.graph.EndpointInfo;
 import org.ros2.rcljava.graph.NameAndTypes;
 import org.ros2.rcljava.node.Node;
 import org.ros2.rcljava.publisher.Publisher;
+import org.ros2.rcljava.qos.policies.Reliability;
+import org.ros2.rcljava.qos.QoSProfile;
 import org.ros2.rcljava.subscription.Subscription;
 
 public class NodeTest {
@@ -944,5 +950,59 @@ public class NodeTest {
     publisher2.dispose();
     subscription.dispose();
     subscription2.dispose();
+  }
+
+  @Test
+  public final void testGetPublishersInfo() {
+    Publisher<rcljava.msg.UInt32> publisher =
+      node.<rcljava.msg.UInt32>createPublisher(rcljava.msg.UInt32.class, "test_get_publishers_info");
+    Publisher<rcljava.msg.UInt32> publisher2 =
+      node.<rcljava.msg.UInt32>createPublisher(
+        rcljava.msg.UInt32.class, "test_get_publishers_info", QoSProfile.sensorData());
+
+    Consumer<Collection<EndpointInfo>> validateEndpointInfo =
+    new Consumer<Collection<EndpointInfo>>() {
+      public void accept(final Collection<EndpointInfo> info) {
+        assertEquals(info.size(), 2);
+        Iterator<EndpointInfo> it = info.iterator();
+        EndpointInfo item = it.next();
+        assertEquals("test_node", item.nodeName);
+        assertEquals("/", item.nodeNamespace);
+        assertEquals("rcljava/msg/UInt32", item.topicType);
+        assertEquals(item.endpointType, EndpointInfo.EndpointType.PUBLISHER);
+        assertEquals(item.qos.getReliability(), Reliability.RELIABLE);
+        item = it.next();
+        assertEquals("test_node", item.nodeName);
+        assertEquals("/", item.nodeNamespace);
+        assertEquals("rcljava/msg/UInt32", item.topicType);
+        assertEquals(item.endpointType, EndpointInfo.EndpointType.PUBLISHER);
+        assertEquals(item.qos.getReliability(), Reliability.BEST_EFFORT);
+        assertFalse(it.hasNext());
+      }
+    };
+
+    long start = System.currentTimeMillis();
+    boolean ok = false;
+    Collection<EndpointInfo> publishersInfo = null;
+    do {
+      publishersInfo = node.getPublishersInfo("/test_get_publishers_info");
+      try {
+        validateEndpointInfo.accept(publishersInfo);
+        ok = true;
+      } catch (AssertionError err) {
+        // ignore here, it's going to be validated again at the end.
+      }
+      // TODO(ivanpauno): We could wait for the graph guard condition to be triggered if that
+      // would be available.
+      try {
+        TimeUnit.MILLISECONDS.sleep(100);
+      } catch (InterruptedException err) {
+        // ignore
+      }
+    } while (!ok && System.currentTimeMillis() < start + 1000);
+    assertNotNull(publishersInfo);
+    validateEndpointInfo.accept(publishersInfo);
+    publisher.dispose();
+    publisher2.dispose();
   }
 }
