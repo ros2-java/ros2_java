@@ -352,28 +352,30 @@ Java_org_ros2_rcljava_node_NodeImpl_nativeGetTopicNamesAndTypes(
     false,
     &topic_names_and_types);
   RCLJAVA_COMMON_THROW_FROM_RCL(env, ret, "failed to get topic names and types");
+  auto cleanup_names_and_types = rcpputils::make_scope_exit(
+    [pnames_and_types = &topic_names_and_types, env]() {
+      rcl_ret_t ret = rcl_names_and_types_fini(pnames_and_types);
+      if (!env->ExceptionCheck() && RCL_RET_OK != ret) {
+        rcljava_throw_rclexception(env, ret, "failed to fini topic names and types structure");
+      }
+    }
+  );
 
   for (size_t i = 0; i < topic_names_and_types.names.size; i++) {
     jobject jitem = env->NewObject(name_and_types_clazz, name_and_types_init_mid);
-    RCLJAVA_COMMON_CHECK_FOR_EXCEPTION_WITH_ERROR_STATEMENT(env, goto cleanup);
+    RCLJAVA_COMMON_CHECK_FOR_EXCEPTION(env);
     jstring jname = env->NewStringUTF(topic_names_and_types.names.data[i]);
-    RCLJAVA_COMMON_CHECK_FOR_EXCEPTION_WITH_ERROR_STATEMENT(env, goto cleanup);
+    RCLJAVA_COMMON_CHECK_FOR_EXCEPTION(env);
     env->SetObjectField(jitem, name_fid, jname);
     // the default constructor already inits types to an empty ArrayList
     jobject jtypes = env->GetObjectField(jitem, types_fid);
     for (size_t j = 0; j < topic_names_and_types.types[i].size; j++) {
       jstring jtype = env->NewStringUTF(topic_names_and_types.types[i].data[j]);
       env->CallBooleanMethod(jtypes, collection_add_mid, jtype);
-      RCLJAVA_COMMON_CHECK_FOR_EXCEPTION_WITH_ERROR_STATEMENT(env, goto cleanup);
+      RCLJAVA_COMMON_CHECK_FOR_EXCEPTION(env);
     }
     env->CallBooleanMethod(jnames_and_types, collection_add_mid, jitem);
-    RCLJAVA_COMMON_CHECK_FOR_EXCEPTION_WITH_ERROR_STATEMENT(env, goto cleanup);
-  }
-
-cleanup:
-  ret = rcl_names_and_types_fini(&topic_names_and_types);
-  if (!env->ExceptionCheck() && RCL_RET_OK != ret) {
-    rcljava_throw_rclexception(env, ret, "failed to fini topic names and types structure");
+    RCLJAVA_COMMON_CHECK_FOR_EXCEPTION(env);
   }
 }
 
