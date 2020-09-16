@@ -243,6 +243,84 @@ Java_org_ros2_rcljava_node_NodeImpl_nativeCreateTimerHandle(
 }
 
 JNIEXPORT void JNICALL
+Java_org_ros2_rcljava_node_NodeImpl_nativeGetNodeNames(
+  JNIEnv * env, jclass, jlong handle, jobject jnode_names_info)
+{
+  rcl_node_t * node = reinterpret_cast<rcl_node_t *>(handle);
+  if (!node) {
+    rcljava_throw_exception(env, "java/lang/IllegalArgumentException", "node handle is NULL");
+    return;
+  }
+
+  jclass list_clazz = env->GetObjectClass(jnode_names_info);
+  jmethodID list_add_mid = env->GetMethodID(list_clazz, "add", "(Ljava/lang/Object;)Z");
+  RCLJAVA_COMMON_CHECK_FOR_EXCEPTION(env);
+  jclass node_info_clazz = env->FindClass("org/ros2/rcljava/graph/NodeNameInfo");
+  RCLJAVA_COMMON_CHECK_FOR_EXCEPTION(env);
+  jmethodID node_info_init_mid = env->GetMethodID(node_info_clazz, "<init>", "()V");
+  RCLJAVA_COMMON_CHECK_FOR_EXCEPTION(env);
+  jfieldID name_fid = env->GetFieldID(node_info_clazz, "name", "Ljava/lang/String;");
+  RCLJAVA_COMMON_CHECK_FOR_EXCEPTION(env);
+  jfieldID namespace_fid = env->GetFieldID(node_info_clazz, "namespace", "Ljava/lang/String;");
+  RCLJAVA_COMMON_CHECK_FOR_EXCEPTION(env);
+  jfieldID enclave_fid = env->GetFieldID(node_info_clazz, "enclave", "Ljava/lang/String;");
+  RCLJAVA_COMMON_CHECK_FOR_EXCEPTION(env);
+
+  rcl_allocator_t allocator = rcl_get_default_allocator();
+  rcutils_string_array_t node_names = rcutils_get_zero_initialized_string_array();
+  rcutils_string_array_t node_namespaces = rcutils_get_zero_initialized_string_array();
+  rcutils_string_array_t enclaves = rcutils_get_zero_initialized_string_array();
+
+  rcl_ret_t ret = rcl_get_node_names_with_enclaves(
+    node,
+    allocator,
+    &node_names,
+    &node_namespaces,
+    &enclaves);
+  RCLJAVA_COMMON_THROW_FROM_RCL(env, ret, "rcl_get_node_names_with_enclaves failed");
+  auto on_scope_exit = rcpputils::make_scope_exit(
+    [pnames = &node_names, pnamespaces = &node_namespaces, penclaves = &enclaves, env]() {
+      rcl_ret_t ret = rcutils_string_array_fini(pnames);
+      if (!env->ExceptionCheck() && RCL_RET_OK != ret) {
+        rcljava_throw_rclexception(env, ret, "failed to fini node names string array");
+      }
+      ret = rcutils_string_array_fini(pnamespaces);
+      if (!env->ExceptionCheck() && RCL_RET_OK != ret) {
+        rcljava_throw_rclexception(env, ret, "failed to fini node namespaces string array");
+      }
+      ret = rcutils_string_array_fini(penclaves);
+      if (!env->ExceptionCheck() && RCL_RET_OK != ret) {
+        rcljava_throw_rclexception(env, ret, "failed to fini enclaves string array");
+      }
+    }
+  );
+
+  if (node_names.size != node_namespaces.size || node_names.size != enclaves.size) {
+    rcljava_throw_exception(
+      env,
+      "java/lang/IllegalStateException",
+      "names, namespaces and enclaves array leghts don't match");
+    return;
+  }
+
+  for (size_t i = 0; i < node_names.size; i++) {
+    jstring jnode_name = env->NewStringUTF(node_names.data[i]);
+    RCLJAVA_COMMON_CHECK_FOR_EXCEPTION(env);
+    jstring jnode_namespace = env->NewStringUTF(node_namespaces.data[i]);
+    RCLJAVA_COMMON_CHECK_FOR_EXCEPTION(env);
+    jstring jenclave = env->NewStringUTF(enclaves.data[i]);
+    RCLJAVA_COMMON_CHECK_FOR_EXCEPTION(env);
+    jobject jitem = env->NewObject(node_info_clazz, node_info_init_mid);
+    RCLJAVA_COMMON_CHECK_FOR_EXCEPTION(env);
+    env->SetObjectField(jitem, name_fid, jnode_name);
+    env->SetObjectField(jitem, namespace_fid, jnode_namespace);
+    env->SetObjectField(jitem, enclave_fid, jenclave);
+    env->CallBooleanMethod(jnode_names_info, list_add_mid, jitem);
+    RCLJAVA_COMMON_CHECK_FOR_EXCEPTION(env);
+  }
+}
+
+JNIEXPORT void JNICALL
 Java_org_ros2_rcljava_node_NodeImpl_nativeGetTopicNamesAndTypes(
   JNIEnv * env, jclass, jlong handle, jobject jnames_and_types)
 {

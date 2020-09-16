@@ -94,6 +94,15 @@ JNICALL Java_org_ros2_rcljava_node_NodeImpl_nativeCreateTimerHandle(
 
 /*
  * Class:     org_ros2_rcljava_node_NodeImpl
+ * Method:    nativeGetNodeNames
+ * Signature: (JLjava/util/List;)V
+ */
+JNIEXPORT void
+JNICALL Java_org_ros2_rcljava_node_NodeImpl_nativeGetNodeNames(
+  JNIEnv *, jclass, jlong, jobject);
+
+/*
+ * Class:     org_ros2_rcljava_node_NodeImpl
  * Method:    nativeGetTopicNamesAndTypes
  * Signature: (JLjava/util/Collection;)V
  */

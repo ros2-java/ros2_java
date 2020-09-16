@@ -26,6 +26,7 @@ import org.ros2.rcljava.consumers.Consumer;
 import org.ros2.rcljava.consumers.TriConsumer;
 import org.ros2.rcljava.graph.EndpointInfo;
 import org.ros2.rcljava.graph.NameAndTypes;
+import org.ros2.rcljava.graph.NodeNameInfo;
 import org.ros2.rcljava.interfaces.Disposable;
 import org.ros2.rcljava.interfaces.MessageDefinition;
 import org.ros2.rcljava.interfaces.ServiceDefinition;
@@ -551,6 +552,12 @@ public interface Node extends Disposable {
    * @return rcl_interfaces.msg.ListParametersResult
    */
   rcl_interfaces.msg.ListParametersResult listParameters(List<String> prefixes, long depth);
+
+  /**
+   * Returns a collection of node names that were detected in the ROS graph.
+   * See @{link NodeNameInfo} for more information about the return value.
+   */
+  Collection<NodeNameInfo> getNodeNames();
 
   /**
    * Return the topics names and types that were detected in the graph.

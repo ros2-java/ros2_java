@@ -46,6 +46,7 @@ import org.ros2.rcljava.executors.MultiThreadedExecutor;
 import org.ros2.rcljava.executors.SingleThreadedExecutor;
 import org.ros2.rcljava.graph.EndpointInfo;
 import org.ros2.rcljava.graph.NameAndTypes;
+import org.ros2.rcljava.graph.NodeNameInfo;
 import org.ros2.rcljava.node.Node;
 import org.ros2.rcljava.publisher.Publisher;
 import org.ros2.rcljava.qos.policies.Reliability;
@@ -879,6 +880,64 @@ public class NodeTest {
     assertEquals(0, subscriptionOne.getHandle());
     subscriptionTwo.dispose();
     assertEquals(0, subscriptionTwo.getHandle());
+    publisherNode.dispose();
+    assertEquals(0, publisherNode.getHandle());
+    subscriptionNodeOne.dispose();
+    assertEquals(0, subscriptionNodeOne.getHandle());
+    subscriptionNodeTwo.dispose();
+    assertEquals(0, subscriptionNodeTwo.getHandle());
+  }
+
+  @Test
+  public final void testGetNodeNames() throws Exception {
+    final Node node1 = RCLJava.createNode("test_get_node_names_1");
+    final Node node2 = RCLJava.createNode("test_get_node_names_2");
+    final Node node3 = RCLJava.createNode("test_get_node_names_3");
+
+    Consumer<Collection<NodeNameInfo>> validateNodeNameInfo =
+    new Consumer<Collection<NodeNameInfo>>() {
+      public void accept(final Collection<NodeNameInfo> nodeNamesInfo) {
+        assertEquals(4, nodeNamesInfo.size());
+        assertTrue(
+          "node 'test_node' was not discovered",
+          nodeNamesInfo.contains(new NodeNameInfo("test_node", "/", "/")));
+        assertTrue(
+          "node 'test_get_node_names_1' was not discovered",
+          nodeNamesInfo.contains(new NodeNameInfo("test_get_node_names_1", "/", "/")));
+        assertTrue(
+          "node 'test_get_node_names_2' was not discovered",
+          nodeNamesInfo.contains(new NodeNameInfo("test_get_node_names_1", "/", "/")));
+        assertTrue(
+          "node 'test_get_node_names_3' was not discovered",
+          nodeNamesInfo.contains(new NodeNameInfo("test_get_node_names_1", "/", "/")));
+      }
+    };
+
+    long start = System.currentTimeMillis();
+    boolean ok = false;
+    Collection<NodeNameInfo> nodeNamesInfo = null;
+    do {
+      nodeNamesInfo = this.node.getNodeNames();
+      try {
+        validateNodeNameInfo.accept(nodeNamesInfo);
+        ok = true;
+      } catch (AssertionError err) {
+        // ignore here, it's going to be validated again at the end.
+      }
+      // TODO(ivanpauno): We could wait for the graph guard condition to be triggered if that
+      // would be available.
+      try {
+        TimeUnit.MILLISECONDS.sleep(100);
+      } catch (InterruptedException err) {
+        // ignore
+      }
+    } while (!ok && System.currentTimeMillis() < start + 1000);
+    assertNotNull(nodeNamesInfo);
+    validateNodeNameInfo.accept(nodeNamesInfo);
+
+    node1.dispose();
+    node2.dispose();
+    node3.dispose();
   }
 
   @Test
