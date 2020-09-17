@@ -379,9 +379,10 @@ Java_org_ros2_rcljava_node_NodeImpl_nativeGetTopicNamesAndTypes(
   }
 }
 
-JNIEXPORT void JNICALL
-Java_org_ros2_rcljava_node_NodeImpl_nativeGetPublishersInfo(
-  JNIEnv * env, jclass, jlong handle, jstring jtopic_name, jobject jpublishers_info)
+template<typename FunctorT>
+void
+get_endpoint_info_common(
+  JNIEnv * env, jlong handle, jstring jtopic_name, jobject jendpoints_info, FunctorT get_info)
 {
   rcl_node_t * node = reinterpret_cast<rcl_node_t *>(handle);
   if (!node) {
@@ -391,7 +392,7 @@ Java_org_ros2_rcljava_node_NodeImpl_nativeGetPublishersInfo(
   }
 
   rcutils_allocator_t allocator = rcutils_get_default_allocator();
-  rcl_topic_endpoint_info_array_t publishers_info =
+  rcl_topic_endpoint_info_array_t endpoints_info =
     rcl_get_zero_initialized_topic_endpoint_info_array();
 
   const char * topic_name = env->GetStringUTFChars(jtopic_name, NULL);
@@ -401,26 +402,26 @@ Java_org_ros2_rcljava_node_NodeImpl_nativeGetPublishersInfo(
     return;
   }
 
-  rcl_ret_t ret = rcl_get_publishers_info_by_topic(
+  rcl_ret_t ret = get_info(
     node,
     &allocator,
     topic_name,
     false,  // use ros mangling conventions
-    &publishers_info);
+    &endpoints_info);
 
   env->ReleaseStringUTFChars(jtopic_name, topic_name);
 
   RCLJAVA_COMMON_THROW_FROM_RCL(env, ret, "failed to get publisher info");
   auto cleanup_info_array = rcpputils::make_scope_exit(
-    [info_ptr = &publishers_info, allocator_ptr = &allocator, env]() {
+    [info_ptr = &endpoints_info, allocator_ptr = &allocator, env]() {
       rcl_ret_t ret = rcl_topic_endpoint_info_array_fini(info_ptr, allocator_ptr);
       if (!env->ExceptionCheck() && RCL_RET_OK != ret) {
-        rcljava_throw_rclexception(env, ret, "failed to destroy rcl publisher info");
+        rcljava_throw_rclexception(env, ret, "failed to destroy rcl endpoints info");
       }
     }
   );
 
-  jclass list_clazz = env->GetObjectClass(jpublishers_info);
+  jclass list_clazz = env->GetObjectClass(jendpoints_info);
   jmethodID list_add_mid = env->GetMethodID(list_clazz, "add", "(Ljava/lang/Object;)Z");
   RCLJAVA_COMMON_CHECK_FOR_EXCEPTION(env);
   jclass endpoint_info_clazz = env->FindClass("org/ros2/rcljava/graph/EndpointInfo");
@@ -431,13 +432,29 @@ Java_org_ros2_rcljava_node_NodeImpl_nativeGetPublishersInfo(
     endpoint_info_clazz, "nativeFromRCL", "(J)V");
   RCLJAVA_COMMON_CHECK_FOR_EXCEPTION(env);
 
-  for (size_t i = 0; i < publishers_info.size; i++) {
+  for (size_t i = 0; i < endpoints_info.size; i++) {
     jobject item = env->NewObject(endpoint_info_clazz, endpoint_info_init_mid);
     RCLJAVA_COMMON_CHECK_FOR_EXCEPTION(env);
-    env->CallVoidMethod(item, endpoint_info_from_rcl_mid, &publishers_info.info_array[i]);
+    env->CallVoidMethod(item, endpoint_info_from_rcl_mid, &endpoints_info.info_array[i]);
     RCLJAVA_COMMON_CHECK_FOR_EXCEPTION(env);
-    env->CallBooleanMethod(jpublishers_info, list_add_mid, item);
+    env->CallBooleanMethod(jendpoints_info, list_add_mid, item);
     RCLJAVA_COMMON_CHECK_FOR_EXCEPTION(env);
     env->DeleteLocalRef(item);
   }
+}
+
+JNIEXPORT void JNICALL
+Java_org_ros2_rcljava_node_NodeImpl_nativeGetPublishersInfo(
+  JNIEnv * env, jclass, jlong handle, jstring jtopic_name, jobject jpublishers_info)
+{
+  get_endpoint_info_common(
+    env, handle, jtopic_name, jpublishers_info, rcl_get_publishers_info_by_topic);
+}
+
+JNIEXPORT void JNICALL
+Java_org_ros2_rcljava_node_NodeImpl_nativeGetSubscriptionsInfo(
+  JNIEnv * env, jclass, jlong handle, jstring jtopic_name, jobject jsubscriptions_info)
+{
+  get_endpoint_info_common(
+    env, handle, jtopic_name, jsubscriptions_info, rcl_get_subscriptions_info_by_topic);
 }

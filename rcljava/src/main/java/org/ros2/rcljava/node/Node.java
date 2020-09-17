@@ -578,4 +578,16 @@ public interface Node extends Disposable {
    *    passed topic.
    */
   Collection<EndpointInfo> getPublishersInfo(final String topicName);
+
+  /**
+   * Get information of all subscriptions in a topic.
+   *
+   * The queried information includes the node that created the publisher, its qos, etc.
+   * For more info, see @{link EndpointInfo}.
+   *
+   * @param topicName The topic name of interest.
+   * @return A collection of `EndpointInfo` instances, describing all subscriptions in the
+   *    passed topic.
+   */
+  Collection<EndpointInfo> getSubscriptionsInfo(final String topicName);
 }

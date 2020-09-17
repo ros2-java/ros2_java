@@ -782,4 +782,13 @@ public class NodeImpl implements Node {
 
   private native static final void nativeGetPublishersInfo(
     final long handle, final String topicName, ArrayList<EndpointInfo> endpointInfo);
+  
+  public final Collection<EndpointInfo> getSubscriptionsInfo(final String topicName) {
+    ArrayList<EndpointInfo> returnValue = new ArrayList();
+    nativeGetSubscriptionsInfo(this.handle, topicName, returnValue);
+    return returnValue;
+  }
+
+  private native static final void nativeGetSubscriptionsInfo(
+    final long handle, final String topicName, ArrayList<EndpointInfo> endpointInfo);
 }

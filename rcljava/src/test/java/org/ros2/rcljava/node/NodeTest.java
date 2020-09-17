@@ -1064,4 +1064,61 @@ public class NodeTest {
     publisher.dispose();
     publisher2.dispose();
   }
+
+  @Test
+  public final void testGetSubscriptionsInfo() {
+    Subscription<rcljava.msg.UInt32> subscription = node.<rcljava.msg.UInt32>createSubscription(
+      rcljava.msg.UInt32.class, "test_get_subscriptions_info", new Consumer<rcljava.msg.UInt32>() {
+        public void accept(final rcljava.msg.UInt32 msg) {}
+      });
+    Subscription<rcljava.msg.UInt32> subscription2 = node.<rcljava.msg.UInt32>createSubscription(
+      rcljava.msg.UInt32.class, "test_get_subscriptions_info", new Consumer<rcljava.msg.UInt32>() {
+        public void accept(final rcljava.msg.UInt32 msg) {}
+      }, QoSProfile.sensorData());
+
+    Consumer<Collection<EndpointInfo>> validateEndpointInfo =
+    new Consumer<Collection<EndpointInfo>>() {
+      public void accept(final Collection<EndpointInfo> info) {
+        assertEquals(info.size(), 2);
+        Iterator<EndpointInfo> it = info.iterator();
+        EndpointInfo item = it.next();
+        assertEquals("test_node", item.nodeName);
+        assertEquals("/", item.nodeNamespace);
+        assertEquals("rcljava/msg/UInt32", item.topicType);
+        assertEquals(item.endpointType, EndpointInfo.EndpointType.SUBSCRIPTION);
+        assertEquals(item.qos.getReliability(), Reliability.RELIABLE);
+        item = it.next();
+        assertEquals("test_node", item.nodeName);
+        assertEquals("/", item.nodeNamespace);
+        assertEquals("rcljava/msg/UInt32", item.topicType);
+        assertEquals(item.endpointType, EndpointInfo.EndpointType.SUBSCRIPTION);
+        assertEquals(item.qos.getReliability(), Reliability.BEST_EFFORT);
+        assertFalse(it.hasNext());
+      }
+    };
+
+    long start = System.currentTimeMillis();
+    boolean ok = false;
+    Collection<EndpointInfo> subscriptionsInfo = null;
+    do {
+      subscriptionsInfo = node.getSubscriptionsInfo("/test_get_subscriptions_info");
+      try {
+        validateEndpointInfo.accept(subscriptionsInfo);
+        ok = true;
+      } catch (AssertionError err) {
+        // ignore here, it's going to be validated again at the end.
+      }
+      // TODO(ivanpauno): We could wait for the graph guard condition to be triggered if that
+      // would be available.
+      try {
+        TimeUnit.MILLISECONDS.sleep(100);
+      } catch (InterruptedException err) {
+        // ignore
+      }
+    } while (!ok && System.currentTimeMillis() < start + 1000);
+    assertNotNull(subscriptionsInfo);
+    validateEndpointInfo.accept(subscriptionsInfo);
+    subscription.dispose();
+    subscription2.dispose();
+  }
 }

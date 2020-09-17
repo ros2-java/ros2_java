@@ -119,6 +119,15 @@ JNIEXPORT void
 JNICALL Java_org_ros2_rcljava_node_NodeImpl_nativeGetPublishersInfo(
   JNIEnv *, jclass, jlong, jstring, jobject);
 
+/*
+ * Class:     org_ros2_rcljava_node_NodeImpl
+ * Method:    nativeGetSubscriptionsInfo
+ * Signature: (JLjava/lang/String;Ljava/util/List;)V
+ */
+JNIEXPORT void
+JNICALL Java_org_ros2_rcljava_node_NodeImpl_nativeGetSubscriptionsInfo(
+  JNIEnv *, jclass, jlong, jstring, jobject);
+
 #ifdef __cplusplus
 }
 #endif
