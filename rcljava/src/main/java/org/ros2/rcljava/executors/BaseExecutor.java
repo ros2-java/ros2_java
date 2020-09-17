@@ -332,12 +332,12 @@ public class BaseExecutor {
     AnyExecutable anyExecutable = getNextExecutable();
     if (anyExecutable == null) {
       waitForWork(0);
-      do {
-        anyExecutable = getNextExecutable();
-        if (anyExecutable != null) {
-          executeAnyExecutable(anyExecutable);
-        }
-      } while (anyExecutable != null);
+      anyExecutable = getNextExecutable();
+    }
+
+    while (anyExecutable != null) {
+      executeAnyExecutable(anyExecutable);
+      anyExecutable = getNextExecutable();
     }
   }
 
