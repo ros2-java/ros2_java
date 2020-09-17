@@ -39,8 +39,10 @@ import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 import org.ros2.rcljava.RCLJava;
+import org.ros2.rcljava.client.Client;
 import org.ros2.rcljava.concurrent.RCLFuture;
 import org.ros2.rcljava.consumers.Consumer;
+import org.ros2.rcljava.consumers.TriConsumer;
 import org.ros2.rcljava.executors.Executor;
 import org.ros2.rcljava.executors.MultiThreadedExecutor;
 import org.ros2.rcljava.executors.SingleThreadedExecutor;
@@ -51,6 +53,8 @@ import org.ros2.rcljava.node.Node;
 import org.ros2.rcljava.publisher.Publisher;
 import org.ros2.rcljava.qos.policies.Reliability;
 import org.ros2.rcljava.qos.QoSProfile;
+import org.ros2.rcljava.service.RMWRequestId;
+import org.ros2.rcljava.service.Service;
 import org.ros2.rcljava.subscription.Subscription;
 
 public class NodeTest {
@@ -1009,6 +1013,67 @@ public class NodeTest {
     publisher2.dispose();
     subscription.dispose();
     subscription2.dispose();
+  }
+
+  @Test
+  public final void testGetServiceNamesAndTypes() throws Exception {
+    Service<rcljava.srv.AddTwoInts> service = node.<rcljava.srv.AddTwoInts>createService(
+      rcljava.srv.AddTwoInts.class, "test_service_names_and_types_one",
+      new TriConsumer<
+        RMWRequestId, rcljava.srv.AddTwoInts_Request, rcljava.srv.AddTwoInts_Response>()
+      {
+        public final void accept(
+          final RMWRequestId header,
+          final rcljava.srv.AddTwoInts_Request request,
+          final rcljava.srv.AddTwoInts_Response response)
+        {}
+      });
+    Client<rcljava.srv.AddTwoInts> client = node.<rcljava.srv.AddTwoInts>createClient(
+      rcljava.srv.AddTwoInts.class, "test_service_names_and_types_two");
+
+    Consumer<Collection<NameAndTypes>> validateNameAndTypes =
+    new Consumer<Collection<NameAndTypes>>() {
+      public void accept(final Collection<NameAndTypes> namesAndTypes) {
+        assertEquals(namesAndTypes.size(), 2);
+        assertTrue(
+          "service 'test_service_names_and_types_one' was not discovered",
+          namesAndTypes.contains(
+            new NameAndTypes(
+              "/test_service_names_and_types_one",
+              new ArrayList(Arrays.asList("rcljava/srv/AddTwoInts")))));
+        assertTrue(
+          "service 'test_service_names_and_types_two' was not discovered",
+          namesAndTypes.contains(
+            new NameAndTypes(
+              "/test_service_names_and_types_two",
+              new ArrayList(Arrays.asList("rcljava/srv/AddTwoInts")))));
+      }
+    };
+
+    long start = System.currentTimeMillis();
+    boolean ok = false;
+    Collection<NameAndTypes> namesAndTypes = null;
+    do {
+      namesAndTypes = this.node.getServiceNamesAndTypes();
+      try {
+        validateNameAndTypes.accept(namesAndTypes);
+        ok = true;
+      } catch (AssertionError err) {
+        // ignore here, it's going to be validated again at the end.
+      }
+      // TODO(ivanpauno): We could wait for the graph guard condition to be triggered if that
+      // would be available.
+      try {
+        TimeUnit.MILLISECONDS.sleep(100);
+      } catch (InterruptedException err) {
+        // ignore
+      }
+    } while (!ok && System.currentTimeMillis() < start + 1000);
+    assertNotNull(namesAndTypes);
+    validateNameAndTypes.accept(namesAndTypes);
+
+    service.dispose();
+    client.dispose();
   }
 
   @Test

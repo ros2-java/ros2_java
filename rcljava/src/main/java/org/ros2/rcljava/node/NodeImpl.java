@@ -774,6 +774,15 @@ public class NodeImpl implements Node {
   private static native final void nativeGetTopicNamesAndTypes(
     long handle, Collection<NameAndTypes> namesAndTypes);
 
+  public final Collection<NameAndTypes> getServiceNamesAndTypes() {
+    Collection<NameAndTypes> namesAndTypes = new ArrayList();
+    nativeGetServiceNamesAndTypes(this.handle, namesAndTypes);
+    return namesAndTypes;
+  }
+
+  private static native final void nativeGetServiceNamesAndTypes(
+    long handle, Collection<NameAndTypes> namesAndTypes);
+
   public final Collection<EndpointInfo> getPublishersInfo(final String topicName) {
     ArrayList<EndpointInfo> returnValue = new ArrayList();
     nativeGetPublishersInfo(this.handle, topicName, returnValue);

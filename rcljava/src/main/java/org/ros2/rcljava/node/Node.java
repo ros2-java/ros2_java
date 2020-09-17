@@ -568,6 +568,14 @@ public interface Node extends Disposable {
   Collection<NameAndTypes> getTopicNamesAndTypes();
 
   /**
+   * Return the service names and types that were detected in the graph.
+   * See @{link graph#NameAndTypes} for more information about the returned value.
+   *
+   * @return the detected service names and types.
+   */
+  Collection<NameAndTypes> getServiceNamesAndTypes();
+
+  /**
    * Get information of all publishers in a topic.
    *
    * The queried information includes the node that created the publisher, its qos, etc.

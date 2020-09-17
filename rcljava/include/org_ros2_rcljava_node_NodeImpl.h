@@ -112,6 +112,15 @@ JNICALL Java_org_ros2_rcljava_node_NodeImpl_nativeGetTopicNamesAndTypes(
 
 /*
  * Class:     org_ros2_rcljava_node_NodeImpl
+ * Method:    nativeGetServiceNamesAndTypes
+ * Signature: (JLjava/util/Collection;)V
+ */
+JNIEXPORT void
+JNICALL Java_org_ros2_rcljava_node_NodeImpl_nativeGetServiceNamesAndTypes(
+  JNIEnv *, jclass, jlong, jobject);
+
+/*
+ * Class:     org_ros2_rcljava_node_NodeImpl
  * Method:    nativeGetPublishersInfo
  * Signature: (JLjava/lang/String;Ljava/util/List;)V
  */

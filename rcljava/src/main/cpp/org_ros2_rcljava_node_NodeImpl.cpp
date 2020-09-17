@@ -320,16 +320,10 @@ Java_org_ros2_rcljava_node_NodeImpl_nativeGetNodeNames(
   }
 }
 
-JNIEXPORT void JNICALL
-Java_org_ros2_rcljava_node_NodeImpl_nativeGetTopicNamesAndTypes(
-  JNIEnv * env, jclass, jlong handle, jobject jnames_and_types)
+void
+fill_jnames_and_types(
+  JNIEnv * env, const rcl_names_and_types_t & names_and_types, jobject jnames_and_types)
 {
-  rcl_node_t * node = reinterpret_cast<rcl_node_t *>(handle);
-  if (!node) {
-    rcljava_throw_exception(env, "java/lang/IllegalArgumentException", "node handle is NULL");
-    return;
-  }
-
   jclass collection_clazz = env->FindClass("java/util/Collection");
   jmethodID collection_add_mid = env->GetMethodID(
     collection_clazz, "add", "(Ljava/lang/Object;)Z");
@@ -343,6 +337,34 @@ Java_org_ros2_rcljava_node_NodeImpl_nativeGetTopicNamesAndTypes(
   jfieldID types_fid = env->GetFieldID(name_and_types_clazz, "types", "Ljava/util/Collection;");
   RCLJAVA_COMMON_CHECK_FOR_EXCEPTION(env);
 
+  for (size_t i = 0; i < names_and_types.names.size; i++) {
+    jobject jitem = env->NewObject(name_and_types_clazz, name_and_types_init_mid);
+    RCLJAVA_COMMON_CHECK_FOR_EXCEPTION(env);
+    jstring jname = env->NewStringUTF(names_and_types.names.data[i]);
+    RCLJAVA_COMMON_CHECK_FOR_EXCEPTION(env);
+    env->SetObjectField(jitem, name_fid, jname);
+    // the default constructor already inits types to an empty ArrayList
+    jobject jtypes = env->GetObjectField(jitem, types_fid);
+    for (size_t j = 0; j < names_and_types.types[i].size; j++) {
+      jstring jtype = env->NewStringUTF(names_and_types.types[i].data[j]);
+      env->CallBooleanMethod(jtypes, collection_add_mid, jtype);
+      RCLJAVA_COMMON_CHECK_FOR_EXCEPTION(env);
+    }
+    env->CallBooleanMethod(jnames_and_types, collection_add_mid, jitem);
+    RCLJAVA_COMMON_CHECK_FOR_EXCEPTION(env);
+  }
+}
+
+JNIEXPORT void JNICALL
+Java_org_ros2_rcljava_node_NodeImpl_nativeGetTopicNamesAndTypes(
+  JNIEnv * env, jclass, jlong handle, jobject jnames_and_types)
+{
+  rcl_node_t * node = reinterpret_cast<rcl_node_t *>(handle);
+  if (!node) {
+    rcljava_throw_exception(env, "java/lang/IllegalArgumentException", "node handle is NULL");
+    return;
+  }
+
   rcl_allocator_t allocator = rcl_get_default_allocator();
   rcl_names_and_types_t topic_names_and_types = rcl_get_zero_initialized_names_and_types();
 
@@ -352,30 +374,37 @@ Java_org_ros2_rcljava_node_NodeImpl_nativeGetTopicNamesAndTypes(
     false,
     &topic_names_and_types);
   RCLJAVA_COMMON_THROW_FROM_RCL(env, ret, "failed to get topic names and types");
-  auto cleanup_names_and_types = rcpputils::make_scope_exit(
-    [pnames_and_types = &topic_names_and_types, env]() {
-      rcl_ret_t ret = rcl_names_and_types_fini(pnames_and_types);
-      if (!env->ExceptionCheck() && RCL_RET_OK != ret) {
-        rcljava_throw_rclexception(env, ret, "failed to fini topic names and types structure");
-      }
-    }
-  );
+  fill_jnames_and_types(env, topic_names_and_types, jnames_and_types);
 
-  for (size_t i = 0; i < topic_names_and_types.names.size; i++) {
-    jobject jitem = env->NewObject(name_and_types_clazz, name_and_types_init_mid);
-    RCLJAVA_COMMON_CHECK_FOR_EXCEPTION(env);
-    jstring jname = env->NewStringUTF(topic_names_and_types.names.data[i]);
-    RCLJAVA_COMMON_CHECK_FOR_EXCEPTION(env);
-    env->SetObjectField(jitem, name_fid, jname);
-    // the default constructor already inits types to an empty ArrayList
-    jobject jtypes = env->GetObjectField(jitem, types_fid);
-    for (size_t j = 0; j < topic_names_and_types.types[i].size; j++) {
-      jstring jtype = env->NewStringUTF(topic_names_and_types.types[i].data[j]);
-      env->CallBooleanMethod(jtypes, collection_add_mid, jtype);
-      RCLJAVA_COMMON_CHECK_FOR_EXCEPTION(env);
-    }
-    env->CallBooleanMethod(jnames_and_types, collection_add_mid, jitem);
-    RCLJAVA_COMMON_CHECK_FOR_EXCEPTION(env);
+  ret = rcl_names_and_types_fini(&topic_names_and_types);
+  if (!env->ExceptionCheck() && RCL_RET_OK != ret) {
+    rcljava_throw_rclexception(env, ret, "failed to fini topic names and types structure");
+  }
+}
+
+JNIEXPORT void JNICALL
+Java_org_ros2_rcljava_node_NodeImpl_nativeGetServiceNamesAndTypes(
+  JNIEnv * env, jclass, jlong handle, jobject jnames_and_types)
+{
+  rcl_node_t * node = reinterpret_cast<rcl_node_t *>(handle);
+  if (!node) {
+    rcljava_throw_exception(env, "java/lang/IllegalArgumentException", "node handle is NULL");
+    return;
+  }
+
+  rcl_allocator_t allocator = rcl_get_default_allocator();
+  rcl_names_and_types_t service_names_and_types = rcl_get_zero_initialized_names_and_types();
+
+  rcl_ret_t ret = rcl_get_service_names_and_types(
+    node,
+    &allocator,
+    &service_names_and_types);
+  RCLJAVA_COMMON_THROW_FROM_RCL(env, ret, "failed to get service names and types");
+  fill_jnames_and_types(env, service_names_and_types, jnames_and_types);
+
+  ret = rcl_names_and_types_fini(&service_names_and_types);
+  if (!env->ExceptionCheck() && RCL_RET_OK != ret) {
+    rcljava_throw_rclexception(env, ret, "failed to fini service names and types structure");
   }
 }
 
