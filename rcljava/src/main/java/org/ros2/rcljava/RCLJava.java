@@ -80,26 +80,6 @@ public final class RCLJava {
 
   private static void cleanup() {
     for (Node node : nodes) {
-      for (Subscription subscription : node.getSubscriptions()) {
-        subscription.dispose();
-      }
-
-      for (Publisher publisher : node.getPublishers()) {
-        publisher.dispose();
-      }
-
-      for (Timer timer : node.getTimers()) {
-        timer.dispose();
-      }
-
-      for (Service service : node.getServices()) {
-        service.dispose();
-      }
-
-      for (Client client : node.getClients()) {
-        client.dispose();
-      }
-
       node.dispose();
     }
     nodes.clear();
