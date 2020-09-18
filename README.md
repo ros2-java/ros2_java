@@ -132,16 +132,22 @@ Although the `ros2_java_android.repos` file contains all the repositories for th
 1. Set Android build configuration:
 
         export PYTHON3_EXEC="$( which python3 )"
+        export PYTHON3_LIBRARY="$( ${PYTHON3_EXEC} -c 'import os.path; from distutils import sysconfig; print(os.path.realpath(os.path.join(sysconfig.get_config_var("LIBPL"), sysconfig.get_config_var("LDLIBRARY"))))' )"
+        export PYTHON3_INCLUDE_DIR="$( ${PYTHON3_EXEC} -c 'from distutils import sysconfig; print(sysconfig.get_config_var("INCLUDEPY"))' )"
         export ANDROID_ABI=armeabi-v7a
         export ANDROID_NATIVE_API_LEVEL=android-21
         export ANDROID_TOOLCHAIN_NAME=arm-linux-androideabi-clang
 
 1. Build (skipping packages that we don't need or can't cross-compile):
 
-        colcon build --packages-skip test_msgs \
+        colcon build \
+          --packages-ignore cyclonedds rcl_logging_log4cxx rosidl_generator_py \
+          --packages-up-to rcljava \
           --cmake-args \
           -DPYTHON_EXECUTABLE=${PYTHON3_EXEC} \
-          -DCMAKE_TOOLCHAIN_FILE=$ANDROID_NDK/build/cmake/android.toolchain.cmake \
+          -DPYTHON_LIBRARY=${PYTHON3_LIBRARY} \
+          -DPYTHON_INCLUDE_DIR=${PYTHON3_INCLUDE_DIR} \
+          -DCMAKE_TOOLCHAIN_FILE=${ANDROID_NDK}/build/cmake/android.toolchain.cmake \
           -DANDROID_FUNCTION_LEVEL_LINKING=OFF \
           -DANDROID_NATIVE_API_LEVEL=${ANDROID_NATIVE_API_LEVEL} \
           -DANDROID_TOOLCHAIN_NAME=${ANDROID_TOOLCHAIN_NAME} \
@@ -149,14 +155,7 @@ Although the `ros2_java_android.repos` file contains all the repositories for th
           -DANDROID_ABI=${ANDROID_ABI} \
           -DANDROID_NDK=${ANDROID_NDK} \
           -DTHIRDPARTY=ON \
-          -DCOMPILE_EXAMPLES=OFF
-
-          # TODO: These options may still need to be adapted
-          # -DCMAKE_FIND_ROOT_PATH="$AMENT_WORKSPACE/install_isolated;$ROS2_ANDROID_WORKSPACE/install_isolated" \
-          # -- \
-          # --parallel \
-          # --ament-gradle-args \
-          # -Pament.android_stl=gnustl_shared -Pament.android_abi=$ANDROID_ABI -Pament.android_ndk=$ANDROID_NDK --
-
+          -DCOMPILE_EXAMPLES=OFF \
+          -DCMAKE_FIND_ROOT_PATH="${PWD}/install"
 
 You can find more information about the Android examples at https://github.com/ros2-java/ros2_android_examples

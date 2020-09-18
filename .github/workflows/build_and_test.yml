@@ -43,15 +43,15 @@ jobs:
       run: |
         sudo pip3 install git+git://github.com/colcon/colcon-gradle.git
         sudo pip3 install git+git://github.com/colcon/colcon-ros-gradle.git
+    - name: Install Android NDK
+      run: |
+        curl -LO https://dl.google.com/android/repository/android-ndk-r21d-linux-x86_64.zip
+        unzip android-ndk-r21d-linux-x86_64.zip
     - name: Fetch VCS repo file
       run: |
         mkdir -p ros2_java_ws/src
         cd ros2_java_ws
         curl -sL https://raw.githubusercontent.com/ros2-java/ros2_java/jacob/android_instructions/ros2_java_android.repos | vcs import src
-    - name: Install Android NDK
-      run: |
-        curl -LO https://dl.google.com/android/repository/android-ndk-r21d-linux-x86_64.zip
-        unzip android-ndk-r21d-linux-x86_64.zip
     - name: Build ros2_java for Android
       run: |
         export PYTHON3_EXEC="$( which python3 )"
@@ -65,7 +65,7 @@ jobs:
         cd ros2_java_ws
         colcon build \
           --packages-ignore cyclonedds rcl_logging_log4cxx rosidl_generator_py \
-          --packages-up-to ros2_listener_android ros2_talker_android \
+          --packages-up-to rcljava \
           --cmake-args \
           -DPYTHON_EXECUTABLE=${PYTHON3_EXEC} \
           -DPYTHON_LIBRARY=${PYTHON3_LIBRARY} \
