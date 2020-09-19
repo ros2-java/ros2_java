@@ -49,11 +49,14 @@ jobs:
       run: |
         curl -LO https://dl.google.com/android/repository/android-ndk-r21d-linux-x86_64.zip
         unzip android-ndk-r21d-linux-x86_64.zip
-    - name: Fetch VCS repo file
+    - name: Setup workspace with VCS repo file
       run: |
         mkdir -p ros2_java_ws/src
         cd ros2_java_ws
         curl -sL file://${{ github.workspace }}/ros2_java_android.repos | vcs import src
+        # Use checked out version of ros2_java
+        rm -rf src/ros2_java/ros2_java
+        ln --symbolic ${{ github.workspace }} src/ros2_java
     - name: Build ros2_java for Android
       run: |
         export PYTHON3_EXEC="$( which python3 )"
