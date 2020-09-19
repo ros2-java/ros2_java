@@ -10,6 +10,7 @@ jobs:
       run: |
         sudo apt-get update -qq
         sudo apt-get install -y default-jdk gradle
+    - uses: actions/checkout@v2
     - uses: ros-tooling/setup-ros@0.0.14
       with:
         required-ros-distributions: dashing
@@ -26,6 +27,7 @@ jobs:
       run: |
         sudo apt-get update -qq
         sudo apt-get install -y default-jdk gradle
+    - uses: actions/checkout@v2
     - name: Setup locale for ROS 2
       run: |
         sudo locale-gen en_US en_US.UTF-8
