@@ -837,7 +837,7 @@ public class NodeTest {
     executor.addNode(composableSubscriptionNodeOne);
     executor.addNode(composableSubscriptionNodeTwo);
 
-    while (RCLJava.ok() && !futureOne.isDone() && !futureTwo.isDone()) {
+    while (RCLJava.ok() && !(futureOne.isDone() && futureTwo.isDone())) {
       publisher.publish(msg);
       executor.spinSome();
     }
