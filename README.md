@@ -75,7 +75,7 @@ Make sure you have Gradle 3.2 (or later) installed.
 
 1. Install build tools:
 
-        sudo apt install curl python3-colcon-common-extensions python3-pip python3-vctool
+        sudo apt install curl python3-colcon-common-extensions python3-pip python3-vcstool
 
 1. Install Gradle extensions for colcon:
 
