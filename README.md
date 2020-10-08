@@ -109,8 +109,6 @@ Make sure you have Gradle 3.2 (or later) installed.
 
 ### Download and Build ROS 2 Java for Android
 
-> TODO: This section needs updated instructions for ROS 2 Dashing and newer
-
 The Android setup is slightly more complex, you'll need the SDK and NDK installed, and an Android device where you can run the examples.
 
 Make sure to download at least the SDK for Android Lollipop (or greater), the examples require the API level 21 at least and NDK 14.
@@ -121,48 +119,43 @@ We'll also need to have the [Android SDK](https://developer.android.com/studio/#
 
 Although the `ros2_java_android.repos` file contains all the repositories for the Android bindings to compile, we'll have to disable certain packages (`python_cmake_module`, `rosidl_generator_py`, `test_msgs`) that are included the repositories and that we either don't need or can't cross-compile properly (e.g. the Python generator)
 
-```
-# define paths
-ROOT_DIR = ${HOME}
-AMENT_WORKSPACE=${ROOT_DIR}/ament_ws
-ROS2_ANDROID_WORKSPACE=${ROOT_DIR}/ros2_android_ws
+1. Download the [Android NDK](https://developer.android.com/ndk/downloads/index.html) and set the environment variable `ANDROID_NDK` to the path where it is extracted.
 
-# pull and build ament
-mkdir -p ${AMENT_WORKSPACE}/src
-cd ${AMENT_WORKSPACE}
-curl https://raw.githubusercontent.com/ros2-java/ament_java/master/ament_java.repos
-vcs import ${AMENT_WORKSPACE}/src < ament_java.repos
-src/ament/ament_tools/scripts/ament.py build --symlink-install --isolated
+1. Download the [Android SDK](https://developer.android.com/studio/#downloads) and set the environment variable `ANDROID_HOME` to the path where it is extracted.
 
-# android build configuration
-export PYTHON3_EXEC="$( which python3 )"
-export ANDROID_ABI=armeabi-v7a
-export ANDROID_NATIVE_API_LEVEL=android-21
-export ANDROID_TOOLCHAIN_NAME=arm-linux-androideabi-clang
+1. Clone ROS 2 and ROS 2 Java source code:
 
-# pull and build ros2 for android
-mkdir -p ${ROS2_ANDROID_WORKSPACE}/src
-cd ${ROS2_ANDROID_WORKSPACE}
-curl https://raw.githubusercontent.com/ros2-java/ros2_java/dashing/ros2_java_android.repos
-vcs import ${ROS2_ANDROID_WORKSPACE}/src < ros2_java_android.repos
-source ${AMENT_WORKSPACE}/install_isolated/local_setup.sh
-ament build --isolated --skip-packages test_msgs \
-  --cmake-args \
-  -DPYTHON_EXECUTABLE=${PYTHON3_EXEC} \
-  -DCMAKE_TOOLCHAIN_FILE=$ANDROID_NDK/build/cmake/android.toolchain.cmake \
-  -DANDROID_FUNCTION_LEVEL_LINKING=OFF \
-  -DANDROID_NATIVE_API_LEVEL=${ANDROID_NATIVE_API_LEVEL} \
-  -DANDROID_TOOLCHAIN_NAME=${ANDROID_TOOLCHAIN_NAME} \
-  -DANDROID_STL=gnustl_shared \
-  -DANDROID_ABI=${ANDROID_ABI} \
-  -DANDROID_NDK=${ANDROID_NDK} \
-  -DTHIRDPARTY=ON \
-  -DCOMPILE_EXAMPLES=OFF \
-  -DCMAKE_FIND_ROOT_PATH="$AMENT_WORKSPACE/install_isolated;$ROS2_ANDROID_WORKSPACE/install_isolated" \
-  -- \
-  --parallel \
-  --ament-gradle-args \
-  -Pament.android_stl=gnustl_shared -Pament.android_abi=$ANDROID_ABI -Pament.android_ndk=$ANDROID_NDK --
-```
+        mkdir -p $HOME/ros2_android_ws/src
+        cd $HOME/ros2_android_ws
+        curl https://raw.githubusercontent.com/ros2-java/ros2_java/dashing/ros2_java_android.repos | vcs import src
+
+1. Set Android build configuration:
+
+        export PYTHON3_EXEC="$( which python3 )"
+        export PYTHON3_LIBRARY="$( ${PYTHON3_EXEC} -c 'import os.path; from distutils import sysconfig; print(os.path.realpath(os.path.join(sysconfig.get_config_var("LIBPL"), sysconfig.get_config_var("LDLIBRARY"))))' )"
+        export PYTHON3_INCLUDE_DIR="$( ${PYTHON3_EXEC} -c 'from distutils import sysconfig; print(sysconfig.get_config_var("INCLUDEPY"))' )"
+        export ANDROID_ABI=armeabi-v7a
+        export ANDROID_NATIVE_API_LEVEL=android-21
+        export ANDROID_TOOLCHAIN_NAME=arm-linux-androideabi-clang
+
+1. Build (skipping packages that we don't need or can't cross-compile):
+
+        colcon build \
+          --packages-ignore cyclonedds rcl_logging_log4cxx rosidl_generator_py \
+          --packages-up-to rcljava \
+          --cmake-args \
+          -DPYTHON_EXECUTABLE=${PYTHON3_EXEC} \
+          -DPYTHON_LIBRARY=${PYTHON3_LIBRARY} \
+          -DPYTHON_INCLUDE_DIR=${PYTHON3_INCLUDE_DIR} \
+          -DCMAKE_TOOLCHAIN_FILE=${ANDROID_NDK}/build/cmake/android.toolchain.cmake \
+          -DANDROID_FUNCTION_LEVEL_LINKING=OFF \
+          -DANDROID_NATIVE_API_LEVEL=${ANDROID_NATIVE_API_LEVEL} \
+          -DANDROID_TOOLCHAIN_NAME=${ANDROID_TOOLCHAIN_NAME} \
+          -DANDROID_STL=c++_shared \
+          -DANDROID_ABI=${ANDROID_ABI} \
+          -DANDROID_NDK=${ANDROID_NDK} \
+          -DTHIRDPARTY=ON \
+          -DCOMPILE_EXAMPLES=OFF \
+          -DCMAKE_FIND_ROOT_PATH="${PWD}/install"
 
 You can find more information about the Android examples at https://github.com/ros2-java/ros2_android_examples

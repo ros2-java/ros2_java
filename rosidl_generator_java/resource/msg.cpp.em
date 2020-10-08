@@ -202,7 +202,7 @@ JNIEXPORT jlong JNICALL Java_@(underscore_separated_jni_type_name)_getDestructor
   JNIEnv * env = nullptr;
   // TODO(esteve): check return status
   assert(g_vm != nullptr);
-  g_vm->GetEnv(reinterpret_cast<void **>(&env), JNI_VERSION_1_8);
+  g_vm->GetEnv(reinterpret_cast<void **>(&env), JNI_VERSION_1_6);
   assert(env != nullptr);
 
   if (ros_message == nullptr) {
@@ -331,7 +331,7 @@ jobject @(underscore_separated_type_name)__convert_to_java(@(msg_normalized_type
   JNIEnv * env = nullptr;
   // TODO(esteve): check return status
   assert(g_vm != nullptr);
-  g_vm->GetEnv(reinterpret_cast<void **>(&env), JNI_VERSION_1_8);
+  g_vm->GetEnv(reinterpret_cast<void **>(&env), JNI_VERSION_1_6);
   assert(env != nullptr);
 
   if (_jmessage_obj == nullptr) {
@@ -435,7 +435,7 @@ JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM * vm, void *)
   }
 
   JNIEnv * env;
-  if (g_vm->GetEnv(reinterpret_cast<void **>(&env), JNI_VERSION_1_8) != JNI_OK) {
+  if (g_vm->GetEnv(reinterpret_cast<void **>(&env), JNI_VERSION_1_6) != JNI_OK) {
     return JNI_ERR;
   } else {
 @[for normalized_type, jni_type in cache.items()]@
@@ -484,7 +484,7 @@ if value_method:
 @[  end if]@
 @[end for]@
   }
-  return JNI_VERSION_1_8;
+  return JNI_VERSION_1_6;
 }
 
 JNIEXPORT void JNICALL JNI_OnUnload(JavaVM * vm, void *)
@@ -493,7 +493,7 @@ JNIEXPORT void JNICALL JNI_OnUnload(JavaVM * vm, void *)
   assert(g_vm == vm);
 
   JNIEnv * env;
-  if (g_vm->GetEnv(reinterpret_cast<void **>(&env), JNI_VERSION_1_8) == JNI_OK) {
+  if (g_vm->GetEnv(reinterpret_cast<void **>(&env), JNI_VERSION_1_6) == JNI_OK) {
 @[for normalized_type, jni_type in cache.items()]@
     if (_j@(normalized_type)_class_global != nullptr) {
       env->DeleteGlobalRef(_j@(normalized_type)_class_global);
