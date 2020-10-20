@@ -62,6 +62,7 @@ for member in message.structure.members:
         namespaced_types.add(get_jni_type(type_))
         include_prefix = idl_structure_type_to_c_include_prefix(type_)
         # TODO(jacobperron): Remove this logic after https://github.com/ros2/rosidl/pull/432 (Foxy)
+        #                    and https://github.com/ros2/rosidl/pull/538
         # Strip off any service or action suffix
         # There are several types that actions and services are composed of, but they are included
         # a common header that is based on the action or service name
@@ -76,10 +77,15 @@ for member in message.structure.members:
             include_prefix = include_prefix[:-8]
         elif include_prefix.endswith('__feedback'):
             include_prefix = include_prefix[:-10]
+        elif include_prefix.endswith('__send_goal'):
+            include_prefix = include_prefix[:-11]
+        elif include_prefix.endswith('__get_result'):
+            include_prefix = include_prefix[:-12]
         member_includes.add(include_prefix + '.h')
 }@
 @{
 # TODO(jacobperron): Remove this logic after https://github.com/ros2/rosidl/pull/432 (Foxy)
+#                    and https://github.com/ros2/rosidl/pull/538
 message_c_include_prefix = idl_structure_type_to_c_include_prefix(message.structure.namespaced_type)
 # Strip off any service or action suffix
 if message_c_include_prefix.endswith('__request'):
@@ -92,6 +98,10 @@ elif message_c_include_prefix.endswith('__result'):
     message_c_include_prefix = message_c_include_prefix[:-8]
 elif message_c_include_prefix.endswith('__feedback'):
     message_c_include_prefix = message_c_include_prefix[:-10]
+elif message_c_include_prefix.endswith('__send_goal'):
+    message_c_include_prefix = message_c_include_prefix[:-11]
+elif message_c_include_prefix.endswith('__get_result'):
+    message_c_include_prefix = message_c_include_prefix[:-12]
 }@
 
 #include <jni.h>
