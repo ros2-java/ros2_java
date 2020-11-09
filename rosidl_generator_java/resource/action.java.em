@@ -13,6 +13,8 @@ type_name = action.namespaced_type.name
 goal_type_name = action.goal.structure.namespaced_type.name
 result_type_name = action.result.structure.namespaced_type.name
 feedback_type_name = action.feedback.structure.namespaced_type.name
+send_goal_type_name = action.send_goal_service.namespaced_type.name
+get_result_type_name = action.get_result_service.namespaced_type.name
 
 data = {
     'package_name': package_name,
@@ -40,6 +42,22 @@ data.update({'message': action.feedback})
 output_file = os.path.join(output_dir, *namespaces[1:], feedback_type_name + '.java')
 expand_template(
     'msg.java.em',
+    data,
+    output_file,
+    template_basepath=template_basepath)
+
+data.update({'service': action.send_goal_service})
+output_file = os.path.join(output_dir, *namespaces[1:], send_goal_type_name + '.java')
+expand_template(
+    'srv.java.em',
+    data,
+    output_file,
+    template_basepath=template_basepath)
+
+data.update({'service': action.get_result_service})
+output_file = os.path.join(output_dir, *namespaces[1:], get_result_type_name + '.java')
+expand_template(
+    'srv.java.em',
     data,
     output_file,
     template_basepath=template_basepath)

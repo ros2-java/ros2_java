@@ -40,7 +40,20 @@ expand_template(
 
 #include "rosidl_generator_c/service_type_support_struct.h"
 
-#include "@(idl_structure_type_to_c_include_prefix(service.namespaced_type)).h"
+@{
+include_prefix = idl_structure_type_to_c_include_prefix(service.namespaced_type)
+# TODO(jacobperron): Remove this logic after https://github.com/ros2/rosidl/pull/538
+# Strip off any service suffix
+# There are a couple service types that actions are composed of, but they are included
+# a common header that is based on the action name
+# ie. there are not separate headers for each type
+if include_prefix.endswith('__send_goal'):
+    include_prefix = include_prefix[:-11]
+elif include_prefix.endswith('__get_result'):
+    include_prefix = include_prefix[:-12]
+}@
+
+#include "@(include_prefix).h"
 
 // Ensure that a jlong is big enough to store raw pointers
 static_assert(sizeof(jlong) >= sizeof(std::intptr_t), "jlong must be able to store pointers");

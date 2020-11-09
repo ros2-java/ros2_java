@@ -58,25 +58,8 @@ expand_template(
     data,
     output_file)
 
-# Generate SendGoal message type
-data.update({'msg': action.send_goal_service.request_message})
-output_file = os.path.join(output_dir, *namespaces[1:], '{0}.ep.{1}.cpp'.format(send_goal_type_name, typesupport_impl))
-expand_template(
-    'msg.cpp.em',
-    data,
-    output_file)
-
-# Generate GetResult message type
-data.update({'msg': action.get_result_service.request_message})
-output_file = os.path.join(output_dir, *namespaces[1:], '{0}.ep.{1}.cpp'.format(send_goal_type_name, typesupport_impl))
-expand_template(
-    'msg.cpp.em',
-    data,
-    output_file)
-
 data = {
     'package_name': package_name,
-    'interface_path': interface_path,
     'output_dir': output_dir,
     'template_basepath': template_basepath,
     'typesupport_impl': typesupport_impl,
