@@ -119,8 +119,14 @@ public class AsyncParametersClientTest {
     List<String> parameterNames =
         Arrays.asList(new String[] {"foo", "bar", "baz", "foo.first", "foo.second", "foobar"});
 
+    List<rcl_interfaces.msg.SetParametersResult> setParametersResults = future.get();
+    assertEquals(6, setParametersResults.size());
+    for (rcl_interfaces.msg.SetParametersResult result : setParametersResults) {
+      assertEquals(true, result.getSuccessful());
+    }
+
     List<ParameterVariant> results = node.getParameters(parameterNames);
-    assertEquals(parameters, future.get());
+    assertEquals(parameters, results);
   }
 
   @Test
