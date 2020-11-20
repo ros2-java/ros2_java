@@ -355,6 +355,8 @@ normalized_type = get_normalized_type(member.type)
 @[    if isinstance(member.type.value_type, (BasicType, AbstractGenericString))]@
   auto _jfield_@(member.name)_fid = env->GetFieldID(_j@(msg_normalized_type)_class_global, "@(member.name)", "L@(list_jni_type);");
   jobject _jarray_list_@(member.name)_obj = env->NewObject(_j@(array_list_normalized_type)_class_global, _j@(array_list_normalized_type)_constructor_global);
+  // TODO(esteve): replace ArrayList with a jobjectArray to initialize the array beforehand
+  jmethodID _jlist_@(member.name)_add_mid = env->GetMethodID(_j@(array_list_normalized_type)_class_global, "add", "(Ljava/lang/Object;)Z");
 @[      if isinstance(member.type, Array)]@
   for (size_t i = 0; i < @(member.type.size); ++i) {
     auto _ros_@(member.name)_element = _ros_message->@(member.name)[i];
@@ -375,9 +377,6 @@ normalized_type = get_normalized_type(member.type)
     jobject _jlist_@(member.name)_element = env->NewObject(
       _j@(normalized_type)_class_global, _j@(normalized_type)_constructor_global, _ros_@(member.name)_element);
 @[      end if]@
-    // TODO(esteve): replace ArrayList with a jobjectArray to initialize the array beforehand
-    jmethodID _jlist_@(member.name)_add_mid = env->GetMethodID(
-      _j@(array_list_normalized_type)_class_global, "add", "(Ljava/lang/Object;)Z");
     if (_jlist_@(member.name)_element != nullptr) {
       jboolean _jlist_@(member.name)_add_result = env->CallBooleanMethod(_jarray_list_@(member.name)_obj, _jlist_@(member.name)_add_mid, _jlist_@(member.name)_element);
       assert(_jlist_@(member.name)_add_result);
@@ -387,6 +386,8 @@ normalized_type = get_normalized_type(member.type)
 
   auto _jfield_@(member.name)_fid = env->GetFieldID(_j@(msg_normalized_type)_class_global, "@(member.name)", "L@(list_jni_type);");
   jobject _jarray_list_@(member.name)_obj = env->NewObject(_j@(array_list_normalized_type)_class_global, _j@(array_list_normalized_type)_constructor_global);
+  // TODO(esteve): replace ArrayList with a jobjectArray to initialize the array beforehand
+  jmethodID _jlist_@(member.name)_add_mid = env->GetMethodID(_j@(array_list_normalized_type)_class_global, "add", "(Ljava/lang/Object;)Z");
 
 @[      if isinstance(member.type, Array)]@
   for (size_t i = 0; i < @(member.type.size); ++i) {
@@ -395,8 +396,6 @@ normalized_type = get_normalized_type(member.type)
   for (size_t i = 0; i < _ros_message->@(member.name).size; ++i) {
     jobject _jlist_@(member.name)_element = _j@(normalized_type)_to_java_function(&(_ros_message->@(member.name).data[i]), nullptr);
 @[      end if]@
-    // TODO(esteve): replace ArrayList with a jobjectArray to initialize the array beforehand
-    jmethodID _jlist_@(member.name)_add_mid = env->GetMethodID(_j@(array_list_normalized_type)_class_global, "add", "(Ljava/lang/Object;)Z");
     if (_jlist_@(member.name)_element != nullptr) {
       jboolean _jlist_@(member.name)_add_result = env->CallBooleanMethod(_jarray_list_@(member.name)_obj, _jlist_@(member.name)_add_mid, _jlist_@(member.name)_element);
       assert(_jlist_@(member.name)_add_result);
