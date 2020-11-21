@@ -3,18 +3,38 @@ name: CI
 on: [push, pull_request]
 
 jobs:
-  build_and_test:
+  linux_build_and_test:
     runs-on: ubuntu-18.04
     steps:
+    - uses: actions/checkout@v2
     - name: Install Java
       run: |
         sudo apt update -qq
         sudo apt install -y default-jdk
-    - uses: ros-tooling/setup-ros@0.0.14
+    - uses: ros-tooling/setup-ros@0.0.24
       with:
         required-ros-distributions: dashing
-    - uses: ros-tooling/action-ros-ci@8d58122
+    - uses: ros-tooling/action-ros-ci@658ebdf
       with:
         package-name: rosidl_generator_java rcljava_common rcljava
         source-ros-binary-installation: dashing
-        vcs-repo-file-url: https://raw.githubusercontent.com/ros2-java/ros2_java/dashing/ros2_java_desktop.repos
+        vcs-repo-file-url: "${{ github.workspace }}/ros2_java_desktop.repos"
+  windows_build_and_test:
+    runs-on: windows-latest
+    steps:
+    - uses: actions/checkout@v2
+    - uses: actions/setup-java@v1
+      with:
+        java-version: '11.0.6' # The JDK version to make available on the path.
+        java-package: jdk
+        architecture: x64
+    - uses: ros-tooling/setup-ros@0.0.24
+      with:
+        required-ros-distributions: dashing
+    - uses: ros-tooling/action-ros-ci@658ebdf
+      with:
+        colcon-extra-args: --merge-install
+        package-name: rosidl_generator_java rcljava_common rcljava
+        vcs-repo-file-url: |
+            https://raw.githubusercontent.com/ros2/ros2/dashing/ros2.repos
+            ${{ github.workspace }}\ros2_java_desktop.repos
