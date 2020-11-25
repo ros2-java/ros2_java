@@ -197,101 +197,101 @@ public class InterfacesTest {
     arrays.setAlignmentCheck(42);
 
     // Test setting/getting fixed length arrays of primitive types
-    List boolList = Arrays.asList(true, false, true);
+    Boolean boolList[] = {true, false, true};
     arrays.setBoolValues(boolList);
     assertEquals(boolList, arrays.getBoolValues());
     assertThrows(IllegalArgumentException.class,
-      () -> arrays.setBoolValues(Arrays.asList(true, false, true, false)));
-    List byteList = Arrays.asList((byte) 0, (byte) 1, (byte) 255);
+      () -> arrays.setBoolValues({true, false, true, false})));
+    byte byteList[] = {(byte) 0, (byte) 1, (byte) 255};
     arrays.setByteValues(byteList);
     assertEquals(byteList, arrays.getByteValues());
     assertThrows(IllegalArgumentException.class,
-      () -> arrays.setByteValues(Arrays.asList((byte) 1, (byte) 2)));
-    List charList = Arrays.asList(' ', 'a', 'Z');
+      () -> arrays.setByteValues({(byte) 1, (byte) 2})));
+    Character charList[] = {' ', 'a', 'Z'});
     arrays.setCharValues(charList);
     assertEquals(charList, arrays.getCharValues());
     assertThrows(IllegalArgumentException.class,
-      () -> arrays.setCharValues(Arrays.asList((byte) 'a', (byte) 'b', (byte) 'c', (byte) 'd')));
-    List float32List = Arrays.asList(0.0f, -1.125f, 1.125f);
+      () -> arrays.setCharValues({(byte) 'a', (byte) 'b', (byte) 'c', (byte) 'd'});
+    float float32List[] = { 0.0f, -1.125f, 1.125f };
     arrays.setFloat32Values(float32List);
     assertEquals(float32List, arrays.getFloat32Values());
     assertThrows(IllegalArgumentException.class,
-      () -> arrays.setFloat32Values(Arrays.asList(1.0f, 2.0f)));
-    List float64List = Arrays.asList(0.0f, -3.1415, 3.1415);
+      () -> arrays.setFloat32Values({ 1.0f, 2.0f }));
+    double float64List[] = { 0.0f, -3.1415, 3.1415 };
     arrays.setFloat64Values(float64List);
     assertEquals(float64List, arrays.getFloat64Values());
     assertThrows(IllegalArgumentException.class,
-      () -> arrays.setFloat64Values(Arrays.asList(1.0, 2.0, 3.0, 4.0)));
-    List int8List = Arrays.asList(0, -128, 127);
+      () -> arrays.setFloat64Values({ 1.0, 2.0, 3.0, 4.0 }));
+    byte int8List[] = { 0, -128, 127 };
     arrays.setInt8Values(int8List);
     assertEquals(int8List, arrays.getInt8Values());
     assertThrows(IllegalArgumentException.class,
-      () ->arrays.setInt8Values(Arrays.asList((byte) 1, (byte) 2)));
-    List uint8List = Arrays.asList(0, 1, 255);
+      () ->arrays.setInt8Values({ (byte) 1, (byte) 2) }));
+    byte uint8List[] = { 0, 1, 255 };
     arrays.setUint8Values(uint8List);
     assertEquals(uint8List, arrays.getUint8Values());
     assertThrows(IllegalArgumentException.class,
-      () -> arrays.setUint8Values(Arrays.asList((byte) 1, (byte) 2, (byte) 3, (byte) 4)));
-    List int16List = Arrays.asList(0, -32768, 32767);
+      () -> arrays.setUint8Values({ (byte) 1, (byte) 2, (byte) 3, (byte) 4 }));
+    short int16List[] = { 0, -32768, 32767 };
     arrays.setInt16Values(int16List);
     assertEquals(int16List, arrays.getInt16Values());
     assertThrows(IllegalArgumentException.class,
-      () -> arrays.setInt16Values(Arrays.asList((short) 1, (short) 2)));
-    List uint16List = Arrays.asList(0, 1, 65535);
+      () -> arrays.setInt16Values({ (short) 1, (short) 2 }));
+    short uint16List[] = { 0, 1, 65535 };
     arrays.setUint16Values(uint16List);
     assertEquals(uint16List, arrays.getUint16Values());
     assertThrows(IllegalArgumentException.class,
-      () -> arrays.setUint16Values(Arrays.asList((short) 1, (short) 2, (short) 3, (short) 4)));
-    List int32List = Arrays.asList(0, -2147483648, 2147483647);
+      () -> arrays.setUint16Values({ (short) 1, (short) 2, (short) 3, (short) 4 }));
+    int int32List = { 0, -2147483648, 2147483647 };
     arrays.setInt32Values(int32List);
     assertEquals(int32List, arrays.getInt32Values());
     assertThrows(IllegalArgumentException.class,
-      () -> arrays.setInt32Values(Arrays.asList(1, 2)));
-    List uint32List = Arrays.asList(0, 1, 4294967295L);
+      () -> arrays.setInt32Values({ 1, 2 }));
+    int uint32List = { 0, 1, 4294967295L };
     arrays.setUint32Values(uint32List);
     assertEquals(uint32List, arrays.getUint32Values());
     assertThrows(IllegalArgumentException.class,
-      () -> arrays.setUint32Values(Arrays.asList(1, 2, 3, 4)));
-    List int64List = Arrays.asList(0, -9223372036854775808L, 9223372036854775807L);
+      () -> arrays.setUint32Values({ 1, 2, 3, 4 }));
+    long int64List = { 0, -9223372036854775808L, 9223372036854775807L };
     arrays.setInt64Values(int64List);
     assertEquals(int64List, arrays.getInt64Values());
     assertThrows(IllegalArgumentException.class,
-      () -> arrays.setInt64Values(Arrays.asList(1L, 2L)));
-    List uint64List = Arrays.asList(0, 1, -1);
+      () -> arrays.setInt64Values({ 1L, 2L }));
+    long uint64List = { 0, 1, -1 };
     arrays.setUint64Values(uint64List);
     assertEquals(uint64List, arrays.getUint64Values());
     assertThrows(IllegalArgumentException.class,
-      () ->arrays.setUint64Values(Arrays.asList(1L, 2L, 3L, 4L)));
+      () ->arrays.setUint64Values({ 1L, 2L, 3L, 4L }));
 
     // Test setting/getting fixed length arrays of strings
-    List stringList = Arrays.asList("", "min value", "max_value");
+    String stringList[] = { "", "min value", "max_value" };
     arrays.setStringValues(stringList);
     assertEquals(stringList, arrays.getStringValues());
     assertThrows(IllegalArgumentException.class,
-      () -> arrays.setStringValues(Arrays.asList("too", "few")));
+      () -> arrays.setStringValues({ "too", "few" }));
 
     // Test setting/getting fixed length arrays of nested types
     rosidl_generator_java.msg.BasicTypes basicTypes = new rosidl_generator_java.msg.BasicTypes();
-    List basicTypesList = Arrays.asList(
-        new rosidl_generator_java.msg.BasicTypes[] {basicTypes, basicTypes, basicTypes});
+    rosidl_generator_java.msg.BasicTypes basicTypesList[] =
+        new rosidl_generator_java.msg.BasicTypes[] { basicTypes, basicTypes, basicTypes };
     arrays.setBasicTypesValues(basicTypesList);
     assertEquals(basicTypesList, arrays.getBasicTypesValues());
     assertThrows(IllegalArgumentException.class,
-      () -> arrays.setBasicTypesValues(Arrays.asList(new rosidl_generator_java.msg.BasicTypes[] {basicTypes})));
+      () -> arrays.setBasicTypesValues(new rosidl_generator_java.msg.BasicTypes[] {basicTypes}));
     rosidl_generator_java.msg.Constants constants = new rosidl_generator_java.msg.Constants();
-    List constantsList = Arrays.asList(
-        new rosidl_generator_java.msg.Constants[] {constants, constants, constants});
+    rosidl_generator_java.msg.Constants constantsList[] =
+        new rosidl_generator_java.msg.Constants[] { constants, constants, constants };
     arrays.setConstantsValues(constantsList);
     assertEquals(constantsList, arrays.getConstantsValues());
     assertThrows(IllegalArgumentException.class,
-      () -> arrays.setConstantsValues(Arrays.asList(new rosidl_generator_java.msg.Constants[] {constants})));
+      () -> arrays.setConstantsValues(new rosidl_generator_java.msg.Constants[] {constants}));
     rosidl_generator_java.msg.Defaults defaults = new rosidl_generator_java.msg.Defaults();
-    List defaultsList = Arrays.asList(
-        new rosidl_generator_java.msg.Defaults[] {defaults, defaults, defaults});
+    rosidl_generator_java.msg.Defaults defaultsList =
+        new rosidl_generator_java.msg.Defaults[] { defaults, defaults, defaults };
     arrays.setDefaultsValues(defaultsList);
     assertEquals(defaultsList, arrays.getDefaultsValues());
     assertThrows(IllegalArgumentException.class,
-      () -> arrays.setDefaultsValues(Arrays.asList(new rosidl_generator_java.msg.Defaults[] {defaults})));
+      () -> arrays.setDefaultsValues(new rosidl_generator_java.msg.Defaults[] { defaults }));
 
     assertEquals(42, arrays.getAlignmentCheck());
   }
@@ -304,158 +304,158 @@ public class InterfacesTest {
     bounded_seq.setAlignmentCheck(42);
 
     // Test setting/getting fixed length bounded_seq of primitive types
-    List boolList = Arrays.asList(true, false, true);
+    Boolean boolList[] = { true, false, true };
     bounded_seq.setBoolValues(boolList);
     assertEquals(boolList, bounded_seq.getBoolValues());
-    List boolListShort = Arrays.asList(false);
+    Boolean boolListShort[] = { true };
     bounded_seq.setBoolValues(boolListShort);
     assertEquals(boolListShort, bounded_seq.getBoolValues());
     assertThrows(IllegalArgumentException.class,
-      () -> bounded_seq.setBoolValues(Arrays.asList(true, false, true, false)));
-    List byteList = Arrays.asList((byte) 0, (byte) 1, (byte) 255);
+      () -> bounded_seq.setBoolValues({ true, false, true, false }));
+    byte byteList[] = { (byte) 0, (byte) 1, (byte) 255 };
     bounded_seq.setByteValues(byteList);
     assertEquals(byteList, bounded_seq.getByteValues());
-    List byteListShort = Arrays.asList((byte) 1);
+    byte byteListShort[] = { (byte) 1 };
     bounded_seq.setByteValues(byteListShort);
     assertEquals(byteListShort, bounded_seq.getByteValues());
     assertThrows(IllegalArgumentException.class,
-      () -> bounded_seq.setByteValues(Arrays.asList((byte) 1, (byte) 2, (byte) 3, (byte) 4)));
-    List charList = Arrays.asList(' ', 'a', 'Z');
+      () -> bounded_seq.setByteValues({ (byte) 1, (byte) 2, (byte) 3, (byte) 4 }));
+    Character charList[] = { ' ', 'a', 'Z' });
     bounded_seq.setCharValues(charList);
     assertEquals(charList, bounded_seq.getCharValues());
-    List charListShort = Arrays.asList('z', 'A');
+    Character charListShort[] = { 'z', 'A' };
     bounded_seq.setCharValues(charListShort);
     assertEquals(charListShort, bounded_seq.getCharValues());
     assertThrows(IllegalArgumentException.class,
-      () -> bounded_seq.setCharValues(Arrays.asList((byte) 'a', (byte) 'b', (byte) 'c', (byte) 'd')));
-    List float32List = Arrays.asList(0.0f, -1.125f, 1.125f);
+      () -> bounded_seq.setCharValues({ (byte) 'a', (byte) 'b', (byte) 'c', (byte) 'd' }));
+    float float32List[] = { 0.0f, -1.125f, 1.125f };
     bounded_seq.setFloat32Values(float32List);
     assertEquals(float32List, bounded_seq.getFloat32Values());
-    List float32ListShort = Arrays.asList(1.125f, -1.125f);
+    float float32ListShort[] = { 1.125f, -1.125f };
     bounded_seq.setFloat32Values(float32ListShort);
     assertEquals(float32ListShort, bounded_seq.getFloat32Values());
     assertThrows(IllegalArgumentException.class,
-      () -> bounded_seq.setFloat32Values(Arrays.asList(1.0f, 2.0f, 3.0f, 4.0f)));
-    List float64List = Arrays.asList(0.0f, -3.1415, 3.1415);
+      () -> bounded_seq.setFloat32Values({ 1.0f, 2.0f, 3.0f, 4.0f }));
+    double float64List[] = { 0.0f, -3.1415, 3.1415 };
     bounded_seq.setFloat64Values(float64List);
     assertEquals(float64List, bounded_seq.getFloat64Values());
-    List float64ListShort = Arrays.asList(3.1415, -3.1415);
+    double float64ListShort[] = { 3.1415, -3.1415 };
     bounded_seq.setFloat64Values(float64ListShort);
     assertEquals(float64ListShort, bounded_seq.getFloat64Values());
     assertThrows(IllegalArgumentException.class,
-      () -> bounded_seq.setFloat64Values(Arrays.asList(1.0, 2.0, 3.0, 4.0)));
-    List int8List = Arrays.asList(0, -128, 127);
+      () -> bounded_seq.setFloat64Values({ 1.0, 2.0, 3.0, 4.0 }));
+    byte int8List = { 0, -128, 127 };
     bounded_seq.setInt8Values(int8List);
     assertEquals(int8List, bounded_seq.getInt8Values());
-    List int8ListShort = Arrays.asList(127, -128);
+    byte int8ListShort = { 127, -128 };
     bounded_seq.setInt8Values(int8ListShort);
     assertEquals(int8ListShort, bounded_seq.getInt8Values());
     assertThrows(IllegalArgumentException.class,
-      () -> bounded_seq.setInt8Values(Arrays.asList((byte) 1, (byte) 2, (byte) 3, (byte) 4)));
-    List uint8List = Arrays.asList(0, 1, 255);
+      () -> bounded_seq.setInt8Values({ (byte) 1, (byte) 2, (byte) 3, (byte) 4 }));
+    byte uint8List = { 0, 1, 255 };
     bounded_seq.setUint8Values(uint8List);
     assertEquals(uint8List, bounded_seq.getUint8Values());
-    List uint8ListShort = Arrays.asList(255, 1);
+    byte uint8ListShort = { 255, 1 };
     bounded_seq.setUint8Values(uint8ListShort);
     assertEquals(uint8ListShort, bounded_seq.getUint8Values());
     assertThrows(IllegalArgumentException.class,
-      () -> bounded_seq.setUint8Values(Arrays.asList((byte) 1, (byte) 2, (byte) 3, (byte) 4)));
-    List int16List = Arrays.asList(0, -32768, 32767);
+      () -> bounded_seq.setUint8Values({ (byte) 1, (byte) 2, (byte) 3, (byte) 4 }));
+    short int16List = { 0, -32768, 32767 };
     bounded_seq.setInt16Values(int16List);
     assertEquals(int16List, bounded_seq.getInt16Values());
-    List int16ListShort = Arrays.asList(32767, -32768);
+    short int16ListShort = { 32767, -32768 };
     bounded_seq.setInt16Values(int16ListShort);
     assertEquals(int16ListShort, bounded_seq.getInt16Values());
     assertThrows(IllegalArgumentException.class,
-      () -> bounded_seq.setInt16Values(Arrays.asList((short) 1, (short) 2, (short) 3, (short) 4)));
-    List uint16List = Arrays.asList(0, 1, 65535);
+      () -> bounded_seq.setInt16Values({ (short) 1, (short) 2, (short) 3, (short) 4) });
+    short uint16List = { 0, 1, 65535 };
     bounded_seq.setUint16Values(uint16List);
     assertEquals(uint16List, bounded_seq.getUint16Values());
-    List uint16ListShort = Arrays.asList(0, 1, 65535);
+    short uint16ListShort = { 0, 1, 65535 };
     bounded_seq.setUint16Values(uint16ListShort);
     assertEquals(uint16ListShort, bounded_seq.getUint16Values());
     assertThrows(IllegalArgumentException.class,
-      () -> bounded_seq.setUint16Values(Arrays.asList((short) 1, (short) 2, (short) 3, (short) 4)));
-    List int32List = Arrays.asList(0, -2147483648, 2147483647);
+      () -> bounded_seq.setUint16Values({ (short) 1, (short) 2, (short) 3, (short) 4 }));
+    int int32List = { 0, -2147483648, 2147483647 };
     bounded_seq.setInt32Values(int32List);
     assertEquals(int32List, bounded_seq.getInt32Values());
-    List int32ListShort = Arrays.asList(2147483647, -2147483648);
+    int int32ListShort = { 2147483647, -2147483648 };
     bounded_seq.setInt32Values(int32ListShort);
     assertEquals(int32ListShort, bounded_seq.getInt32Values());
     assertThrows(IllegalArgumentException.class,
-      () -> bounded_seq.setInt32Values(Arrays.asList(1, 2, 3, 4)));
-    List uint32List = Arrays.asList(0, 1, 4294967295L);
+      () -> bounded_seq.setInt32Values({ 1, 2, 3, 4 }));
+    int uint32List = { 0, 1, 4294967295L };
     bounded_seq.setUint32Values(uint32List);
     assertEquals(uint32List, bounded_seq.getUint32Values());
-    List uint32ListShort = Arrays.asList(4294967295L, 1);
+    int uint32ListShort = { 4294967295L, 1 };
     bounded_seq.setUint32Values(uint32ListShort);
     assertEquals(uint32ListShort, bounded_seq.getUint32Values());
     assertThrows(IllegalArgumentException.class,
-      () -> bounded_seq.setUint32Values(Arrays.asList(1, 2, 3, 4)));
-    List int64List = Arrays.asList(0, -9223372036854775808L, 9223372036854775807L);
+      () -> bounded_seq.setUint32Values({ 1, 2, 3, 4 }));
+    long int64List = { 0, -9223372036854775808L, 9223372036854775807L };
     bounded_seq.setInt64Values(int64List);
     assertEquals(int64List, bounded_seq.getInt64Values());
-    List int64ListShort = Arrays.asList(0, -9223372036854775808L, 9223372036854775807L);
+    long int64ListShort = { 0, -9223372036854775808L, 9223372036854775807L };
     bounded_seq.setInt64Values(int64ListShort);
     assertEquals(int64ListShort, bounded_seq.getInt64Values());
     assertThrows(IllegalArgumentException.class,
-      () -> bounded_seq.setInt64Values(Arrays.asList(1L, 2L, 3L, 4L)));
-    List uint64List = Arrays.asList(0, 1, -1);
+      () -> bounded_seq.setInt64Values({ 1L, 2L, 3L, 4L }));
+    long uint64List = { 0, 1, -1 };
     bounded_seq.setUint64Values(uint64List);
     assertEquals(uint64List, bounded_seq.getUint64Values());
-    List uint64ListShort = Arrays.asList(0, 1, -1);
+    long uint64ListShort = { 0, 1, -1 };
     bounded_seq.setUint64Values(uint64ListShort);
     assertEquals(uint64ListShort, bounded_seq.getUint64Values());
     assertThrows(IllegalArgumentException.class,
-      () -> bounded_seq.setUint64Values(Arrays.asList(1L, 2L, 3L, 4L)));
+      () -> bounded_seq.setUint64Values({ 1L, 2L, 3L, 4L }));
 
     // Test setting/getting fixed length bounded_seq of strings
-    List stringList = Arrays.asList("", "min value", "max_value");
+    String stringList[] = { "", "min value", "max_value" };
     bounded_seq.setStringValues(stringList);
     assertEquals(stringList, bounded_seq.getStringValues());
-    List stringListShort = Arrays.asList("max_value", "");
+    String stringListShort[] = { "max_value", "" };
     bounded_seq.setStringValues(stringListShort);
     assertEquals(stringListShort, bounded_seq.getStringValues());
     assertThrows(IllegalArgumentException.class,
-      () -> bounded_seq.setStringValues(Arrays.asList("too", "many", "values", "!")));
+      () -> bounded_seq.setStringValues({ "too", "many", "values", "!" }));
 
     // Test setting/getting fixed length bounded_seq of nested types
     rosidl_generator_java.msg.BasicTypes basicTypes = new rosidl_generator_java.msg.BasicTypes();
-    List basicTypesList = Arrays.asList(
-        new rosidl_generator_java.msg.BasicTypes[] {basicTypes, basicTypes, basicTypes});
+    rosidl_generator_java.msg.BasicTypes basicTypesList[] =
+        new rosidl_generator_java.msg.BasicTypes[] {basicTypes, basicTypes, basicTypes};
     bounded_seq.setBasicTypesValues(basicTypesList);
     assertEquals(basicTypesList, bounded_seq.getBasicTypesValues());
-    List basicTypesListShort = Arrays.asList(
-        new rosidl_generator_java.msg.BasicTypes[] {basicTypes});
+    rosidl_generator_java.msg.BasicTypes basicTypesListShort[] =
+        new rosidl_generator_java.msg.BasicTypes[] {basicTypes};
     bounded_seq.setBasicTypesValues(basicTypesListShort);
     assertEquals(basicTypesListShort, bounded_seq.getBasicTypesValues());
     assertThrows(IllegalArgumentException.class,
       () -> bounded_seq.setBasicTypesValues(
-          Arrays.asList(new rosidl_generator_java.msg.BasicTypes[] {basicTypes, basicTypes, basicTypes, basicTypes})));
+          new rosidl_generator_java.msg.BasicTypes[] {basicTypes, basicTypes, basicTypes, basicTypes}));
     rosidl_generator_java.msg.Constants constants = new rosidl_generator_java.msg.Constants();
-    List constantsList = Arrays.asList(
-        new rosidl_generator_java.msg.Constants[] {constants, constants, constants});
+    rosidl_generator_java.msg.Constants constantsList =
+        new rosidl_generator_java.msg.Constants[] {constants, constants, constants};
     bounded_seq.setConstantsValues(constantsList);
     assertEquals(constantsList, bounded_seq.getConstantsValues());
-    List constantsListShort = Arrays.asList(
+    rosidl_generator_java.msg.Constants constantsListShort =
         new rosidl_generator_java.msg.Constants[] {constants});
     bounded_seq.setConstantsValues(constantsListShort);
     assertEquals(constantsListShort, bounded_seq.getConstantsValues());
     assertThrows(IllegalArgumentException.class,
       () -> bounded_seq.setConstantsValues(
-          Arrays.asList(new rosidl_generator_java.msg.Constants[] {constants, constants, constants, constants})));
+          new rosidl_generator_java.msg.Constants[] {constants, constants, constants, constants}));
     rosidl_generator_java.msg.Defaults defaults = new rosidl_generator_java.msg.Defaults();
-    List defaultsList = Arrays.asList(
-        new rosidl_generator_java.msg.Defaults[] {defaults, defaults, defaults});
+    rosidl_generator_java.msg.Defaults defaultsList =
+        new rosidl_generator_java.msg.Defaults[] {defaults, defaults, defaults};
     bounded_seq.setDefaultsValues(defaultsList);
     assertEquals(defaultsList, bounded_seq.getDefaultsValues());
-    List defaultsListShort = Arrays.asList(
-        new rosidl_generator_java.msg.Defaults[] {defaults, defaults, defaults});
+    rosidl_generator_java.msg.Defaults defaultsListShort =
+        new rosidl_generator_java.msg.Defaults[] {defaults, defaults, defaults};
     bounded_seq.setDefaultsValues(defaultsListShort);
     assertEquals(defaultsListShort, bounded_seq.getDefaultsValues());
     assertThrows(IllegalArgumentException.class,
       () -> bounded_seq.setDefaultsValues(
-          Arrays.asList(new rosidl_generator_java.msg.Defaults[] {defaults, defaults, defaults, defaults})));
+          new rosidl_generator_java.msg.Defaults[] {defaults, defaults, defaults, defaults}));
 
     assertEquals(42, bounded_seq.getAlignmentCheck());
   }
