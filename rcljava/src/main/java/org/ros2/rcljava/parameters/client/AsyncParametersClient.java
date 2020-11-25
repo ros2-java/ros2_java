@@ -23,40 +23,40 @@ import org.ros2.rcljava.parameters.ParameterType;
 import org.ros2.rcljava.parameters.ParameterVariant;
 
 public interface AsyncParametersClient {
-  public Future<List<ParameterVariant>> getParameters(final List<String> names);
+  public Future<ParameterVariant[]> getParameters(final String[] names);
 
-  public Future<List<ParameterVariant>> getParameters(
-      final List<String> names, final Consumer<Future<List<ParameterVariant>>> callback);
+  public Future<ParameterVariant[]> getParameters(
+      final String[] names, final Consumer<Future<ParameterVariant[]>> callback);
 
-  public Future<List<ParameterType>> getParameterTypes(final List<String> names);
+  public Future<ParameterType[]> getParameterTypes(final String[] names);
 
-  public Future<List<ParameterType>> getParameterTypes(
-      final List<String> names, final Consumer<Future<List<ParameterType>>> callback);
+  public Future<ParameterType[]> getParameterTypes(
+      final String[] names, final Consumer<Future<ParameterType[]>> callback);
 
-  public Future<List<rcl_interfaces.msg.SetParametersResult>> setParameters(
-      final List<ParameterVariant> parameters);
+  public Future<rcl_interfaces.msg.SetParametersResult[]> setParameters(
+      final ParameterVariant[] parameters);
 
-  public Future<List<rcl_interfaces.msg.SetParametersResult>> setParameters(
-      final List<ParameterVariant> parameters,
-      final Consumer<Future<List<rcl_interfaces.msg.SetParametersResult>>> callback);
-
-  public Future<rcl_interfaces.msg.SetParametersResult> setParametersAtomically(
-      final List<ParameterVariant> parameters);
+  public Future<rcl_interfaces.msg.SetParametersResult[]> setParameters(
+      final ParameterVariant[] parameters,
+      final Consumer<Future<rcl_interfaces.msg.SetParametersResult[]>> callback);
 
   public Future<rcl_interfaces.msg.SetParametersResult> setParametersAtomically(
-      final List<ParameterVariant> parameters,
+      final ParameterVariant[] parameters);
+
+  public Future<rcl_interfaces.msg.SetParametersResult> setParametersAtomically(
+      final ParameterVariant[] parameters,
       final Consumer<Future<rcl_interfaces.msg.SetParametersResult>> callback);
 
   public Future<rcl_interfaces.msg.ListParametersResult> listParameters(
-      final List<String> prefixes, long depth);
+      final String[] prefixes, long depth);
 
-  public Future<rcl_interfaces.msg.ListParametersResult> listParameters(final List<String> prefixes,
+  public Future<rcl_interfaces.msg.ListParametersResult> listParameters(final String[] prefixes,
       long depth, final Consumer<Future<rcl_interfaces.msg.ListParametersResult>> callback);
 
-  public Future<List<rcl_interfaces.msg.ParameterDescriptor>> describeParameters(
-      final List<String> names);
+  public Future<rcl_interfaces.msg.ParameterDescriptor[]> describeParameters(
+      final String[] names);
 
-  public Future<List<rcl_interfaces.msg.ParameterDescriptor>> describeParameters(
-      final List<String> names,
-      final Consumer<Future<List<rcl_interfaces.msg.ParameterDescriptor>>> callback);
+  public Future<rcl_interfaces.msg.ParameterDescriptor[]> describeParameters(
+      final String[] names,
+      final Consumer<Future<rcl_interfaces.msg.ParameterDescriptor[]>> callback);
 }

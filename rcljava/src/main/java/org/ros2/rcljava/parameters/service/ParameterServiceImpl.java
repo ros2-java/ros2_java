@@ -16,6 +16,7 @@
 package org.ros2.rcljava.parameters.service;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import org.ros2.rcljava.consumers.TriConsumer;
@@ -48,11 +49,11 @@ public class ParameterServiceImpl implements ParameterService {
           public void accept(RMWRequestId rmwRequestId,
               rcl_interfaces.srv.GetParameters_Request request,
               rcl_interfaces.srv.GetParameters_Response response) {
-            List<ParameterVariant> values = node.getParameters(request.getNames());
-            List<rcl_interfaces.msg.ParameterValue> pvalues =
-                new ArrayList<rcl_interfaces.msg.ParameterValue>();
-            for (ParameterVariant pvariant : values) {
-              pvalues.add(pvariant.getParameterValue());
+            ParameterVariant[] values = node.getParameters(request.getNames());
+            rcl_interfaces.msg.ParameterValue[] pvalues =
+                new rcl_interfaces.msg.ParameterValue[values.length];
+            for (int i = 0; i < values.length; i++) {
+              pvalues[i] = values[i].getParameterValue();
             }
             response.setValues(pvalues);
           }
@@ -67,10 +68,10 @@ public class ParameterServiceImpl implements ParameterService {
           public void accept(RMWRequestId rmwRequestId,
               rcl_interfaces.srv.GetParameterTypes_Request request,
               rcl_interfaces.srv.GetParameterTypes_Response response) {
-            List<ParameterType> types = node.getParameterTypes(request.getNames());
-            List<Byte> ptypes = new ArrayList<Byte>();
-            for (ParameterType type : types) {
-              ptypes.add(type.getValue());
+            ParameterType[] types = node.getParameterTypes(request.getNames());
+            byte[] ptypes = new byte[types.length];
+            for (int i = 0; i < types.length; i++) {
+              ptypes[i] = types[i].getValue();
             }
             response.setTypes(ptypes);
           }
@@ -89,7 +90,8 @@ public class ParameterServiceImpl implements ParameterService {
             for (rcl_interfaces.msg.Parameter p : request.getParameters()) {
               pvariants.add(ParameterVariant.fromParameter(p));
             }
-            List<rcl_interfaces.msg.SetParametersResult> results = node.setParameters(pvariants);
+            rcl_interfaces.msg.SetParametersResult[] results =
+                node.setParameters((ParameterVariant[])pvariants.toArray());
             response.setResults(results);
           }
         },
@@ -109,7 +111,7 @@ public class ParameterServiceImpl implements ParameterService {
                   pvariants.add(ParameterVariant.fromParameter(p));
                 }
                 rcl_interfaces.msg.SetParametersResult result =
-                    node.setParametersAtomically(pvariants);
+                    node.setParametersAtomically((ParameterVariant[])pvariants.toArray());
                 response.setResult(result);
               }
             },
@@ -124,8 +126,8 @@ public class ParameterServiceImpl implements ParameterService {
               rcl_interfaces.srv.DescribeParameters_Request request,
               rcl_interfaces.srv.DescribeParameters_Response response) {
             List<rcl_interfaces.msg.ParameterDescriptor> descriptors =
-                node.describeParameters(request.getNames());
-            response.setDescriptors(descriptors);
+                Arrays.asList(node.describeParameters(request.getNames()));
+            response.setDescriptors((rcl_interfaces.msg.ParameterDescriptor[])descriptors.toArray());
           }
         },
         qosProfile);

@@ -50,6 +50,7 @@ import java.lang.ref.WeakReference;
 import java.lang.reflect.Method;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
@@ -401,7 +402,7 @@ public class NodeImpl implements Node {
     return this.name;
   }
 
-  public List<ParameterVariant> getParameters(List<String> names) {
+  public ParameterVariant[] getParameters(String[] names) {
     synchronized (mutex) {
       List<ParameterVariant> results = new ArrayList<ParameterVariant>();
       for (String name : names) {
@@ -411,11 +412,11 @@ public class NodeImpl implements Node {
           }
         }
       }
-      return results;
+      return (ParameterVariant[])results.toArray();
     }
   }
 
-  public List<ParameterType> getParameterTypes(List<String> names) {
+  public ParameterType[] getParameterTypes(String[] names) {
     synchronized (mutex) {
       List<ParameterType> results = new ArrayList<ParameterType>();
       for (String name : names) {
@@ -427,24 +428,24 @@ public class NodeImpl implements Node {
           }
         }
       }
-      return results;
+      return (ParameterType[])results.toArray();
     }
   }
 
-  public List<rcl_interfaces.msg.SetParametersResult> setParameters(
-      List<ParameterVariant> parameters) {
+  public rcl_interfaces.msg.SetParametersResult[] setParameters(
+      ParameterVariant[] parameters) {
     List<rcl_interfaces.msg.SetParametersResult> results =
         new ArrayList<rcl_interfaces.msg.SetParametersResult>();
     for (ParameterVariant p : parameters) {
       rcl_interfaces.msg.SetParametersResult result =
-          this.setParametersAtomically(java.util.Arrays.asList(new ParameterVariant[] {p}));
+          this.setParametersAtomically(new ParameterVariant[] {p});
       results.add(result);
     }
-    return results;
+    return (rcl_interfaces.msg.SetParametersResult[])results.toArray();
   }
 
   public rcl_interfaces.msg.SetParametersResult setParametersAtomically(
-      List<ParameterVariant> parameters) {
+      ParameterVariant[] parameters) {
     synchronized (mutex) {
       rcl_interfaces.msg.SetParametersResult result = new rcl_interfaces.msg.SetParametersResult();
       for (ParameterVariant p : parameters) {
@@ -455,8 +456,8 @@ public class NodeImpl implements Node {
     }
   }
 
-  public List<rcl_interfaces.msg.ParameterDescriptor> describeParameters(
-      List<String> names) {
+  public rcl_interfaces.msg.ParameterDescriptor[] describeParameters(
+      String[] names) {
     synchronized (mutex) {
       List<rcl_interfaces.msg.ParameterDescriptor> results =
           new ArrayList<rcl_interfaces.msg.ParameterDescriptor>();
@@ -471,20 +472,22 @@ public class NodeImpl implements Node {
           }
         }
       }
-      return results;
+      return (rcl_interfaces.msg.ParameterDescriptor[])results.toArray();
     }
   }
 
   public rcl_interfaces.msg.ListParametersResult listParameters(
-      List<String> prefixes, long depth) {
+      String[] prefixes, long depth) {
     synchronized (mutex) {
       rcl_interfaces.msg.ListParametersResult result =
           new rcl_interfaces.msg.ListParametersResult();
 
       String separator = ".";
+      List<String> resultNames = Arrays.asList(result.getNames());
+      List<String> resultPrefixes = Arrays.asList(result.getPrefixes());
       for (Map.Entry<String, ParameterVariant> entry : this.parameters.entrySet()) {
         boolean getAll =
-            (prefixes.size() == 0)
+            (prefixes.length == 0)
             && ((depth == rcl_interfaces.srv.ListParameters_Request.DEPTH_RECURSIVE)
                    || ((entry.getKey().length() - entry.getKey().replace(separator, "").length())
                           < depth));
@@ -502,16 +505,20 @@ public class NodeImpl implements Node {
           }
         }
         if (getAll || prefixMatches) {
-          result.getNames().add(entry.getKey());
+          resultNames.add(entry.getKey());
           int lastSeparator = entry.getKey().lastIndexOf(separator);
           if (-1 != lastSeparator) {
             String prefix = entry.getKey().substring(0, lastSeparator);
-            if (!result.getPrefixes().contains(prefix)) {
-              result.getPrefixes().add(prefix);
+            if (!resultPrefixes.contains(prefix)) {
+              resultPrefixes.add(prefix);
             }
           }
         }
       }
+
+      result.setNames((String[])resultNames.toArray());
+      result.setPrefixes((String[])resultPrefixes.toArray());
+
       return result;
     }
   }

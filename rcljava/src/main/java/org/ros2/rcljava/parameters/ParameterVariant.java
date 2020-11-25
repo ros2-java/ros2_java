@@ -15,8 +15,6 @@
 
 package org.ros2.rcljava.parameters;
 
-import java.util.Arrays;
-import java.util.List;
 
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
@@ -94,7 +92,7 @@ public class ParameterVariant {
     this.value.setType(ParameterType.PARAMETER_STRING.getValue());
   }
 
-  public ParameterVariant(final String name, final List<Byte> byteArrayValue) {
+  public ParameterVariant(final String name, final byte[] byteArrayValue) {
     this.name = name;
     this.value = new rcl_interfaces.msg.ParameterValue();
     this.value.setByteArrayValue(byteArrayValue);
@@ -161,7 +159,7 @@ public class ParameterVariant {
     return this.value.getBoolValue();
   }
 
-  public final List<Byte> asByteArray() {
+  public final byte[] asByteArray() {
     if (getType() != ParameterType.PARAMETER_BYTE_ARRAY) {
       throw new IllegalArgumentException("Invalid type");
     }

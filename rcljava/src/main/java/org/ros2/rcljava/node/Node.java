@@ -175,15 +175,15 @@ public interface Node extends Disposable {
 
   String getName();
 
-  List<ParameterVariant> getParameters(List<String> names);
+  ParameterVariant[] getParameters(String[] names);
 
-  List<ParameterType> getParameterTypes(List<String> names);
+  ParameterType[] getParameterTypes(String[] names);
 
-  List<rcl_interfaces.msg.SetParametersResult> setParameters(List<ParameterVariant> parameters);
+  rcl_interfaces.msg.SetParametersResult[] setParameters(ParameterVariant[] parameters);
 
-  rcl_interfaces.msg.SetParametersResult setParametersAtomically(List<ParameterVariant> parameters);
+  rcl_interfaces.msg.SetParametersResult setParametersAtomically(ParameterVariant[] parameters);
 
-  List<rcl_interfaces.msg.ParameterDescriptor> describeParameters(List<String> names);
+  rcl_interfaces.msg.ParameterDescriptor[] describeParameters(String[] names);
 
-  rcl_interfaces.msg.ListParametersResult listParameters(List<String> prefixes, long depth);
+  rcl_interfaces.msg.ListParametersResult listParameters(String[] prefixes, long depth);
 }
