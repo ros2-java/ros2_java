@@ -8,8 +8,9 @@ jobs:
     steps:
     - name: Install Java
       run: |
-        sudo apt update -qq
-        sudo apt install -y default-jdk
+        sudo apt-get update -qq
+        sudo apt-get install -y default-jdk gradle
+    - uses: actions/checkout@v2
     - uses: ros-tooling/setup-ros@0.0.14
       with:
         required-ros-distributions: dashing
@@ -17,4 +18,70 @@ jobs:
       with:
         package-name: rosidl_generator_java rcljava_common rcljava
         source-ros-binary-installation: dashing
-        vcs-repo-file-url: https://raw.githubusercontent.com/ros2-java/ros2_java/dashing/ros2_java_desktop.repos
+        vcs-repo-file-url: ${{ github.workspace }}/ros2_java_desktop.repos
+
+  build_android:
+    runs-on: ubuntu-18.04
+    steps:
+    - name: Install Java
+      run: |
+        sudo apt-get update -qq
+        sudo apt-get install -y default-jdk gradle
+    - uses: actions/checkout@v2
+    - name: Setup locale for ROS 2
+      run: |
+        sudo locale-gen en_US en_US.UTF-8
+        sudo update-locale LC_ALL=en_US.UTF-8 LANG=en_US.UTF-8
+        export LANG=en_US.UTF-8
+    - name: Setup sources for ROS 2
+      run: |
+        sudo apt-get update && sudo apt-get install -y curl gnupg2 lsb-release
+        curl -sL https://raw.githubusercontent.com/ros/rosdistro/master/ros.asc | sudo apt-key add -
+        sudo sh -c 'echo "deb [arch=$(dpkg --print-architecture)] http://packages.ros.org/ros2/ubuntu $(lsb_release -cs) main" > /etc/apt/sources.list.d/ros2-latest.list'
+    - name: Install ROS 2 dependencies
+      run: |
+        sudo apt-get update && sudo apt-get install -y python3-colcon-common-extensions python3-vcstool python3-lark-parser python3-dev
+    - name: Install colcon extensions for Gradle
+      run: |
+        sudo pip3 install git+git://github.com/colcon/colcon-gradle.git
+        sudo pip3 install git+git://github.com/colcon/colcon-ros-gradle.git
+    - name: Install Android NDK
+      run: |
+        curl -LO https://dl.google.com/android/repository/android-ndk-r21d-linux-x86_64.zip
+        unzip android-ndk-r21d-linux-x86_64.zip
+    - name: Setup workspace with VCS repo file
+      run: |
+        mkdir -p ros2_java_ws/src
+        cd ros2_java_ws
+        curl -sL file://${{ github.workspace }}/ros2_java_android.repos | vcs import src
+        # Use checked out version of ros2_java
+        rm -rf src/ros2_java/ros2_java
+        ln --symbolic ${{ github.workspace }} src/ros2_java
+    - name: Build ros2_java for Android
+      run: |
+        export PYTHON3_EXEC="$( which python3 )"
+        export PYTHON3_LIBRARY="$( ${PYTHON3_EXEC} -c 'import os.path; from distutils import sysconfig; print(os.path.realpath(os.path.join(sysconfig.get_config_var("LIBPL"), sysconfig.get_config_var("LDLIBRARY"))))' )"
+        export PYTHON3_INCLUDE_DIR="$( ${PYTHON3_EXEC} -c 'from distutils import sysconfig; print(sysconfig.get_config_var("INCLUDEPY"))' )"
+        export ANDROID_ABI=armeabi-v7a
+        export ANDROID_NATIVE_API_LEVEL=android-21
+        export ANDROID_TOOLCHAIN_NAME=arm-linux-androideabi-clang
+        export ANDROID_NDK=${PWD}/android-ndk-r21d
+
+        cd ros2_java_ws
+        colcon build \
+          --packages-ignore cyclonedds rcl_logging_log4cxx rosidl_generator_py \
+          --packages-up-to rcljava \
+          --cmake-args \
+          -DPYTHON_EXECUTABLE=${PYTHON3_EXEC} \
+          -DPYTHON_LIBRARY=${PYTHON3_LIBRARY} \
+          -DPYTHON_INCLUDE_DIR=${PYTHON3_INCLUDE_DIR} \
+          -DCMAKE_TOOLCHAIN_FILE=${ANDROID_NDK}/build/cmake/android.toolchain.cmake \
+          -DANDROID_FUNCTION_LEVEL_LINKING=OFF \
+          -DANDROID_NATIVE_API_LEVEL=${ANDROID_NATIVE_API_LEVEL} \
+          -DANDROID_TOOLCHAIN_NAME=${ANDROID_TOOLCHAIN_NAME} \
+          -DANDROID_STL=c++_shared \
+          -DANDROID_ABI=${ANDROID_ABI} \
+          -DANDROID_NDK=${ANDROID_NDK} \
+          -DTHIRDPARTY=ON \
+          -DCOMPILE_EXAMPLES=OFF \
+          -DCMAKE_FIND_ROOT_PATH="${PWD}/install"
