@@ -14,10 +14,10 @@ jobs:
     - uses: ros-tooling/setup-ros@0.1.0
       with:
         required-ros-distributions: dashing
-    - uses: ros-tooling/action-ros-ci@8d58122
+    - uses: ros-tooling/action-ros-ci@0.1.0
       with:
         package-name: rosidl_generator_java rcljava_common rcljava
-        source-ros-binary-installation: dashing
+        target-ros2-distro: dashing
         vcs-repo-file-url: ${{ github.workspace }}/ros2_java_desktop.repos
 
   build_android:
