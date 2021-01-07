@@ -100,38 +100,38 @@ public class ParameterVariant {
     this.value.setType(ParameterType.PARAMETER_STRING.getValue());
   }
 
-  public ParameterVariant(final String name, final Byte[] byteArrayValue) {
+  public ParameterVariant(final String name, final byte[] byteArrayValue) {
     this.name = name;
     this.value = new rcl_interfaces.msg.ParameterValue();
-    this.value.setByteArrayValue(Arrays.asList(byteArrayValue));
+    this.value.setByteArrayValue(byteArrayValue);
     this.value.setType(ParameterType.PARAMETER_BYTE_ARRAY.getValue());
   }
 
-  public ParameterVariant(final String name, final Boolean[] boolArrayValue) {
+  public ParameterVariant(final String name, final boolean[] boolArrayValue) {
     this.name = name;
     this.value = new rcl_interfaces.msg.ParameterValue();
-    this.value.setBoolArrayValue(Arrays.asList(boolArrayValue));
+    this.value.setBoolArrayValue(boolArrayValue);
     this.value.setType(ParameterType.PARAMETER_BOOL_ARRAY.getValue());
   }
 
-  public ParameterVariant(final String name, final Long[] integerArrayValue) {
+  public ParameterVariant(final String name, final long[] integerArrayValue) {
     this.name = name;
     this.value = new rcl_interfaces.msg.ParameterValue();
-    this.value.setIntegerArrayValue(Arrays.asList(integerArrayValue));
+    this.value.setIntegerArrayValue(integerArrayValue);
     this.value.setType(ParameterType.PARAMETER_INTEGER_ARRAY.getValue());
   }
 
-  public ParameterVariant(final String name, final Double[] doubleArrayValue) {
+  public ParameterVariant(final String name, final double[] doubleArrayValue) {
     this.name = name;
     this.value = new rcl_interfaces.msg.ParameterValue();
-    this.value.setDoubleArrayValue(Arrays.asList(doubleArrayValue));
+    this.value.setDoubleArrayValue(doubleArrayValue);
     this.value.setType(ParameterType.PARAMETER_DOUBLE_ARRAY.getValue());
   }
 
   public ParameterVariant(final String name, final String[] stringArrayValue) {
     this.name = name;
     this.value = new rcl_interfaces.msg.ParameterValue();
-    this.value.setStringArrayValue(Arrays.asList(stringArrayValue));
+    this.value.setStringArrayValue(stringArrayValue);
     this.value.setType(ParameterType.PARAMETER_STRING_ARRAY.getValue());
   }
 
@@ -203,39 +203,39 @@ public class ParameterVariant {
     return this.value.getBoolValue();
   }
 
-  public final Byte[] asByteArray() {
+  public final byte[] asByteArray() {
     if (getType() != ParameterType.PARAMETER_BYTE_ARRAY) {
       throw new IllegalArgumentException("Invalid type");
     }
-    return this.value.getByteArrayValue().toArray(new Byte[0]);
+    return this.value.getByteArrayValue();
   }
 
-  public final Boolean[] asBooleanArray() {
+  public final boolean[] asBooleanArray() {
     if (getType() != ParameterType.PARAMETER_BOOL_ARRAY) {
       throw new IllegalArgumentException("Invalid type");
     }
-    return this.value.getBoolArrayValue().toArray(new Boolean[0]);
+    return this.value.getBoolArrayValue();
   }
 
-  public final Long[] asIntegerArray() {
+  public final long[] asIntegerArray() {
     if (getType() != ParameterType.PARAMETER_INTEGER_ARRAY) {
       throw new IllegalArgumentException("Invalid type");
     }
-    return this.value.getIntegerArrayValue().toArray(new Long[0]);
+    return this.value.getIntegerArrayValue();
   }
 
-  public final Double[] asDoubleArray() {
+  public final double[] asDoubleArray() {
     if (getType() != ParameterType.PARAMETER_DOUBLE_ARRAY) {
       throw new IllegalArgumentException("Invalid type");
     }
-    return this.value.getDoubleArrayValue().toArray(new Double[0]);
+    return this.value.getDoubleArrayValue();
   }
 
   public final String[] asStringArray() {
     if (getType() != ParameterType.PARAMETER_STRING_ARRAY) {
       throw new IllegalArgumentException("Invalid type");
     }
-    return this.value.getStringArrayValue().toArray(new String[0]);
+    return this.value.getStringArrayValue();
   }
 
   public final rcl_interfaces.msg.Parameter toParameter() {
@@ -256,15 +256,15 @@ public class ParameterVariant {
       case rcl_interfaces.msg.ParameterType.PARAMETER_STRING:
         return new ParameterVariant(parameter.getName(), parameter.getValue().getStringValue());
       case rcl_interfaces.msg.ParameterType.PARAMETER_BYTE_ARRAY:
-        return new ParameterVariant(parameter.getName(), parameter.getValue().getByteArrayValue().toArray(new Byte[0]));
+        return new ParameterVariant(parameter.getName(), parameter.getValue().getByteArrayValue());
       case rcl_interfaces.msg.ParameterType.PARAMETER_BOOL_ARRAY:
-        return new ParameterVariant(parameter.getName(), parameter.getValue().getBoolArrayValue().toArray(new Boolean[0]));
+        return new ParameterVariant(parameter.getName(), parameter.getValue().getBoolArrayValue());
       case rcl_interfaces.msg.ParameterType.PARAMETER_INTEGER_ARRAY:
-        return new ParameterVariant(parameter.getName(), parameter.getValue().getIntegerArrayValue().toArray(new Long[0]));
+        return new ParameterVariant(parameter.getName(), parameter.getValue().getIntegerArrayValue());
       case rcl_interfaces.msg.ParameterType.PARAMETER_DOUBLE_ARRAY:
-        return new ParameterVariant(parameter.getName(), parameter.getValue().getDoubleArrayValue().toArray(new Double[0]));
+        return new ParameterVariant(parameter.getName(), parameter.getValue().getDoubleArrayValue());
       case rcl_interfaces.msg.ParameterType.PARAMETER_STRING_ARRAY:
-        return new ParameterVariant(parameter.getName(), parameter.getValue().getStringArrayValue().toArray(new String[0]));
+        return new ParameterVariant(parameter.getName(), parameter.getValue().getStringArrayValue());
       case rcl_interfaces.msg.ParameterType.PARAMETER_NOT_SET:
         throw new IllegalArgumentException("Type from ParameterValue is not set");
       default:

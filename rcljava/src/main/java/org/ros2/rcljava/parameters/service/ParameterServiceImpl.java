@@ -48,7 +48,7 @@ public class ParameterServiceImpl implements ParameterService {
           public void accept(RMWRequestId rmwRequestId,
               rcl_interfaces.srv.GetParameters_Request request,
               rcl_interfaces.srv.GetParameters_Response response) {
-            List<ParameterVariant> values = node.getParameters(request.getNames());
+            List<ParameterVariant> values = node.getParameters(request.getNamesAsList());
             List<rcl_interfaces.msg.ParameterValue> pvalues =
                 new ArrayList<rcl_interfaces.msg.ParameterValue>();
             for (ParameterVariant pvariant : values) {
@@ -67,7 +67,7 @@ public class ParameterServiceImpl implements ParameterService {
           public void accept(RMWRequestId rmwRequestId,
               rcl_interfaces.srv.GetParameterTypes_Request request,
               rcl_interfaces.srv.GetParameterTypes_Response response) {
-            List<ParameterType> types = node.getParameterTypes(request.getNames());
+            List<ParameterType> types = node.getParameterTypes(request.getNamesAsList());
             List<Byte> ptypes = new ArrayList<Byte>();
             for (ParameterType type : types) {
               ptypes.add(type.getValue());
@@ -124,7 +124,7 @@ public class ParameterServiceImpl implements ParameterService {
               rcl_interfaces.srv.DescribeParameters_Request request,
               rcl_interfaces.srv.DescribeParameters_Response response) {
             List<rcl_interfaces.msg.ParameterDescriptor> descriptors =
-                node.describeParameters(request.getNames());
+                node.describeParameters(request.getNamesAsList());
             response.setDescriptors(descriptors);
           }
         },
@@ -139,7 +139,7 @@ public class ParameterServiceImpl implements ParameterService {
               rcl_interfaces.srv.ListParameters_Request request,
               rcl_interfaces.srv.ListParameters_Response response) {
             rcl_interfaces.msg.ListParametersResult result =
-                node.listParameters(request.getPrefixes(), request.getDepth());
+                node.listParameters(request.getPrefixesAsList(), request.getDepth());
             response.setResult(result);
           }
         },

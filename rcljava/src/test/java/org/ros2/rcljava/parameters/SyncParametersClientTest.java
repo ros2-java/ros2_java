@@ -15,6 +15,7 @@
 
 package org.ros2.rcljava.parameters;
 
+import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertTrue;
@@ -133,9 +134,9 @@ public class SyncParametersClientTest {
     rcl_interfaces.msg.ListParametersResult parametersAndPrefixes =
         parametersClient.listParameters(Arrays.asList(new String[] {"foo", "bar"}), 10);
 
-    assertEquals(
-        parametersAndPrefixes.getNames(), Arrays.asList(new String[] {"foo.first", "foo.second"}));
-    assertEquals(parametersAndPrefixes.getPrefixes(), Arrays.asList(new String[] {"foo"}));
+    assertArrayEquals(
+        parametersAndPrefixes.getNames(), new String[] {"foo.first", "foo.second"});
+    assertEquals(parametersAndPrefixes.getPrefixes(), new String[] {"foo"});
   }
 
   @Test

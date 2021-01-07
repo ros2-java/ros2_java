@@ -781,6 +781,8 @@ public class NodeImpl implements Node {
     rcl_interfaces.msg.ListParametersResult result =
         new rcl_interfaces.msg.ListParametersResult();
 
+    List<String> resultNames = new ArrayList<String>();
+    List<String> resultPrefixes = new ArrayList<String>();
     synchronized (parametersMutex) {
       for (Map.Entry<String, ParameterAndDescriptor> entry : this.parameters.entrySet()) {
         boolean getAll =
@@ -805,16 +807,18 @@ public class NodeImpl implements Node {
         }
 
         if (getAll || prefixMatches) {
-          result.getNames().add(entry.getKey());
+          resultNames.add(entry.getKey());
           int lastSeparator = entry.getKey().lastIndexOf(separator);
           if (-1 != lastSeparator) {
             String prefix = entry.getKey().substring(0, lastSeparator);
-            if (!result.getPrefixes().contains(prefix)) {
-              result.getPrefixes().add(prefix);
+            if (!resultPrefixes.contains(prefix)) {
+              resultPrefixes.add(prefix);
             }
           }
         }
       }
+      result.setNames(resultNames);
+      result.setPrefixes(resultPrefixes);
       return result;
     }
   }
@@ -853,7 +857,7 @@ public class NodeImpl implements Node {
 
   private native static final void nativeGetPublishersInfo(
     final long handle, final String topicName, ArrayList<EndpointInfo> endpointInfo);
-  
+
   public final Collection<EndpointInfo> getSubscriptionsInfo(final String topicName) {
     ArrayList<EndpointInfo> returnValue = new ArrayList();
     nativeGetSubscriptionsInfo(this.handle, topicName, returnValue);
