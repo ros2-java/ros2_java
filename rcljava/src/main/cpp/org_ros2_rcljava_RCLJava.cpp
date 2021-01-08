@@ -48,13 +48,8 @@ JNIEXPORT jlong JNICALL
 Java_org_ros2_rcljava_RCLJava_nativeCreateNodeHandle(
   JNIEnv * env, jclass, jstring jnode_name, jstring jnamespace, jlong context_handle)
 {
-  const char * node_name_tmp = env->GetStringUTFChars(jnode_name, 0);
-  std::string node_name(node_name_tmp);
-  env->ReleaseStringUTFChars(jnode_name, node_name_tmp);
-
-  const char * namespace_tmp = env->GetStringUTFChars(jnamespace, 0);
-  std::string namespace_(namespace_tmp);
-  env->ReleaseStringUTFChars(jnamespace, namespace_tmp);
+  const char * node_name = env->GetStringUTFChars(jnode_name, 0);
+  const char * node_namespace = env->GetStringUTFChars(jnamespace, 0);
 
   rcl_context_t * context = reinterpret_cast<rcl_context_t *>(context_handle);
 
@@ -62,8 +57,9 @@ Java_org_ros2_rcljava_RCLJava_nativeCreateNodeHandle(
   *node = rcl_get_zero_initialized_node();
 
   rcl_node_options_t default_options = rcl_node_get_default_options();
-  rcl_ret_t ret = rcl_node_init(
-    node, node_name.c_str(), namespace_.c_str(), context, &default_options);
+  rcl_ret_t ret = rcl_node_init(node, node_name, node_namespace, context, &default_options);
+  env->ReleaseStringUTFChars(jnode_name, node_name);
+  env->ReleaseStringUTFChars(jnamespace, node_namespace);
   if (ret != RCL_RET_OK) {
     std::string msg = "Failed to create node: " + std::string(rcl_get_error_string().str);
     rcl_reset_error();
