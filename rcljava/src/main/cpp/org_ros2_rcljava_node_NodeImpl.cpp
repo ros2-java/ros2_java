@@ -39,11 +39,7 @@ Java_org_ros2_rcljava_node_NodeImpl_nativeCreatePublisherHandle(
   jmethodID mid = env->GetStaticMethodID(jmessage_class, "getTypeSupport", "()J");
   jlong jts = env->CallStaticLongMethod(jmessage_class, mid);
 
-  const char * topic_tmp = env->GetStringUTFChars(jtopic, 0);
-
-  std::string topic(topic_tmp);
-
-  env->ReleaseStringUTFChars(jtopic, topic_tmp);
+  const char * topic = env->GetStringUTFChars(jtopic, 0);
 
   rcl_node_t * node = reinterpret_cast<rcl_node_t *>(node_handle);
 
@@ -56,7 +52,8 @@ Java_org_ros2_rcljava_node_NodeImpl_nativeCreatePublisherHandle(
   rmw_qos_profile_t * qos_profile = reinterpret_cast<rmw_qos_profile_t *>(qos_profile_handle);
   publisher_ops.qos = *qos_profile;
 
-  rcl_ret_t ret = rcl_publisher_init(publisher, node, ts, topic.c_str(), &publisher_ops);
+  rcl_ret_t ret = rcl_publisher_init(publisher, node, ts, topic, &publisher_ops);
+  env->ReleaseStringUTFChars(jtopic, topic);
 
   if (ret != RCL_RET_OK) {
     std::string msg = "Failed to create publisher: " + std::string(rcl_get_error_string().str);
@@ -77,11 +74,7 @@ Java_org_ros2_rcljava_node_NodeImpl_nativeCreateSubscriptionHandle(
   jmethodID mid = env->GetStaticMethodID(jmessage_class, "getTypeSupport", "()J");
   jlong jts = env->CallStaticLongMethod(jmessage_class, mid);
 
-  const char * topic_tmp = env->GetStringUTFChars(jtopic, 0);
-
-  std::string topic(topic_tmp);
-
-  env->ReleaseStringUTFChars(jtopic, topic_tmp);
+  const char * topic = env->GetStringUTFChars(jtopic, 0);
 
   rcl_node_t * node = reinterpret_cast<rcl_node_t *>(node_handle);
 
@@ -95,7 +88,8 @@ Java_org_ros2_rcljava_node_NodeImpl_nativeCreateSubscriptionHandle(
   rmw_qos_profile_t * qos_profile = reinterpret_cast<rmw_qos_profile_t *>(qos_profile_handle);
   subscription_ops.qos = *qos_profile;
 
-  rcl_ret_t ret = rcl_subscription_init(subscription, node, ts, topic.c_str(), &subscription_ops);
+  rcl_ret_t ret = rcl_subscription_init(subscription, node, ts, topic, &subscription_ops);
+  env->ReleaseStringUTFChars(jtopic, topic);
 
   if (ret != RCL_RET_OK) {
     std::string msg = "Failed to create subscription: " + std::string(rcl_get_error_string().str);
@@ -121,11 +115,7 @@ Java_org_ros2_rcljava_node_NodeImpl_nativeCreateServiceHandle(
 
   assert(jts != 0);
 
-  const char * service_name_tmp = env->GetStringUTFChars(jservice_name, 0);
-
-  std::string service_name(service_name_tmp);
-
-  env->ReleaseStringUTFChars(jservice_name, service_name_tmp);
+  const char * service_name = env->GetStringUTFChars(jservice_name, 0);
 
   rcl_node_t * node = reinterpret_cast<rcl_node_t *>(node_handle);
 
@@ -138,7 +128,8 @@ Java_org_ros2_rcljava_node_NodeImpl_nativeCreateServiceHandle(
   rmw_qos_profile_t * qos_profile = reinterpret_cast<rmw_qos_profile_t *>(qos_profile_handle);
   service_ops.qos = *qos_profile;
 
-  rcl_ret_t ret = rcl_service_init(service, node, ts, service_name.c_str(), &service_ops);
+  rcl_ret_t ret = rcl_service_init(service, node, ts, service_name, &service_ops);
+  env->ReleaseStringUTFChars(jservice_name, service_name);
 
   if (ret != RCL_RET_OK) {
     std::string msg = "Failed to create service: " + std::string(rcl_get_error_string().str);
@@ -164,11 +155,7 @@ Java_org_ros2_rcljava_node_NodeImpl_nativeCreateClientHandle(
 
   assert(jts != 0);
 
-  const char * service_name_tmp = env->GetStringUTFChars(jservice_name, 0);
-
-  std::string service_name(service_name_tmp);
-
-  env->ReleaseStringUTFChars(jservice_name, service_name_tmp);
+  const char * service_name = env->GetStringUTFChars(jservice_name, 0);
 
   rcl_node_t * node = reinterpret_cast<rcl_node_t *>(node_handle);
 
@@ -181,7 +168,8 @@ Java_org_ros2_rcljava_node_NodeImpl_nativeCreateClientHandle(
   rmw_qos_profile_t * qos_profile = reinterpret_cast<rmw_qos_profile_t *>(qos_profile_handle);
   client_ops.qos = *qos_profile;
 
-  rcl_ret_t ret = rcl_client_init(client, node, ts, service_name.c_str(), &client_ops);
+  rcl_ret_t ret = rcl_client_init(client, node, ts, service_name, &client_ops);
+  env->ReleaseStringUTFChars(jservice_name, service_name);
 
   if (ret != RCL_RET_OK) {
     std::string msg = "Failed to create client: " + std::string(rcl_get_error_string().str);
