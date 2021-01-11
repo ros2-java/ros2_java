@@ -100,9 +100,7 @@ public class ServiceImpl<T extends ServiceDefinition> implements Service<T> {
 
   public void executeCallback(
       RMWRequestId rmwRequestId, MessageDefinition request, MessageDefinition response) {
-    TriConsumer<RMWRequestId, MessageDefinition, MessageDefinition> callback =
-        ((ServiceImpl) this).callback;
-
+    TriConsumer callback = this.callback;
     callback.accept(rmwRequestId, request, response);
   }
 
