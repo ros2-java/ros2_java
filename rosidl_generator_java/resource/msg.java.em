@@ -38,7 +38,7 @@ import @('.'.join(member.type.namespaced_name()));
 @[  end if]@
 @[end for]@
 
-public final class @(type_name) implements MessageDefinition {
+public class @(type_name) implements MessageDefinition {
 
   private static final Logger logger = LoggerFactory.getLogger(@(type_name).class);
 

@@ -63,8 +63,12 @@ expand_template(
     template_basepath=template_basepath)
 
 action_imports = [
+    'java.util.List',
     'org.ros2.rcljava.common.JNIUtils',
     'org.ros2.rcljava.interfaces.ActionDefinition',
+    'org.ros2.rcljava.interfaces.GoalRequestDefinition',
+    'org.ros2.rcljava.interfaces.GoalResponseDefinition',
+    'org.ros2.rcljava.interfaces.MessageDefinition',
     'org.slf4j.Logger',
     'org.slf4j.LoggerFactory',
 ]
@@ -75,6 +79,42 @@ import @(action_import);
 @[end for]@
 
 public class @(type_name) implements ActionDefinition {
+
+  public static class SendGoalRequest extends @(type_name)_SendGoal_Request implements GoalRequestDefinition<@(type_name)> {
+    public List<Byte> getGoalUuid() {
+      // Return List since it's hash is based on the values (not the object pointer)
+      return super.getGoalId().getUuidAsList();
+    }
+  }
+
+  public static class SendGoalResponse extends @(type_name)_SendGoal_Response implements GoalResponseDefinition<@(type_name)> {
+    public void accept(boolean accepted) {
+      super.setAccepted(accepted);
+    }
+
+    public void setStamp(int sec, int nanosec) {
+      builtin_interfaces.msg.Time msg = new builtin_interfaces.msg.Time();
+      msg.setSec(sec);
+      msg.setNanosec(nanosec);
+      super.setStamp(msg);
+    }
+  }
+
+  public Class<? extends GoalRequestDefinition> getSendGoalRequestType() {
+    return SendGoalRequest.class;
+  }
+
+  public Class<? extends GoalResponseDefinition> getSendGoalResponseType() {
+    return SendGoalResponse.class;
+  }
+
+  public Class<? extends MessageDefinition> getGetResultRequestType() {
+    return @(type_name)_GetResult_Request.class;
+  }
+
+  public Class<? extends MessageDefinition> getGetResultResponseType() {
+    return @(type_name)_GetResult_Response.class;
+  }
 
   private static final Logger logger = LoggerFactory.getLogger(@(type_name).class);
 
