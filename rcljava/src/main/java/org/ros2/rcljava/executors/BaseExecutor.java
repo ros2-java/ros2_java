@@ -30,11 +30,13 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import org.ros2.rcljava.RCLJava;
+import org.ros2.rcljava.action.ActionServer;
 import org.ros2.rcljava.client.Client;
 import org.ros2.rcljava.common.JNIUtils;
 import org.ros2.rcljava.events.EventHandler;
 import org.ros2.rcljava.executors.AnyExecutable;
 import org.ros2.rcljava.executors.Executor;
+import org.ros2.rcljava.interfaces.ActionDefinition;
 import org.ros2.rcljava.interfaces.MessageDefinition;
 import org.ros2.rcljava.interfaces.ServiceDefinition;
 import org.ros2.rcljava.node.ComposableNode;
@@ -68,6 +70,8 @@ public class BaseExecutor {
   private List<Map.Entry<Long, Client>> clientHandles = new ArrayList<Map.Entry<Long, Client>>();
 
   private List<Map.Entry<Long, EventHandler>> eventHandles = new ArrayList<Map.Entry<Long, EventHandler>>();
+
+  private List<Map.Entry<Long, ActionServer>> actionServerHandles = new ArrayList<Map.Entry<Long, ActionServer>>();
 
   protected void addNode(ComposableNode node) {
     this.nodes.add(node);
@@ -168,6 +172,11 @@ public class BaseExecutor {
       anyExecutable.eventHandler.executeCallback();
       eventHandles.remove(anyExecutable.eventHandler.getHandle());
     }
+
+    if (anyExecutable.actionServer != null) {
+      anyExecutable.actionServer.execute();
+      this.actionServerHandles.remove(anyExecutable.actionServer.getHandle());
+    }
   }
 
   protected void waitForWork(long timeout) {
@@ -176,6 +185,7 @@ public class BaseExecutor {
     this.serviceHandles.clear();
     this.clientHandles.clear();
     this.eventHandles.clear();
+    this.actionServerHandles.clear();
 
     for (ComposableNode node : this.nodes) {
       for (Subscription<MessageDefinition> subscription : node.getNode().getSubscriptions()) {
@@ -209,6 +219,11 @@ public class BaseExecutor {
         this.clientHandles.add(
             new AbstractMap.SimpleEntry<Long, Client>(client.getHandle(), client));
       }
+
+      for (ActionServer<ActionDefinition> actionServer : node.getNode().getActionServers()) {
+        this.actionServerHandles.add(
+            new AbstractMap.SimpleEntry<Long, ActionServer>(actionServer.getHandle(), actionServer));
+      }
     }
 
     int subscriptionsSize = 0;
@@ -222,6 +237,13 @@ public class BaseExecutor {
       timersSize += node.getNode().getTimers().size();
       clientsSize += node.getNode().getClients().size();
       servicesSize += node.getNode().getServices().size();
+
+      for (ActionServer actionServer : node.getNode().getActionServers()) {
+        subscriptionsSize += actionServer.getNumberOfSubscriptions();
+        timersSize += actionServer.getNumberOfTimers();
+        clientsSize += actionServer.getNumberOfClients();
+        servicesSize += actionServer.getNumberOfServices();
+      }
     }
 
     if (subscriptionsSize == 0 && timersSize == 0 && clientsSize == 0 && servicesSize == 0) {
@@ -256,6 +278,10 @@ public class BaseExecutor {
       nativeWaitSetAddEvent(waitSetHandle, entry.getKey());
     }
 
+    for (Map.Entry<Long, ActionServer> entry : this.actionServerHandles) {
+      nativeWaitSetAddActionServer(waitSetHandle, entry.getKey());
+    }
+
     nativeWait(waitSetHandle, timeout);
 
     for (int i = 0; i < this.subscriptionHandles.size(); ++i) {
@@ -285,6 +311,12 @@ public class BaseExecutor {
     for (int i = 0; i < this.eventHandles.size(); ++i) {
       if (!nativeWaitSetEventIsReady(waitSetHandle, i)) {
         this.eventHandles.get(i).setValue(null);
+      }
+    }
+
+    for (Map.Entry<Long, ActionServer> entry : this.actionServerHandles) {
+      if (!entry.getValue().isReady(waitSetHandle)) {
+        entry.setValue(null);
       }
     }
 
@@ -326,6 +358,14 @@ public class BaseExecutor {
       Map.Entry<Long, EventHandler> entry = eventIterator.next();
       if (entry.getValue() == null) {
         eventIterator.remove();
+      }
+    }
+
+    Iterator<Map.Entry<Long, ActionServer>> actionServerIterator = this.actionServerHandles.iterator();
+    while (actionServerIterator.hasNext()) {
+      Map.Entry<Long, ActionServer> entry = actionServerIterator.next();
+      if (entry.getValue() == null) {
+        actionServerIterator.remove();
       }
     }
 
@@ -373,6 +413,14 @@ public class BaseExecutor {
     for (Map.Entry<Long, EventHandler> entry : this.eventHandles) {
       if (entry.getValue() != null) {
         anyExecutable.eventHandler = entry.getValue();
+        entry.setValue(null);
+        return anyExecutable;
+      }
+    }
+
+    for (Map.Entry<Long, ActionServer> entry : this.actionServerHandles) {
+      if (entry.getValue() != null) {
+        anyExecutable.actionServer = entry.getValue();
         entry.setValue(null);
         return anyExecutable;
       }
@@ -461,6 +509,8 @@ public class BaseExecutor {
 
   private static native void nativeWaitSetAddEvent(long waitSetHandle, long eventHandle);
 
+  private static native void nativeWaitSetAddActionServer(long waitSetHandle, long actionServerHandle);
+
   private static native RMWRequestId nativeTakeRequest(long serviceHandle,
       long requestFromJavaConverterHandle, long requestToJavaConverterHandle,
       long requestDestructorHandle, MessageDefinition requestMessage);
@@ -482,4 +532,6 @@ public class BaseExecutor {
   private static native boolean nativeWaitSetServiceIsReady(long waitSetHandle, long index);
 
   private static native boolean nativeWaitSetClientIsReady(long waitSetHandle, long index);
+
+  private static native boolean nativeWaitSetActionServerIsReady(long waitSetHandle, long actionServerHandle);
 }

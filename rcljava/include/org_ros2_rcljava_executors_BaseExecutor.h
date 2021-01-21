@@ -100,6 +100,15 @@ JNICALL Java_org_ros2_rcljava_executors_BaseExecutor_nativeWaitSetAddClient(
 
 /*
  * Class:     org_ros2_rcljava_executors_BaseExecutor
+ * Method:    nativeWaitSetAddActionServer
+ * Signature: (JJ)V
+ */
+JNIEXPORT void
+JNICALL Java_org_ros2_rcljava_executors_BaseExecutor_nativeWaitSetAddActionServer(
+  JNIEnv *, jclass, jlong, jlong);
+
+/*
+ * Class:     org_ros2_rcljava_executors_BaseExecutor
  * Method:    nativeTakeRequest
  * Signature: (JJJJLorg/ros2/rcljava/interfaces/MessageDefinition;)Lorg/ros2/rcljava/RMWRequestId;
  */

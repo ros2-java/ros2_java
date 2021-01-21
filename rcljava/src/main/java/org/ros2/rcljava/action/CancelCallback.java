@@ -1,4 +1,4 @@
-/* Copyright 2017-2018 Esteve Fernandez <esteve@apache.org>
+/* Copyright 2020 ros2-java contributors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,20 +13,21 @@
  * limitations under the License.
  */
 
-package org.ros2.rcljava.executors;
+package org.ros2.rcljava.action;
 
-import org.ros2.rcljava.action.ActionServer;
-import org.ros2.rcljava.client.Client;
-import org.ros2.rcljava.events.EventHandler;
-import org.ros2.rcljava.subscription.Subscription;
-import org.ros2.rcljava.service.Service;
-import org.ros2.rcljava.timer.Timer;
+import org.ros2.rcljava.interfaces.ActionDefinition;
 
-public class AnyExecutable {
-  public Timer timer;
-  public Subscription subscription;
-  public Service service;
-  public Client client;
-  public EventHandler eventHandler;
-  public ActionServer actionServer;
+public interface CancelCallback<T extends ActionDefinition> {
+  enum CancelResponse {
+    REJECT,
+    ACCEPT,
+  };
+
+  /**
+   * Called when a new cancel request is received.
+   *
+   * @param goalHandle The goal handle.
+   * @return Cancel response indicating if the cancel request was accepted or not.
+   */
+  CancelResponse handleCancel(ActionServerGoalHandle<T> goalHandle);
 }

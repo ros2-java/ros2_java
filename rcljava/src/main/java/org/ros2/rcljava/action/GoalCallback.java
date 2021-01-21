@@ -1,4 +1,4 @@
-/* Copyright 2017-2018 Esteve Fernandez <esteve@apache.org>
+/* Copyright 2020 ros2-java contributors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,20 +13,21 @@
  * limitations under the License.
  */
 
-package org.ros2.rcljava.executors;
+package org.ros2.rcljava.action;
 
-import org.ros2.rcljava.action.ActionServer;
-import org.ros2.rcljava.client.Client;
-import org.ros2.rcljava.events.EventHandler;
-import org.ros2.rcljava.subscription.Subscription;
-import org.ros2.rcljava.service.Service;
-import org.ros2.rcljava.timer.Timer;
+import org.ros2.rcljava.interfaces.GoalRequestDefinition;
 
-public class AnyExecutable {
-  public Timer timer;
-  public Subscription subscription;
-  public Service service;
-  public Client client;
-  public EventHandler eventHandler;
-  public ActionServer actionServer;
+public interface GoalCallback<T extends GoalRequestDefinition> {
+  public enum GoalResponse {
+    REJECT,
+    ACCEPT,
+  };
+
+  /**
+   * Called when a new goal request is received.
+   *
+   * @param goal The action goal request.
+   * @return Goal response indicating if the goal was accepted or not.
+   */
+  GoalResponse handleGoal(T goal);
 }

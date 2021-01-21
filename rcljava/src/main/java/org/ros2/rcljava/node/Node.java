@@ -20,6 +20,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
+import org.ros2.rcljava.action.ActionServer;
+import org.ros2.rcljava.action.ActionServerGoalHandle;
+import org.ros2.rcljava.action.CancelCallback;
+import org.ros2.rcljava.action.GoalCallback;
 import org.ros2.rcljava.client.Client;
 import org.ros2.rcljava.concurrent.Callback;
 import org.ros2.rcljava.consumers.Consumer;
@@ -28,6 +32,8 @@ import org.ros2.rcljava.graph.EndpointInfo;
 import org.ros2.rcljava.graph.NameAndTypes;
 import org.ros2.rcljava.graph.NodeNameInfo;
 import org.ros2.rcljava.interfaces.Disposable;
+import org.ros2.rcljava.interfaces.ActionDefinition;
+import org.ros2.rcljava.interfaces.GoalRequestDefinition;
 import org.ros2.rcljava.interfaces.MessageDefinition;
 import org.ros2.rcljava.interfaces.ServiceDefinition;
 import org.ros2.rcljava.parameters.ParameterCallback;
@@ -76,6 +82,11 @@ public interface Node extends Disposable {
    * @return All the @{link Timer}s that were created by this instance.
    */
   Collection<Timer> getTimers();
+
+  /**
+   * @return All the @{link ActionServer}s that were created by this instance.
+   */
+  Collection<ActionServer> getActionServers();
 
   /**
    * Create a Subscription&lt;T&gt;.
@@ -134,6 +145,24 @@ public interface Node extends Disposable {
       final String serviceName) throws NoSuchFieldException, IllegalAccessException;
 
   /**
+   * Create an ActionServer&lt;T&gt;.
+   *
+   * @param <T> The type of action that will be handled by the created @{link ActionServer}.
+   * @param actionName The name of action that the create @{link ActionServer} will offer.
+   * @param goalCallback The callback that will be called when the @{link ActionServer}
+   *     receives a new goal request.
+   * @param cancelCallback The callback that will be called when the @{link ActionServer}
+   *     receives a cancle request for an active goal.
+   * @param acceptedCallback The callback that will be called when the @{link ActionServer}
+   *     accepts a goal request.
+   */
+  <T extends ActionDefinition> ActionServer<T> createActionServer(final Class<T> actionType,
+      final String actionName,
+      final GoalCallback<? extends GoalRequestDefinition<T>> goalCallback,
+      final CancelCallback<T> cancelCallback,
+      final Consumer<ActionServerGoalHandle<T>> acceptedCallback);
+
+  /**
    * Remove a Subscription created by this Node.
    *
    * Calling this method effectively invalidates the passed @{link Subscription}.
@@ -180,6 +209,18 @@ public interface Node extends Disposable {
    *   removed or was never created by this Node.
    */
   boolean removeClient(final Client client);
+
+  /**
+   * Remove an @{link ActionServer} created by this Node.
+   *
+   * Calling this method effectively invalidates the passed @{link ActionServer}.
+   * If the server was not created by this Node, then nothing happens.
+   *
+   * @param actionServer The object to remove from this node.
+   * @return true if the server was removed, false if the server was already
+   *   removed or was never created by this Node.
+   */
+  boolean removeActionServer(final ActionServer actionServer);
 
   /**
    * Create a wall timer.
