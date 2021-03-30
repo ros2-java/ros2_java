@@ -165,3 +165,46 @@ function(ament_add_junit_tests TARGET_NAME)
 
   add_dependencies(${TARGET_NAME} "${TARGET_NAME}_jar")
 endfunction()
+
+#
+# Creates a sources jar from list of source files
+#
+# :param OUTPUT_NAME: Name of Jar
+# :type OUTPUT_NAME: string
+# :param SOURCES: Sources files
+# :type SOURCES: String list with file names
+#
+# @public
+#
+function(add_source_jar _TARGET_NAME)
+
+  cmake_parse_arguments(_add_source_jar
+    ""
+    "OUTPUT_NAME"
+    "SOURCES"
+    ${ARGN}
+  )
+
+  if(NOT _add_source_jar_OUTPUT_NAME)
+    set(_add_source_jar_OUTPUT_NAME "${_TARGET_NAME}.jar")
+  endif()
+
+  set(_SOURCE_FILES ${_add_source_jar_SOURCES} ${_add_source_jar_UNPARSED_ARGUMENTS})
+  set(_JAVA_JAR_SOURCES_OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/${_add_source_jar_OUTPUT_NAME}.jar)
+
+  add_custom_command(
+    OUTPUT ${_add_source_jar_OUTPUT_NAME}
+    COMMAND ${Java_JAR_EXECUTABLE} -cf ${_JAVA_JAR_SOURCES_OUTPUT} ${_SOURCE_FILES}
+    WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
+  )
+  add_custom_target(${_TARGET_NAME} ALL DEPENDS ${_add_source_jar_OUTPUT_NAME})
+
+  # Set install property (for 'install_jar()').
+  set_property(
+    TARGET ${_TARGET_NAME}
+    PROPERTY
+        INSTALL_FILES
+          ${_JAVA_JAR_SOURCES_OUTPUT}
+  )
+
+endfunction()

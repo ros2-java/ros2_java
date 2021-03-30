@@ -230,6 +230,16 @@ add_jar("${PROJECT_NAME}_jar"
 install_jar("${PROJECT_NAME}_jar" "share/${PROJECT_NAME}/java")
 ament_export_jars("share/${PROJECT_NAME}/java/${PROJECT_NAME}.jar")
 
+add_source_jar("${PROJECT_NAME}-source_jar"
+  ${${PROJECT_NAME}_sources}
+  OUTPUT_NAME
+  ${PROJECT_NAME}-source
+)
+
+install_jar("${PROJECT_NAME}-source_jar" "share/${PROJECT_NAME}/java")
+ament_export_jars("share/${PROJECT_NAME}/java/${PROJECT_NAME}-source.jar")
+
+
 if(BUILD_TESTING)
   find_package(ament_lint_auto REQUIRED)
   find_package(std_msgs REQUIRED)
