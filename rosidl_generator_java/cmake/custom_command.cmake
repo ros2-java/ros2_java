@@ -43,4 +43,11 @@ add_jar("${PROJECT_NAME}_messages_jar"
   ${_jar_deps}
 )
 
+add_source_jar("${PROJECT_NAME}_messages_source_jar"
+  ${_generated_java_files}
+  OUTPUT_NAME
+  ${PROJECT_NAME}_messages-source
+)
+
 add_dependencies("${PROJECT_NAME}_messages_jar" "${rosidl_generate_interfaces_TARGET}${_target_suffix}")
+add_dependencies("${PROJECT_NAME}_messages_source_jar" "${rosidl_generate_interfaces_TARGET}${_target_suffix}")
