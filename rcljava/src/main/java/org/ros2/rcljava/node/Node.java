@@ -152,7 +152,7 @@ public interface Node extends Disposable {
    * @param goalCallback The callback that will be called when the @{link ActionServer}
    *     receives a new goal request.
    * @param cancelCallback The callback that will be called when the @{link ActionServer}
-   *     receives a cancle request for an active goal.
+   *     receives a cancel request for an active goal.
    * @param acceptedCallback The callback that will be called when the @{link ActionServer}
    *     accepts a goal request.
    */

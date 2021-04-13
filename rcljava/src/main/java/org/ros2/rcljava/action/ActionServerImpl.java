@@ -322,7 +322,8 @@ public class ActionServerImpl<T extends ActionDefinition> implements ActionServe
     // Call user callback
     GoalCallback.GoalResponse response = this.goalCallback.handleGoal(requestMessage);
 
-    boolean accepted = GoalCallback.GoalResponse.ACCEPT == response;
+    boolean accepted = GoalCallback.GoalResponse.ACCEPT_AND_DEFER == response
+      || GoalCallback.GoalResponse.ACCEPT_AND_EXECUTE == response;
     responseMessage.accept(accepted);
 
     System.out.println("Goal request handled " + accepted);
@@ -334,6 +335,10 @@ public class ActionServerImpl<T extends ActionDefinition> implements ActionServe
     GoalHandleImpl goalHandle = this.new GoalHandleImpl(
       this, goalInfo, requestMessage.getGoal());
     this.goalHandles.put(requestMessage.getGoalUuid(), goalHandle);
+    if (GoalCallback.GoalResponse.ACCEPT_AND_EXECUTE == response) {
+      goalHandle.execute();
+      this.acceptedCallback.accept(goalHandle);
+    }
     return goalHandle;
   }
 
@@ -467,9 +472,6 @@ public class ActionServerImpl<T extends ActionDefinition> implements ActionServe
             this.handle, rmwRequestId,
             responseFromJavaConverterHandle, responseToJavaConverterHandle,
             responseDestructorHandle, responseMessage);
-          if (goalHandle != null) {
-            this.acceptedCallback.accept(goalHandle);
-          }
         }
       }
     }

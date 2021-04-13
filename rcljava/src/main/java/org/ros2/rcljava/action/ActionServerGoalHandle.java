@@ -41,6 +41,13 @@ public interface ActionServerGoalHandle<T extends ActionDefinition> extends Disp
   public boolean isCanceling();
 
   /**
+   * Transition the goal to the EXECUTING state.
+   *
+   * Pre-condition: the goal must be in the ACCEPTED state.
+   */
+  public void execute();
+
+  /**
    * Transition the goal to the SUCCEEDED state.
    *
    * Pre-condition: the goal must be in the EXECUTING or CANCELING state.

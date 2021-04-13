@@ -41,7 +41,7 @@ public class ActionServerTest {
     public test_msgs.action.Fibonacci_Goal goal;
     public GoalResponse handleGoal(test_msgs.action.Fibonacci.SendGoalRequest goal) {
       this.goal = goal.getGoal();
-      return GoalResponse.ACCEPT;
+      return GoalResponse.ACCEPT_AND_EXECUTE;
     }
   }
 

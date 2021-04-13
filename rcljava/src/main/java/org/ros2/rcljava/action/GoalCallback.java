@@ -20,7 +20,8 @@ import org.ros2.rcljava.interfaces.GoalRequestDefinition;
 public interface GoalCallback<T extends GoalRequestDefinition> {
   public enum GoalResponse {
     REJECT,
-    ACCEPT,
+    ACCEPT_AND_EXECUTE,
+    ACCEPT_AND_DEFER,
   };
 
   /**
