@@ -953,10 +953,10 @@ public class NodeTest {
       rcljava.msg.UInt32.class, "test_get_topic_names_and_types_one");
     Publisher<rcljava.msg.UInt32> publisher2 = node.<rcljava.msg.UInt32>createPublisher(
       rcljava.msg.UInt32.class, "test_get_topic_names_and_types_two");
-    Subscription<rcljava.msg.Empty> subscription = node.<rcljava.msg.Empty>createSubscription(
-      rcljava.msg.Empty.class, "test_get_topic_names_and_types_one",
-      new Consumer<rcljava.msg.Empty>() {
-        public void accept(final rcljava.msg.Empty msg) {}
+    Subscription<rcljava.msg.UInt32> subscription = node.<rcljava.msg.UInt32>createSubscription(
+      rcljava.msg.UInt32.class, "test_get_topic_names_and_types_one",
+      new Consumer<rcljava.msg.UInt32>() {
+        public void accept(final rcljava.msg.UInt32 msg) {}
       });
     Subscription<rcljava.msg.Empty> subscription2 = node.<rcljava.msg.Empty>createSubscription(
       rcljava.msg.Empty.class, "test_get_topic_names_and_types_three",
@@ -974,7 +974,7 @@ public class NodeTest {
           namesAndTypes.contains(
             new NameAndTypes(
               "/test_get_topic_names_and_types_one",
-              new ArrayList(Arrays.asList("rcljava/msg/Empty", "rcljava/msg/UInt32")))));
+              new ArrayList(Arrays.asList("rcljava/msg/UInt32")))));
         assertTrue(
           "topic 'test_get_topic_names_and_types_two' was not discovered",
           namesAndTypes.contains(
