@@ -27,6 +27,11 @@ public class BaseComposableNode implements ComposableNode {
     node = RCLJava.createNode(this.name);
   }
 
+  public BaseComposableNode(String name, String namespace) {
+    this.name = name;
+    node = RCLJava.createNode(name, namespace);
+  }
+
   public Node getNode() {
     return node;
   }
