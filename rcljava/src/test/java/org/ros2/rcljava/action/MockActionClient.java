@@ -26,15 +26,15 @@ import org.ros2.rcljava.node.Node;
 import org.ros2.rcljava.subscription.Subscription;
 
 public class MockActionClient {
-  class FeedbackCallback implements Consumer<test_msgs.action.Fibonacci_Feedback> {
-    public List<test_msgs.action.Fibonacci_Feedback> feedbackReceived;
+  class FeedbackCallback implements Consumer<test_msgs.action.Fibonacci_FeedbackMessage> {
+    public List<test_msgs.action.Fibonacci_FeedbackMessage> feedbackReceived;
 
     public FeedbackCallback() {
       feedbackReceived = Collections.synchronizedList(
-        new ArrayList<test_msgs.action.Fibonacci_Feedback>());
+        new ArrayList<test_msgs.action.Fibonacci_FeedbackMessage>());
     }
 
-    public void accept(final test_msgs.action.Fibonacci_Feedback feedback) {
+    public void accept(final test_msgs.action.Fibonacci_FeedbackMessage feedback) {
       this.feedbackReceived.add(feedback);
     }
   }
@@ -56,7 +56,7 @@ public class MockActionClient {
   public Client<action_msgs.srv.CancelGoal> cancelGoalClient;
   public FeedbackCallback feedbackCallback;
   public StatusCallback statusCallback;
-  public Subscription<test_msgs.action.Fibonacci_Feedback> feedbackSubscription;
+  public Subscription<test_msgs.action.Fibonacci_FeedbackMessage> feedbackSubscription;
   public Subscription<action_msgs.msg.GoalStatusArray> statusSubscription;
 
   public MockActionClient(Node node, String actionName) throws IllegalAccessException, NoSuchFieldException {
@@ -70,8 +70,8 @@ public class MockActionClient {
     // Create mock subscriptions that make up an action client
     feedbackCallback = new FeedbackCallback();
     statusCallback = new StatusCallback();
-    feedbackSubscription = node.<test_msgs.action.Fibonacci_Feedback>createSubscription(
-      test_msgs.action.Fibonacci_Feedback.class,
+    feedbackSubscription = node.<test_msgs.action.Fibonacci_FeedbackMessage>createSubscription(
+      test_msgs.action.Fibonacci_FeedbackMessage.class,
       actionName + "/_action/feedback",
       feedbackCallback);
     statusSubscription = node.<action_msgs.msg.GoalStatusArray>createSubscription(

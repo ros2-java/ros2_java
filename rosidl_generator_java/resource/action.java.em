@@ -13,6 +13,7 @@ type_name = action.namespaced_type.name
 goal_type_name = action.goal.structure.namespaced_type.name
 result_type_name = action.result.structure.namespaced_type.name
 feedback_type_name = action.feedback.structure.namespaced_type.name
+feedback_message_type_name = action.feedback_message.structure.namespaced_type.name
 send_goal_type_name = action.send_goal_service.namespaced_type.name
 get_result_type_name = action.get_result_service.namespaced_type.name
 
@@ -40,6 +41,14 @@ expand_template(
 
 data.update({'message': action.feedback})
 output_file = os.path.join(output_dir, *namespaces[1:], feedback_type_name + '.java')
+expand_template(
+    'msg.java.em',
+    data,
+    output_file,
+    template_basepath=template_basepath)
+
+data.update({'message': action.feedback_message})
+output_file = os.path.join(output_dir, *namespaces[1:], feedback_message_type_name + '.java')
 expand_template(
     'msg.java.em',
     data,
@@ -134,4 +143,6 @@ public class @(type_name) implements ActionDefinition {
   public static final Class<@(type_name)_Result> ResultType = @(type_name)_Result.class;
 
   public static final Class<@(type_name)_Feedback> FeedbackType = @(type_name)_Feedback.class;
+
+  public static final Class<@(type_name)_FeedbackMessage> FeedbackMessageType = @(type_name)_FeedbackMessage.class;
 }

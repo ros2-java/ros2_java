@@ -66,6 +66,8 @@ for member in message.structure.members:
             include_prefix = include_prefix[:-8]
         elif include_prefix.endswith('__feedback'):
             include_prefix = include_prefix[:-10]
+        elif include_prefix.endswith('__feedback_message'):
+            include_prefix = include_prefix[:-18]
         elif include_prefix.endswith('__send_goal'):
             include_prefix = include_prefix[:-11]
         elif include_prefix.endswith('__get_result'):
@@ -87,6 +89,8 @@ elif message_c_include_prefix.endswith('__result'):
     message_c_include_prefix = message_c_include_prefix[:-8]
 elif message_c_include_prefix.endswith('__feedback'):
     message_c_include_prefix = message_c_include_prefix[:-10]
+elif message_c_include_prefix.endswith('__feedback_message'):
+    message_c_include_prefix = message_c_include_prefix[:-18]
 elif message_c_include_prefix.endswith('__send_goal'):
     message_c_include_prefix = message_c_include_prefix[:-11]
 elif message_c_include_prefix.endswith('__get_result'):
