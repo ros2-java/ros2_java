@@ -20,6 +20,7 @@ if(NOT ANDROID)
   find_package(JNI REQUIRED)
 endif()
 include(UseJava)
+include(JavaExtra)
 
 # Default to C++14
 if(NOT CMAKE_CXX_STANDARD)
@@ -147,6 +148,14 @@ install_jar("${PROJECT_NAME}_jar" "share/${PROJECT_NAME}/java")
 list(APPEND ${PROJECT_NAME}_exported_jars "share/${PROJECT_NAME}/java/${PROJECT_NAME}.jar")
 
 ament_export_jars(${${PROJECT_NAME}_exported_jars})
+
+add_source_jar("${PROJECT_NAME}-source_jar"
+  ${${PROJECT_NAME}_java_sources}
+  OUTPUT_NAME
+  ${PROJECT_NAME}-source
+)
+
+install_jar("${PROJECT_NAME}-source_jar" "share/${PROJECT_NAME}/java")
 
 include_directories(include)
 
