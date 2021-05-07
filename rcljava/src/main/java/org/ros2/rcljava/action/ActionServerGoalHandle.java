@@ -17,9 +17,21 @@ package org.ros2.rcljava.action;
 
 import org.ros2.rcljava.interfaces.ActionDefinition;
 import org.ros2.rcljava.interfaces.Disposable;
-import org.ros2.rcljava.interfaces.MessageDefinition;
+import org.ros2.rcljava.interfaces.GoalDefinition;
+import org.ros2.rcljava.interfaces.FeedbackDefinition;
+import org.ros2.rcljava.interfaces.ResultDefinition;
 
 public interface ActionServerGoalHandle<T extends ActionDefinition> extends Disposable {
+  /**
+   * Get the action result type.
+   */
+  public Class<? extends ResultDefinition> getResultType();
+
+  /**
+   * Get the action feedback type.
+   */
+  public Class<? extends FeedbackDefinition> getFeedbackType();
+
   /**
    * Get the message containing the timestamp and ID for the goal.
    */
@@ -28,7 +40,7 @@ public interface ActionServerGoalHandle<T extends ActionDefinition> extends Disp
   /**
    * Get the goal message.
    */
-  public MessageDefinition getGoal();
+  public GoalDefinition<T> getGoal();
 
   /**
    * Get the goal status.
@@ -52,19 +64,26 @@ public interface ActionServerGoalHandle<T extends ActionDefinition> extends Disp
    *
    * Pre-condition: the goal must be in the EXECUTING or CANCELING state.
    */
-  public void succeed();
+  public void succeed(ResultDefinition<T> result);
 
   /**
    * Transition the goal the the CANCELED state.
    *
    * Pre-condition: the goal must be in the CANCELING state.
    */
-  public void canceled();
+  public void canceled(ResultDefinition<T> result);
 
   /**
    * Transition the goal the the CANCELED state.
    *
    * Pre-condition: the goal must be in the EXCUTING or CANCELING state.
    */
-  public void abort();
+  public void abort(ResultDefinition<T> result);
+
+  /**
+   * Send an update about the progress of a goal.
+   *
+   * Pre-condition: the goal must be in the EXCUTING state.
+   */
+  public void publishFeedback(FeedbackDefinition<T> result);
 }

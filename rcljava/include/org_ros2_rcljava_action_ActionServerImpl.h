@@ -126,11 +126,46 @@ JNICALL Java_org_ros2_rcljava_action_ActionServerImpl_nativeProcessCancelRequest
  * Method:    nativeCheckGoalExists
  * Signature: (JLorg/ros2/rcljava/interfaces/MessageDefinition;JJ)Z
  */
-
 JNIEXPORT jboolean
 JNICALL Java_org_ros2_rcljava_action_ActionServerImpl_nativeCheckGoalExists(
   JNIEnv * env, jclass,
   jlong, jobject, jlong, jlong);
+
+/*
+ * Class:     org_ros2_rcljava_action_ActionServerImpl
+ * Method:    nativePublishStatus
+ * Signature: (J)
+ */
+JNIEXPORT void
+JNICALL Java_org_ros2_rcljava_action_ActionServerImpl_nativePublishStatus(
+  JNIEnv * env, jclass, jlong);
+
+/*
+ * Class:     org_ros2_rcljava_action_ActionServerImpl
+ * Method:    nativePublishFeedbackMessage
+ * Signature: (JLorg/ros2/rcljava/interfaces/FeedbackMessageDefinition;JJ)
+ */
+JNIEXPORT void
+JNICALL Java_org_ros2_rcljava_action_ActionServerImpl_nativePublishFeedbackMessage(
+  JNIEnv * env, jclass, jlong, jobject, jlong, jlong);
+
+/*
+ * Class:     org_ros2_rcljava_action_ActionServerImpl
+ * Method:    nativeNotifyGoalDone
+ * Signature: (J)
+ */
+JNIEXPORT void
+JNICALL Java_org_ros2_rcljava_action_ActionServerImpl_nativeNotifyGoalDone(
+  JNIEnv * env, jclass, jlong);
+
+/*
+ * Class:     org_ros2_rcljava_action_ActionServerImpl
+ * Method:    nativeExpireGoals
+ * Signature: (JLaction_msgs/msg/GoalInfo;JLorg/ros2/rcljava/consumers/Consumer;)
+ */
+JNIEXPORT void
+JNICALL Java_org_ros2_rcljava_action_ActionServerImpl_nativeExpireGoals(
+  JNIEnv * env, jclass, jlong, jobject, jlong, jobject);
 
 #ifdef __cplusplus
 }

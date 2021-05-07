@@ -18,6 +18,9 @@ package org.ros2.rcljava.interfaces;
 public interface ActionDefinition {
   Class<? extends GoalRequestDefinition> getSendGoalRequestType();
   Class<? extends GoalResponseDefinition> getSendGoalResponseType();
-  Class<? extends MessageDefinition> getGetResultRequestType();
-  Class<? extends MessageDefinition> getGetResultResponseType();
+  Class<? extends ResultRequestDefinition> getGetResultRequestType();
+  Class<? extends ResultResponseDefinition> getGetResultResponseType();
+  Class<? extends ResultDefinition> getResultType();
+  Class<? extends FeedbackDefinition> getFeedbackType();
+  Class<? extends FeedbackMessageDefinition> getFeedbackMessageType();
 }

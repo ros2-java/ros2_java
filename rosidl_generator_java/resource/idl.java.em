@@ -26,6 +26,7 @@ data = {
     'interface_path': interface_path,
     'output_dir': output_dir,
     'template_basepath': template_basepath,
+    'marker_interfaces': [],
 }
 
 for message in content.get_elements_of_type(Message):

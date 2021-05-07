@@ -17,6 +17,9 @@ from rosidl_parser.definition import BoundedSequence
 from rosidl_parser.definition import NamespacedType
 
 type_name = message.structure.namespaced_type.name
+interfaces_implemented = ['MessageDefinition']
+interfaces_implemented.extend(f"{t.rsplit('.', 1)[1]}" for t in marker_interfaces)
+interfaces_implemented = ', '.join(interfaces_implemented)
 
 message_imports = [
     'org.apache.commons.lang3.builder.EqualsBuilder',
@@ -26,6 +29,7 @@ message_imports = [
     'org.slf4j.Logger',
     'org.slf4j.LoggerFactory',
 ]
+message_imports.extend(f"{t.split('<', 1)[0]}" for t in marker_interfaces)
 }@
 @[for message_import in message_imports]@
 import @(message_import);
@@ -38,7 +42,7 @@ import @('.'.join(member.type.namespaced_name()));
 @[  end if]@
 @[end for]@
 
-public class @(type_name) implements MessageDefinition {
+public class @(type_name) implements @(interfaces_implemented) {
 
   private static final Logger logger = LoggerFactory.getLogger(@(type_name).class);
 

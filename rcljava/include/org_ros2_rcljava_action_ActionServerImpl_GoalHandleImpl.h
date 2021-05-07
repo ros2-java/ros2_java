@@ -41,48 +41,12 @@ JNICALL Java_org_ros2_rcljava_action_ActionServerImpl_00024GoalHandleImpl_native
 
 /*
  * Class:     org_ros2_rcljava_action_ActionServerImpl$GoalHandleImpl
- * Method:    nativeGoalEventExecute
- * Signature: (J)
+ * Method:    nativeUpdateGoalState
+ * Signature: (JJ)
  */
 JNIEXPORT void
-JNICALL Java_org_ros2_rcljava_action_ActionServerImpl_00024GoalHandleImpl_nativeGoalEventExecute(
-  JNIEnv * env, jclass, jlong);
-
-/*
- * Class:     org_ros2_rcljava_action_ActionServerImpl$GoalHandleImpl
- * Method:    nativeGoalEventCancelGoal
- * Signature: (J)
- */
-JNIEXPORT void
-JNICALL Java_org_ros2_rcljava_action_ActionServerImpl_00024GoalHandleImpl_nativeGoalEventCancelGoal(
-  JNIEnv * env, jclass, jlong);
-
-/*
- * Class:     org_ros2_rcljava_action_ActionServerImpl$GoalHandleImpl
- * Method:    nativeGoalEventSucceed
- * Signature: (J)
- */
-JNIEXPORT void
-JNICALL Java_org_ros2_rcljava_action_ActionServerImpl_00024GoalHandleImpl_nativeGoalEventSucceed(
-  JNIEnv * env, jclass, jlong);
-
-/*
- * Class:     org_ros2_rcljava_action_ActionServerImpl$GoalHandleImpl
- * Method:    nativeGoalEventAbort
- * Signature: (J)
- */
-JNIEXPORT void
-JNICALL Java_org_ros2_rcljava_action_ActionServerImpl_00024GoalHandleImpl_nativeGoalEventAbort(
-  JNIEnv * env, jclass, jlong);
-
-/*
- * Class:     org_ros2_rcljava_action_ActionServerImpl$GoalHandleImpl
- * Method:    nativeGoalEventCanceled
- * Signature: (J)
- */
-JNIEXPORT void
-JNICALL Java_org_ros2_rcljava_action_ActionServerImpl_00024GoalHandleImpl_nativeGoalEventCanceled(
-  JNIEnv * env, jclass, jlong);
+JNICALL Java_org_ros2_rcljava_action_ActionServerImpl_00024GoalHandleImpl_nativeUpdateGoalState(
+  JNIEnv * env, jclass, jlong jgoal_handle, jlong jevent);
 
 /*
  * Class:     org_ros2_rcljava_action_ActionServerImpl$GoalHandleImpl

@@ -16,32 +16,31 @@
 package org.ros2.rcljava.action;
 
 public enum GoalStatus {
-  UNKNOWN,
-  ACCEPTED,
-  EXECUTING,
-  CANCELING,
-  SUCCEEDED,
-  CANCELED,
-  ABORTED;
+  UNKNOWN(action_msgs.msg.GoalStatus.STATUS_UNKNOWN),
+  ACCEPTED(action_msgs.msg.GoalStatus.STATUS_ACCEPTED),
+  EXECUTING(action_msgs.msg.GoalStatus.STATUS_EXECUTING),
+  CANCELING(action_msgs.msg.GoalStatus.STATUS_CANCELING),
+  SUCCEEDED(action_msgs.msg.GoalStatus.STATUS_SUCCEEDED),
+  CANCELED(action_msgs.msg.GoalStatus.STATUS_CANCELED),
+  ABORTED(action_msgs.msg.GoalStatus.STATUS_ABORTED);
 
-  public static GoalStatus fromMessageValue(byte status) {
-    switch (status) {
-      case action_msgs.msg.GoalStatus.STATUS_ACCEPTED:
-        return GoalStatus.ACCEPTED;
-      case action_msgs.msg.GoalStatus.STATUS_EXECUTING:
-        return GoalStatus.EXECUTING;
-      case action_msgs.msg.GoalStatus.STATUS_CANCELING:
-        return GoalStatus.CANCELING;
-      case action_msgs.msg.GoalStatus.STATUS_SUCCEEDED:
-        return GoalStatus.SUCCEEDED;
-      case action_msgs.msg.GoalStatus.STATUS_CANCELED:
-        return GoalStatus.CANCELED;
-      case action_msgs.msg.GoalStatus.STATUS_ABORTED:
-        return GoalStatus.ABORTED;
-      case action_msgs.msg.GoalStatus.STATUS_UNKNOWN:
-      default:
-        return GoalStatus.UNKNOWN;
+  public static GoalStatus fromMessageValue(byte value) {
+    for (GoalStatus status: GoalStatus.values()) {
+      if (status.status == value) {
+        return status;
+      }
     }
+    return GoalStatus.ABORTED;
   }
+
+  public byte toMessageValue() {
+    return this.status;
+  }
+
+  private GoalStatus(byte status) {
+    this.status = status;
+  }
+
+  private byte status;
 }
 

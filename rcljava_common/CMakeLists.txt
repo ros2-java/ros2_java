@@ -39,9 +39,15 @@ set(${PROJECT_NAME}_java_sources
   "src/main/java/org/ros2/rcljava/exceptions/RCLReturn.java"
   "src/main/java/org/ros2/rcljava/interfaces/ActionDefinition.java"
   "src/main/java/org/ros2/rcljava/interfaces/Disposable.java"
-  "src/main/java/org/ros2/rcljava/interfaces/GoalRequestDefinition.java"
+  "src/main/java/org/ros2/rcljava/interfaces/FeedbackDefinition.java"
+  "src/main/java/org/ros2/rcljava/interfaces/FeedbackMessageDefinition.java"
+  "src/main/java/org/ros2/rcljava/interfaces/GoalDefinition.java"
   "src/main/java/org/ros2/rcljava/interfaces/GoalResponseDefinition.java"
+  "src/main/java/org/ros2/rcljava/interfaces/GoalRequestDefinition.java"
   "src/main/java/org/ros2/rcljava/interfaces/MessageDefinition.java"
+  "src/main/java/org/ros2/rcljava/interfaces/ResultDefinition.java"
+  "src/main/java/org/ros2/rcljava/interfaces/ResultRequestDefinition.java"
+  "src/main/java/org/ros2/rcljava/interfaces/ResultResponseDefinition.java"
   "src/main/java/org/ros2/rcljava/interfaces/ServiceDefinition.java"
 )
 
