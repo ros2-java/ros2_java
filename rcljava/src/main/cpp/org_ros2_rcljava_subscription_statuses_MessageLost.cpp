@@ -24,7 +24,7 @@
 using rcljava_common::exceptions::rcljava_throw_exception;
 
 JNIEXPORT jlong JNICALL
-Java_org_ros2_rcljava_subscription_statuses_MessageLost_nativeAllocateRCL(
+Java_org_ros2_rcljava_subscription_statuses_MessageLost_nativeAllocateRCLStatusEvent(
   JNIEnv * env, jclass)
 {
   void * p = malloc(sizeof(rmw_message_lost_status_t));
@@ -36,14 +36,14 @@ Java_org_ros2_rcljava_subscription_statuses_MessageLost_nativeAllocateRCL(
 }
 
 JNIEXPORT void JNICALL
-Java_org_ros2_rcljava_subscription_statuses_MessageLost_nativeDeallocateRCL(
+Java_org_ros2_rcljava_subscription_statuses_MessageLost_nativeDeallocateRCLStatusEvent(
   JNIEnv *, jclass, jlong handle)
 {
   free(reinterpret_cast<void *>(handle));
 }
 
 JNIEXPORT void JNICALL
-Java_org_ros2_rcljava_subscription_statuses_MessageLost_nativeFromRCL(
+Java_org_ros2_rcljava_subscription_statuses_MessageLost_nativeFromRCLEvent(
   JNIEnv * env, jobject self, jlong handle)
 {
   auto * p = reinterpret_cast<rmw_message_lost_status_t *>(handle);
@@ -67,7 +67,7 @@ Java_org_ros2_rcljava_subscription_statuses_MessageLost_nativeFromRCL(
 }
 
 JNIEXPORT jint JNICALL
-Java_org_ros2_rcljava_subscription_statuses_MessageLost_nativeGetEventType(
+Java_org_ros2_rcljava_subscription_statuses_MessageLost_nativeGetSubscriptionEventType(
   JNIEnv *, jclass)
 {
   return RCL_SUBSCRIPTION_MESSAGE_LOST;

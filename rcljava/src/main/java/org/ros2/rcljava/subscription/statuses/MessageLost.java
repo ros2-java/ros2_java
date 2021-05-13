@@ -30,16 +30,16 @@ public class MessageLost implements SubscriptionEventStatus {
   public int totalCountChange;
 
   public final long allocateRCLStatusEvent() {
-    return nativeAllocateRCL();
+    return nativeAllocateRCLStatusEvent();
   }
   public final void deallocateRCLStatusEvent(long handle) {
-    nativeDeallocateRCL(handle);
+    nativeDeallocateRCLStatusEvent(handle);
   }
   public final void fromRCLEvent(long handle) {
-    nativeFromRCL(handle);
+    nativeFromRCLEvent(handle);
   }
   public final int getSubscriptionEventType() {
-    return nativeGetEventType();
+    return nativeGetSubscriptionEventType();
   }
   // TODO(ivanpauno): Remove this when -source 8 can be used (method references for the win)
   public static final Supplier<MessageLost> factory = new Supplier<MessageLost>() {
@@ -47,6 +47,11 @@ public class MessageLost implements SubscriptionEventStatus {
       return new MessageLost();
     }
   };
+
+  private static native long nativeAllocateRCLStatusEvent();
+  private static native void nativeDeallocateRCLStatusEvent(long handle);
+  private native void nativeFromRCLEvent(long handle);
+  private static native int nativeGetSubscriptionEventType();
 
   private static final Logger logger = LoggerFactory.getLogger(MessageLost.class);
   static {
@@ -57,9 +62,4 @@ public class MessageLost implements SubscriptionEventStatus {
       System.exit(1);
     }
   }
-
-  private static native long nativeAllocateRCL();
-  private static native void nativeDeallocateRCL(long handle);
-  private native void nativeFromRCL(long handle);
-  private static native int nativeGetEventType();
 }
