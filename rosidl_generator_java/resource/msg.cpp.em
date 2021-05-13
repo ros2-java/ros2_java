@@ -519,6 +519,7 @@ if value_method:
 
 JNIEXPORT void JNICALL JNI_OnUnload(JavaVM * vm, void *)
 {
+  (void)vm;
   assert(g_vm != nullptr);
   assert(g_vm == vm);
 
