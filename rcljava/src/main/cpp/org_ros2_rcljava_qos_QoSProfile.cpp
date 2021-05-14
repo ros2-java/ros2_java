@@ -78,7 +78,7 @@ qos_from_rcl(JNIEnv * env, const rmw_qos_profile_t & qos, jobject jqos)
   RCLJAVA_COMMON_CHECK_FOR_EXCEPTION(env);
 
   jclass history_clazz = env->FindClass("org/ros2/rcljava/qos/policies/History");
-  jfieldID history_value_fid;
+  jfieldID history_value_fid = nullptr;
   switch (qos.history) {
     case RMW_QOS_POLICY_HISTORY_SYSTEM_DEFAULT:
       history_value_fid = env->GetStaticFieldID(
@@ -108,7 +108,7 @@ qos_from_rcl(JNIEnv * env, const rmw_qos_profile_t & qos, jobject jqos)
   env->SetIntField(jqos, depth_fid, qos.depth);
 
   jclass reliability_clazz = env->FindClass("org/ros2/rcljava/qos/policies/Reliability");
-  jfieldID reliability_value_fid;
+  jfieldID reliability_value_fid = nullptr;
   switch (qos.reliability) {
     case RMW_QOS_POLICY_RELIABILITY_SYSTEM_DEFAULT:
       reliability_value_fid = env->GetStaticFieldID(
@@ -136,7 +136,7 @@ qos_from_rcl(JNIEnv * env, const rmw_qos_profile_t & qos, jobject jqos)
   env->SetObjectField(jqos, reliability_fid, reliability_value);
 
   jclass durability_clazz = env->FindClass("org/ros2/rcljava/qos/policies/Durability");
-  jfieldID durability_value_fid;
+  jfieldID durability_value_fid = nullptr;
   switch (qos.durability) {
     case RMW_QOS_POLICY_DURABILITY_SYSTEM_DEFAULT:
       durability_value_fid = env->GetStaticFieldID(
@@ -173,7 +173,7 @@ qos_from_rcl(JNIEnv * env, const rmw_qos_profile_t & qos, jobject jqos)
   RCLJAVA_COMMON_CHECK_FOR_EXCEPTION(env);
 
   jclass liveliness_clazz = env->FindClass("org/ros2/rcljava/qos/policies/Liveliness");
-  jfieldID liveliness_value_fid;
+  jfieldID liveliness_value_fid = nullptr;
   switch (qos.liveliness) {
     case RMW_QOS_POLICY_LIVELINESS_SYSTEM_DEFAULT:
       liveliness_value_fid = env->GetStaticFieldID(

@@ -92,7 +92,7 @@ JNICALL Java_org_ros2_rcljava_action_ActionServerImpl_nativeTakeResultRequest(
  */
 JNIEXPORT void
 JNICALL Java_org_ros2_rcljava_action_ActionServerImpl_nativeSendGoalResponse(
-  JNIEnv *, jclass, jlong, jobject, jlong, jlong, jlong, jobject);
+  JNIEnv *, jclass, jlong, jobject, jlong, jlong, jobject);
 
 /*
  * Class:     org_ros2_rcljava_action_ActionServerImpl
@@ -101,7 +101,7 @@ JNICALL Java_org_ros2_rcljava_action_ActionServerImpl_nativeSendGoalResponse(
  */
 JNIEXPORT void
 JNICALL Java_org_ros2_rcljava_action_ActionServerImpl_nativeSendCancelResponse(
-  JNIEnv *, jclass, jlong, jobject, jlong, jlong, jlong, jobject);
+  JNIEnv *, jclass, jlong, jobject, jlong, jlong, jobject);
 
 /*
  * Class:     org_ros2_rcljava_action_ActionServerImpl
@@ -110,7 +110,7 @@ JNICALL Java_org_ros2_rcljava_action_ActionServerImpl_nativeSendCancelResponse(
  */
 JNIEXPORT void
 JNICALL Java_org_ros2_rcljava_action_ActionServerImpl_nativeSendResultResponse(
-  JNIEnv *, jclass, jlong, jobject, jlong, jlong, jlong, jobject);
+  JNIEnv *, jclass, jlong, jobject, jlong, jlong, jobject);
 
 /*
  * Class:     org_ros2_rcljava_action_ActionServerImpl

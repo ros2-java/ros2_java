@@ -415,14 +415,12 @@ public class ActionServerImpl<T extends ActionDefinition> implements ActionServe
     ResultResponseDefinition<T> resultResponse)
   {
     long resultFromJavaConverterHandle = resultResponse.getFromJavaConverterInstance();
-    long resultToJavaConverterHandle = resultResponse.getToJavaConverterInstance();
     long resultDestructorHandle = resultResponse.getDestructorInstance();
 
     nativeSendResultResponse(
       this.handle,
       rmwRequestId,
       resultFromJavaConverterHandle,
-      resultToJavaConverterHandle,
       resultDestructorHandle,
       resultResponse);
   }
@@ -452,7 +450,6 @@ public class ActionServerImpl<T extends ActionDefinition> implements ActionServe
     long actionServerHandle,
     RMWRequestId header,
     long responseFromJavaConverterHandle,
-    long responseToJavaConverterHandle,
     long responseDestructorHandle,
     MessageDefinition responseMessage);
 
@@ -460,7 +457,6 @@ public class ActionServerImpl<T extends ActionDefinition> implements ActionServe
     long actionServerHandle,
     RMWRequestId header,
     long responseFromJavaConverterHandle,
-    long responseToJavaConverterHandle,
     long responseDestructorHandle,
     MessageDefinition responseMessage);
 
@@ -468,7 +464,6 @@ public class ActionServerImpl<T extends ActionDefinition> implements ActionServe
     long actionServerHandle,
     RMWRequestId header,
     long responseFromJavaConverterHandle,
-    long responseToJavaConverterHandle,
     long responseDestructorHandle,
     MessageDefinition responseMessage);
 
@@ -600,7 +595,6 @@ public class ActionServerImpl<T extends ActionDefinition> implements ActionServe
         long requestToJavaConverterHandle = requestMessage.getToJavaConverterInstance();
         long requestDestructorHandle = requestMessage.getDestructorInstance();
         long responseFromJavaConverterHandle = responseMessage.getFromJavaConverterInstance();
-        long responseToJavaConverterHandle = responseMessage.getToJavaConverterInstance();
         long responseDestructorHandle = responseMessage.getDestructorInstance();
 
         RMWRequestId rmwRequestId =
@@ -612,8 +606,7 @@ public class ActionServerImpl<T extends ActionDefinition> implements ActionServe
           ActionServerGoalHandle<T> goalHandle = this.executeGoalRequest(
             rmwRequestId, requestMessage, responseMessage);
           nativeSendGoalResponse(
-            this.handle, rmwRequestId,
-            responseFromJavaConverterHandle, responseToJavaConverterHandle,
+            this.handle, rmwRequestId, responseFromJavaConverterHandle,
             responseDestructorHandle, responseMessage);
         }
       }
@@ -646,8 +639,7 @@ public class ActionServerImpl<T extends ActionDefinition> implements ActionServe
         responseMessage = executeCancelRequest(responseMessage);
         nativeSendCancelResponse(
           this.handle, rmwRequestId,
-          responseFromJavaConverterHandle, responseToJavaConverterHandle,
-          responseDestructorHandle, responseMessage);
+          responseFromJavaConverterHandle, responseDestructorHandle, responseMessage);
       }
     }
 

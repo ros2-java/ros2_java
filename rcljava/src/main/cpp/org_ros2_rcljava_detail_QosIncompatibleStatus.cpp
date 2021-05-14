@@ -75,7 +75,7 @@ Java_org_ros2_rcljava_detail_QosIncompatibleStatus_nativeFromRCLEvent(
     return;
   }
 
-  jfieldID enum_value_fid;
+  jfieldID enum_value_fid = nullptr;
   switch (p->last_policy_kind) {
     case RMW_QOS_POLICY_INVALID:
       enum_value_fid = env->GetStaticFieldID(qos_kind_clazz, "INVALID", enum_class_path);

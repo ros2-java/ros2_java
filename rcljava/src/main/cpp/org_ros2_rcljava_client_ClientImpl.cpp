@@ -36,13 +36,11 @@ using rcljava_common::signatures::destroy_ros_message_signature;
 
 JNIEXPORT jlong JNICALL
 Java_org_ros2_rcljava_client_ClientImpl_nativeSendClientRequest(
-  JNIEnv * env, jclass, jlong client_handle,
-  jlong jrequest_from_java_converter_handle, jlong jrequest_to_java_converter_handle,
+  JNIEnv * env, jclass, jlong client_handle, jlong jrequest_from_java_converter_handle,
   jlong jrequest_destructor_handle, jobject jrequest_msg)
 {
   assert(client_handle != 0);
   assert(jrequest_from_java_converter_handle != 0);
-  assert(jrequest_to_java_converter_handle != 0);
   assert(jrequest_destructor_handle != 0);
   assert(jrequest_msg != nullptr);
 

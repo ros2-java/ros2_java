@@ -81,7 +81,7 @@ public class ClientImpl<T extends ServiceDefinition> implements Client<T> {
     synchronized (pendingRequests) {
       long sequenceNumber = nativeSendClientRequest(
           handle, request.getFromJavaConverterInstance(),
-          request.getToJavaConverterInstance(), request.getDestructorInstance(), request);
+          request.getDestructorInstance(), request);
       RCLFuture<V> future = new RCLFuture<V>(this.nodeReference);
 
       Map.Entry<Consumer, RCLFuture> entry =
@@ -109,8 +109,8 @@ public class ClientImpl<T extends ServiceDefinition> implements Client<T> {
   }
 
   private static native long nativeSendClientRequest(
-      long handle, long requestFromJavaConverterHandle, long requestToJavaConverterHandle,
-      long requestDestructorHandle, MessageDefinition requestMessage);
+      long handle, long requestFromJavaConverterHandle, long requestDestructorHandle,
+      MessageDefinition requestMessage);
 
   public final Class<MessageDefinition> getRequestType() {
     return this.requestType;

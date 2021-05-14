@@ -165,9 +165,7 @@ Java_org_ros2_rcljava_executors_BaseExecutor_nativeTake(
       reinterpret_cast<convert_to_java_signature>(jto_java_converter);
 
     jobject jtaken_msg = convert_to_java(taken_msg, nullptr);
-
     destroy_ros_message(taken_msg);
-
     return jtaken_msg;
   }
 
@@ -291,11 +289,8 @@ Java_org_ros2_rcljava_executors_BaseExecutor_nativeTakeRequest(
   }
 
   if (ret != RCL_RET_SERVICE_TAKE_FAILED) {
-    jobject jtaken_msg = convert_to_java(taken_msg, jrequest_msg);
-
+    convert_to_java(taken_msg, jrequest_msg);
     destroy_ros_message(taken_msg);
-
-    assert(jtaken_msg != nullptr);
 
     jobject jheader = rcljava::convert_rmw_request_id_to_java(env, &header);
     return jheader;
@@ -309,12 +304,11 @@ Java_org_ros2_rcljava_executors_BaseExecutor_nativeTakeRequest(
 JNIEXPORT void JNICALL
 Java_org_ros2_rcljava_executors_BaseExecutor_nativeSendServiceResponse(
   JNIEnv * env, jclass, jlong service_handle, jobject jrequest_id,
-  jlong jresponse_from_java_converter_handle, jlong jresponse_to_java_converter_handle,
-  jlong jresponse_destructor_handle, jobject jresponse_msg)
+  jlong jresponse_from_java_converter_handle, jlong jresponse_destructor_handle,
+  jobject jresponse_msg)
 {
   assert(service_handle != 0);
   assert(jresponse_from_java_converter_handle != 0);
-  assert(jresponse_to_java_converter_handle != 0);
   assert(jresponse_destructor_handle != 0);
   assert(jresponse_msg != nullptr);
 
@@ -381,11 +375,8 @@ Java_org_ros2_rcljava_executors_BaseExecutor_nativeTakeResponse(
   }
 
   if (ret != RCL_RET_CLIENT_TAKE_FAILED) {
-    jobject jtaken_msg = convert_to_java(taken_msg, jresponse_msg);
-
+    convert_to_java(taken_msg, jresponse_msg);
     destroy_ros_message(taken_msg);
-
-    assert(jtaken_msg != nullptr);
 
     jobject jheader = rcljava::convert_rmw_request_id_to_java(env, &header);
     return jheader;

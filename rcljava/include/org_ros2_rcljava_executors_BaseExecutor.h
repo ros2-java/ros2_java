@@ -123,7 +123,7 @@ JNICALL Java_org_ros2_rcljava_executors_BaseExecutor_nativeTakeRequest(
  */
 JNIEXPORT void
 JNICALL Java_org_ros2_rcljava_executors_BaseExecutor_nativeSendServiceResponse(
-  JNIEnv *, jclass, jlong, jobject, jlong, jlong, jlong, jobject);
+  JNIEnv *, jclass, jlong, jobject, jlong, jlong, jobject);
 
 /*
  * Class:     org_ros2_rcljava_executors_BaseExecutor

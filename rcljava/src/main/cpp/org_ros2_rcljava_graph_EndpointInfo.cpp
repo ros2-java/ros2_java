@@ -59,7 +59,7 @@ Java_org_ros2_rcljava_graph_EndpointInfo_nativeFromRCL(JNIEnv * env, jobject sel
   jstring jtopic_type = env->NewStringUTF(p->topic_type);
   RCLJAVA_COMMON_CHECK_FOR_EXCEPTION(env);
   env->SetObjectField(self, topic_type_fid, jtopic_type);
-  jfieldID enum_value_fid;
+  jfieldID enum_value_fid = nullptr;
   switch (p->endpoint_type) {
     case RMW_ENDPOINT_INVALID:
       enum_value_fid = env->GetStaticFieldID(

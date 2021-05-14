@@ -127,8 +127,7 @@ public class BaseExecutor {
         if (rmwRequestId != null) {
           anyExecutable.service.executeCallback(rmwRequestId, requestMessage, responseMessage);
           nativeSendServiceResponse(anyExecutable.service.getHandle(), rmwRequestId,
-              responseFromJavaConverterHandle, responseToJavaConverterHandle,
-              responseDestructorHandle, responseMessage);
+              responseFromJavaConverterHandle, responseDestructorHandle, responseMessage);
         }
       }
       serviceHandles.remove(anyExecutable.service.getHandle());
@@ -515,8 +514,8 @@ public class BaseExecutor {
       long requestFromJavaConverterHandle, long requestToJavaConverterHandle,
       long requestDestructorHandle, MessageDefinition requestMessage);
 
-  private static native void nativeSendServiceResponse(long serviceHandle, RMWRequestId header,
-      long responseFromJavaConverterHandle, long responseToJavaConverterHandle,
+  private static native void nativeSendServiceResponse(
+      long serviceHandle, RMWRequestId header, long responseFromJavaConverterHandle,
       long responseDestructorHandle, MessageDefinition responseMessage);
 
   private static native RMWRequestId nativeTakeResponse(long clientHandle,

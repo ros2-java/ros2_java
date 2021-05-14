@@ -212,9 +212,8 @@ Java_org_ros2_rcljava_action_ActionServerImpl_nativeCreateActionServer(
       return nullptr; \
     } \
     if (RCL_RET_OK == ret) { \
-      jobject jtaken_msg = convert_to_java(taken_msg, jrequest_msg); \
+      convert_to_java(taken_msg, jrequest_msg); \
       destroy_ros_message(taken_msg); \
-      assert(jtaken_msg != nullptr); \
       jobject jheader = rcljava::convert_rmw_request_id_to_java(env, &header); \
       return jheader; \
     } \
@@ -226,7 +225,6 @@ Java_org_ros2_rcljava_action_ActionServerImpl_nativeCreateActionServer(
 #define RCLJAVA_ACTION_SERVER_SEND_RESPONSE(Type) \
   do { \
     assert(jresponse_from_java_converter_handle != 0); \
-    assert(jresponse_to_java_converter_handle != 0); \
     assert(jresponse_destructor_handle != 0); \
     rcl_action_server_t * action_server = reinterpret_cast<rcl_action_server_t *>( \
       action_server_handle); \
@@ -275,8 +273,8 @@ JNICALL Java_org_ros2_rcljava_action_ActionServerImpl_nativeTakeResultRequest(
 JNIEXPORT void
 JNICALL Java_org_ros2_rcljava_action_ActionServerImpl_nativeSendGoalResponse(
   JNIEnv * env, jclass, jlong action_server_handle, jobject jrequest_id,
-  jlong jresponse_from_java_converter_handle, jlong jresponse_to_java_converter_handle,
-  jlong jresponse_destructor_handle, jobject jresponse_msg)
+  jlong jresponse_from_java_converter_handle, jlong jresponse_destructor_handle,
+  jobject jresponse_msg)
 {
   RCLJAVA_ACTION_SERVER_SEND_RESPONSE(goal);
 }
@@ -284,8 +282,8 @@ JNICALL Java_org_ros2_rcljava_action_ActionServerImpl_nativeSendGoalResponse(
 JNIEXPORT void
 JNICALL Java_org_ros2_rcljava_action_ActionServerImpl_nativeSendCancelResponse(
   JNIEnv * env, jclass, jlong action_server_handle, jobject jrequest_id,
-  jlong jresponse_from_java_converter_handle, jlong jresponse_to_java_converter_handle,
-  jlong jresponse_destructor_handle, jobject jresponse_msg)
+  jlong jresponse_from_java_converter_handle, jlong jresponse_destructor_handle,
+  jobject jresponse_msg)
 {
   RCLJAVA_ACTION_SERVER_SEND_RESPONSE(cancel);
 }
@@ -293,8 +291,8 @@ JNICALL Java_org_ros2_rcljava_action_ActionServerImpl_nativeSendCancelResponse(
 JNIEXPORT void
 JNICALL Java_org_ros2_rcljava_action_ActionServerImpl_nativeSendResultResponse(
   JNIEnv * env, jclass, jlong action_server_handle, jobject jrequest_id,
-  jlong jresponse_from_java_converter_handle, jlong jresponse_to_java_converter_handle,
-  jlong jresponse_destructor_handle, jobject jresponse_msg)
+  jlong jresponse_from_java_converter_handle, jlong jresponse_destructor_handle,
+  jobject jresponse_msg)
 {
   RCLJAVA_ACTION_SERVER_SEND_RESPONSE(result);
 }
