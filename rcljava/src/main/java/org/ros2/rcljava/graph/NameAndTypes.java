@@ -45,12 +45,12 @@ public class NameAndTypes {
    */
   public NameAndTypes(final String name, final Collection<String> types) {
     this.name = name;
-    this.types = new ArrayList(types);
+    this.types = new ArrayList<String>(types);
   }
 
   /// @internal Default constructor, only used from jni code.
   private NameAndTypes() {
-    this.types = new ArrayList();
+    this.types = new ArrayList<String>();
   }
 
   @Override

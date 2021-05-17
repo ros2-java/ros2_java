@@ -176,9 +176,9 @@ public class ActionServerImpl<T extends ActionDefinition> implements ActionServe
         ActionServerImpl.this.actionTypeInstance.getFeedbackMessageType();
       FeedbackMessageDefinition<T> feedbackMessage = null;
       try {
-        feedbackMessage = feedbackMessageType.newInstance();
-      } catch (Exception ex) {
-        throw new IllegalArgumentException("Failed to instantiate feedback message", ex);
+        feedbackMessage = feedbackMessageType.getDeclaredConstructor().newInstance();
+      } catch (ReflectiveOperationException ex) {
+        throw new IllegalArgumentException("Failed to instantiate feedback message: ", ex);
       }
       feedbackMessage.setFeedback(feedback);
       feedbackMessage.setGoalUuid(this.goalInfo.getGoalId().getUuidAsList());
@@ -202,7 +202,7 @@ public class ActionServerImpl<T extends ActionDefinition> implements ActionServe
 
     private synchronized final void toTerminalState(byte status, ResultDefinition<T> result) {
       nativeUpdateGoalState(this.handle, status);
-      ResultResponseDefinition resultResponse = ActionServerImpl.this.createResultResponse();
+      ResultResponseDefinition<T> resultResponse = ActionServerImpl.this.createResultResponse();
       resultResponse.setGoalStatus(status);
       resultResponse.setResult(result);
       ActionServerImpl.this.sendResult(goalInfo.getGoalId().getUuidAsList(), resultResponse);
@@ -265,9 +265,9 @@ public class ActionServerImpl<T extends ActionDefinition> implements ActionServe
       final Consumer<ActionServerGoalHandle<T>> acceptedCallback) throws IllegalArgumentException {
     this.nodeReference = nodeReference;
     try {
-      this.actionTypeInstance = actionType.newInstance();
-    } catch (Exception ex) {
-      throw new IllegalArgumentException("Failed to instantiate provided action type", ex);
+      this.actionTypeInstance = actionType.getDeclaredConstructor().newInstance();
+    } catch (ReflectiveOperationException ex) {
+      throw new IllegalArgumentException("Failed to instantiate provided action type: ", ex);
     }
     this.actionName = actionName;
     this.goalCallback = goalCallback;
@@ -545,9 +545,10 @@ public class ActionServerImpl<T extends ActionDefinition> implements ActionServe
   private ResultResponseDefinition<T> createResultResponse() {
     ResultResponseDefinition<T> resultResponse;
     try {
-      resultResponse = this.actionTypeInstance.getGetResultResponseType().newInstance();
-    } catch (Exception ex) {
-      throw new IllegalArgumentException("Failed to instantiate provided action type", ex);
+      resultResponse =
+        this.actionTypeInstance.getGetResultResponseType().getDeclaredConstructor().newInstance();
+    } catch (ReflectiveOperationException ex) {
+      throw new IllegalStateException("Failed to instantiate provided action type: ", ex);
     }
     return resultResponse;
   }
@@ -582,12 +583,10 @@ public class ActionServerImpl<T extends ActionDefinition> implements ActionServe
       GoalResponseDefinition<T> responseMessage = null;
 
       try {
-        requestMessage = requestType.newInstance();
-        responseMessage = responseType.newInstance();
-      } catch (InstantiationException ie) {
-        ie.printStackTrace();
-      } catch (IllegalAccessException iae) {
-        iae.printStackTrace();
+        requestMessage = requestType.getDeclaredConstructor().newInstance();
+        responseMessage = responseType.getDeclaredConstructor().newInstance();
+      } catch (ReflectiveOperationException ex) {
+        throw new IllegalStateException("Failed to instantiate request or responce: ", ex);
       }
 
       if (requestMessage != null && responseMessage != null) {
@@ -648,9 +647,9 @@ public class ActionServerImpl<T extends ActionDefinition> implements ActionServe
 
       ResultRequestDefinition<T> requestMessage = null;
       try {
-        requestMessage = requestType.newInstance();
-      } catch (Exception ex) {
-        throw new IllegalArgumentException("Failed to instantiate action result request", ex);
+        requestMessage = requestType.getDeclaredConstructor().newInstance();
+      } catch (ReflectiveOperationException ex) {
+        throw new IllegalArgumentException("Failed to instantiate action result request: ", ex);
       }
 
       if (requestMessage != null) {

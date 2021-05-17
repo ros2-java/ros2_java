@@ -136,7 +136,7 @@ public class SyncParametersClientTest {
 
     assertArrayEquals(
         parametersAndPrefixes.getNames(), new String[] {"foo.first", "foo.second"});
-    assertEquals(parametersAndPrefixes.getPrefixes(), new String[] {"foo"});
+    assertArrayEquals(parametersAndPrefixes.getPrefixes(), new String[] {"foo"});
   }
 
   @Test

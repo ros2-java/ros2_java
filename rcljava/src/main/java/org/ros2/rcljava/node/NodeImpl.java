@@ -482,10 +482,11 @@ public class NodeImpl implements Node {
 
   private static native long nativeCreateTimerHandle(long clockHandle, long contextHandle, long timerPeriod);
 
+  @SuppressWarnings("deprecation")
   private Timer createTimer(Clock clock, final long period, final TimeUnit unit, final Callback callback) {
     long timerPeriodNS = TimeUnit.NANOSECONDS.convert(period, unit);
     long timerHandle = nativeCreateTimerHandle(clock.getHandle(), this.context.getHandle(), timerPeriodNS);
-    WallTimer timer = new WallTimerImpl(new WeakReference<Node>(this), timerHandle, callback, timerPeriodNS);
+    Timer timer = new WallTimerImpl(new WeakReference<Node>(this), timerHandle, callback, timerPeriodNS);
     this.timers.add(timer);
     return timer;
   }
@@ -493,6 +494,7 @@ public class NodeImpl implements Node {
   /**
    * {@inheritDoc}
    */
+  @SuppressWarnings("deprecation")
   public WallTimer createWallTimer(final long period, final TimeUnit unit, final Callback callback) {
     return (WallTimer) this.createTimer(this.wall_clock, period, unit, callback);
   }

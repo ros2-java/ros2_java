@@ -233,6 +233,7 @@ public interface Node extends Disposable {
    * @param callback Function that is called when the timer expires.
    * @return The created timer.
    */
+  @SuppressWarnings("deprecation")
   WallTimer createWallTimer(final long period, final TimeUnit unit, final Callback callback);
 
   /**

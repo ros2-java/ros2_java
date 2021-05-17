@@ -15,16 +15,17 @@
 
 package org.ros2.rcljava.executors;
 
+import java.lang.SuppressWarnings;
 import java.util.AbstractMap;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-
 import java.util.Collection;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.LinkedBlockingQueue;
+
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -81,6 +82,23 @@ public class BaseExecutor {
     this.nodes.remove(node);
   }
 
+  @SuppressWarnings("unchecked")
+  protected static void executeSubscriptionCallbackUnchecked(
+    Subscription subscription,
+    MessageDefinition message)
+  {
+    subscription.executeCallback(message);
+  }
+
+  @SuppressWarnings("unchecked")
+  protected static void clientHandleResponseUnchecked(
+    Client client,
+    RMWRequestId rmwRequestId,
+    MessageDefinition response)
+  {
+    client.handleResponse(rmwRequestId, response);
+  }
+
   protected void executeAnyExecutable(AnyExecutable anyExecutable) {
     if (anyExecutable.timer != null) {
       anyExecutable.timer.callTimer();
@@ -92,25 +110,25 @@ public class BaseExecutor {
       MessageDefinition message = nativeTake(
           anyExecutable.subscription.getHandle(), anyExecutable.subscription.getMessageType());
       if (message != null) {
-        anyExecutable.subscription.executeCallback(message);
+        // Safety: nativeTake() will return the correct type here.
+        // We can't do much better here, as subscriptions are type erased.
+        executeSubscriptionCallbackUnchecked(anyExecutable.subscription, message);
       }
       subscriptionHandles.remove(anyExecutable.subscription.getHandle());
     }
 
     if (anyExecutable.service != null) {
-      Class<MessageDefinition> requestType = anyExecutable.service.getRequestType();
-      Class<MessageDefinition> responseType = anyExecutable.service.getResponseType();
+      Class<? extends MessageDefinition> requestType = anyExecutable.service.getRequestType();
+      Class<? extends MessageDefinition> responseType = anyExecutable.service.getResponseType();
 
       MessageDefinition requestMessage = null;
       MessageDefinition responseMessage = null;
 
       try {
-        requestMessage = requestType.newInstance();
-        responseMessage = responseType.newInstance();
-      } catch (InstantiationException ie) {
-        ie.printStackTrace();
-      } catch (IllegalAccessException iae) {
-        iae.printStackTrace();
+        requestMessage = requestType.getDeclaredConstructor().newInstance();
+        responseMessage = responseType.getDeclaredConstructor().newInstance();
+      } catch (ReflectiveOperationException e) {
+        throw new IllegalStateException("Failed to instantiate service request/response");
       }
 
       if (requestMessage != null && responseMessage != null) {
@@ -134,24 +152,18 @@ public class BaseExecutor {
     }
 
     if (anyExecutable.client != null) {
-      Class<MessageDefinition> requestType = anyExecutable.client.getRequestType();
-      Class<MessageDefinition> responseType = anyExecutable.client.getResponseType();
+      Class<? extends MessageDefinition> requestType = anyExecutable.client.getRequestType();
+      Class<? extends MessageDefinition> responseType = anyExecutable.client.getResponseType();
 
-      MessageDefinition requestMessage = null;
       MessageDefinition responseMessage = null;
 
       try {
-        requestMessage = requestType.newInstance();
-        responseMessage = responseType.newInstance();
-      } catch (InstantiationException ie) {
-        ie.printStackTrace();
-      } catch (IllegalAccessException iae) {
-        iae.printStackTrace();
+        responseMessage = responseType.getDeclaredConstructor().newInstance();
+      } catch (ReflectiveOperationException ie) {
+        throw new IllegalStateException("Failed to instantiate service response");
       }
 
-      if (requestMessage != null && responseMessage != null) {
-        long requestFromJavaConverterHandle = requestMessage.getFromJavaConverterInstance();
-        long requestToJavaConverterHandle = requestMessage.getToJavaConverterInstance();
+      if (responseMessage != null) {
         long responseFromJavaConverterHandle = responseMessage.getFromJavaConverterInstance();
         long responseToJavaConverterHandle = responseMessage.getToJavaConverterInstance();
         long responseDestructorHandle = responseMessage.getDestructorInstance();
@@ -161,7 +173,9 @@ public class BaseExecutor {
                 responseToJavaConverterHandle, responseDestructorHandle, responseMessage);
 
         if (rmwRequestId != null) {
-          anyExecutable.client.handleResponse(rmwRequestId, responseMessage);
+          // Safety: nativeTakeResponse() will return the correct type here.
+          // We can't do much better here, as subscriptions are type erased.
+          clientHandleResponseUnchecked(anyExecutable.client, rmwRequestId, responseMessage);
         }
       }
       clientHandles.remove(anyExecutable.client.getHandle());
@@ -187,7 +201,7 @@ public class BaseExecutor {
     this.actionServerHandles.clear();
 
     for (ComposableNode node : this.nodes) {
-      for (Subscription<MessageDefinition> subscription : node.getNode().getSubscriptions()) {
+      for (Subscription subscription : node.getNode().getSubscriptions()) {
         this.subscriptionHandles.add(new AbstractMap.SimpleEntry<Long, Subscription>(
             subscription.getHandle(), subscription));
         Collection<EventHandler> eventHandlers = subscription.getEventHandlers();
@@ -209,17 +223,17 @@ public class BaseExecutor {
         this.timerHandles.add(new AbstractMap.SimpleEntry<Long, Timer>(timer.getHandle(), timer));
       }
 
-      for (Service<ServiceDefinition> service : node.getNode().getServices()) {
+      for (Service service : node.getNode().getServices()) {
         this.serviceHandles.add(
             new AbstractMap.SimpleEntry<Long, Service>(service.getHandle(), service));
       }
 
-      for (Client<ServiceDefinition> client : node.getNode().getClients()) {
+      for (Client client : node.getNode().getClients()) {
         this.clientHandles.add(
             new AbstractMap.SimpleEntry<Long, Client>(client.getHandle(), client));
       }
 
-      for (ActionServer<ActionDefinition> actionServer : node.getNode().getActionServers()) {
+      for (ActionServer actionServer : node.getNode().getActionServers()) {
         this.actionServerHandles.add(
             new AbstractMap.SimpleEntry<Long, ActionServer>(actionServer.getHandle(), actionServer));
       }
@@ -498,7 +512,7 @@ public class BaseExecutor {
   private static native void nativeWait(long waitSetHandle, long timeout);
 
   private static native MessageDefinition nativeTake(
-      long subscriptionHandle, Class<MessageDefinition> messageType);
+      long subscriptionHandle, Class<? extends MessageDefinition> messageType);
 
   private static native void nativeWaitSetAddService(long waitSetHandle, long serviceHandle);
 
