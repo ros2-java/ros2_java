@@ -29,6 +29,7 @@ from rosidl_parser.definition import Service
 @{
 data = {
     'package_name': package_name,
+    'interface_path': interface_path,
     'output_dir': output_dir,
     'template_basepath': template_basepath,
 }

@@ -13,6 +13,9 @@
 @#######################################################################
 @# Handle messages
 @#######################################################################
+// generated from rosidl_generator_java/resource/idl.java.em
+// with input from @(package_name):@(interface_path)
+// generated code does not contain a copyright notice
 @{
 import os
 

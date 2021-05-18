@@ -1,4 +1,7 @@
 @# Included from rosidl_generator_java/resource/idl.cpp.em
+// generated from rosidl_generator_java/resource/action.cpp.em
+// with input from @(package_name):@(interface_path)
+// generated code does not contain a copyright notice
 @{
 import os
 
@@ -16,6 +19,7 @@ get_result_type_name = action.get_result_service.namespaced_type.name
 
 data = {
     'package_name': package_name,
+    'interface_path': interface_path,
     'output_dir': output_dir,
     'template_basepath': template_basepath,
 }
@@ -60,6 +64,7 @@ expand_template(
 
 data = {
     'package_name': package_name,
+    'interface_path': interface_path,
     'output_dir': output_dir,
     'template_basepath': template_basepath,
     'typesupport_impl': typesupport_impl,

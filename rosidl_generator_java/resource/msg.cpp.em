@@ -1,4 +1,7 @@
 @# Included from rosidl_generator_java/resource/idl.cpp.em
+// generated from rosidl_generator_java/resource/msg.cpp.em
+// with input from @(package_name):@(interface_path)
+// generated code does not contain a copyright notice
 @{
 from collections import defaultdict
 
@@ -95,10 +98,12 @@ elif message_c_include_prefix.endswith('__send_goal'):
     message_c_include_prefix = message_c_include_prefix[:-11]
 elif message_c_include_prefix.endswith('__get_result'):
     message_c_include_prefix = message_c_include_prefix[:-12]
+member_includes.add(f'{message_c_include_prefix}.h')
 }@
-
+@
 #include <jni.h>
 
+#include <algorithm>
 #include <cassert>
 #include <cstdint>
 #include <string>
@@ -111,8 +116,6 @@ elif message_c_include_prefix.endswith('__get_result'):
 @[for include in member_includes]@
 #include "@(include)"
 @[end for]@
-
-#include "@(message_c_include_prefix).h"
 
 // Ensure that a jlong is big enough to store raw pointers
 static_assert(sizeof(jlong) >= sizeof(std::intptr_t), "jlong must be able to store pointers");
@@ -265,7 +268,7 @@ jni_signature = get_jni_signature(base_type)
     auto _dest_@(member.name) = ros_message->@(member.name);
 @[    end if]@
 @[    if isinstance(member.type.value_type, BasicType)]@
-    j@(get_java_name) *_jarray_@(member.name)_ptr = env->Get@(get_method_name)ArrayElements(_jarray_@(member.name)_obj, nullptr);
+    j@(get_java_name) * _jarray_@(member.name)_ptr = env->Get@(get_method_name)ArrayElements(_jarray_@(member.name)_obj, nullptr);
     std::copy(_jarray_@(member.name)_ptr, _jarray_@(member.name)_ptr + _jarray_@(member.name)_size, _dest_@(member.name));
     env->Release@(get_method_name)ArrayElements(_jarray_@(member.name)_obj, _jarray_@(member.name)_ptr, 0);
 @[    else]@
@@ -378,12 +381,12 @@ jni_signature = get_jni_signature(base_type)
 @[    if isinstance(member.type.value_type, BasicType)]@
 @[      if isinstance(member.type, Array)]@
   j@(get_java_name)Array _jarray_@(member.name)_obj = env->New@(get_method_name)Array(@(member.type.size));
-  j@(get_java_name) *_j@(get_java_name)_@(member.name)_buf = (j@(get_java_name) *)malloc(sizeof(j@(get_java_name)) * @(member.type.size));
+  auto * _j@(get_java_name)_@(member.name)_buf = static_cast<j@(get_java_name) *>(malloc(sizeof(j@(get_java_name)) * @(member.type.size)));
   std::copy(_ros_message->@(member.name), _ros_message->@(member.name) + @(member.type.size), _j@(get_java_name)_@(member.name)_buf);
   env->Set@(get_method_name)ArrayRegion(_jarray_@(member.name)_obj, 0, @(member.type.size), (const j@(get_java_name) *)_j@(get_java_name)_@(member.name)_buf);
 @[      else]@
   j@(get_java_name)Array _jarray_@(member.name)_obj = env->New@(get_method_name)Array(_ros_message->@(member.name).size);
-  j@(get_java_name) *_j@(get_java_name)_@(member.name)_buf = (j@(get_java_name) *)malloc(sizeof(j@(get_java_name)) * _ros_message->@(member.name).size);
+  auto * _j@(get_java_name)_@(member.name)_buf = static_cast<j@(get_java_name) *>(malloc(sizeof(j@(get_java_name)) * _ros_message->@(member.name).size));
   std::copy(_ros_message->@(member.name).data, _ros_message->@(member.name).data + _ros_message->@(member.name).size, _j@(get_java_name)_@(member.name)_buf);
   env->Set@(get_method_name)ArrayRegion(_jarray_@(member.name)_obj, 0, _ros_message->@(member.name).size, (const j@(get_java_name) *)_j@(get_java_name)_@(member.name)_buf);
 @[      end if]@
@@ -563,7 +566,7 @@ JNIEXPORT jlong JNICALL Java_@(underscore_separated_jni_type_name)_getToJavaConv
 
 JNIEXPORT jlong JNICALL Java_@(underscore_separated_jni_type_name)_getTypeSupport(JNIEnv *, jclass)
 {
-  jlong ptr = reinterpret_cast<jlong>(ROSIDL_GET_MSG_TYPE_SUPPORT(@(','.join(message.structure.namespaced_type.namespaced_name()))));
+  jlong ptr = reinterpret_cast<jlong>(ROSIDL_GET_MSG_TYPE_SUPPORT(@(', '.join(message.structure.namespaced_type.namespaced_name()))));
   return ptr;
 }
 

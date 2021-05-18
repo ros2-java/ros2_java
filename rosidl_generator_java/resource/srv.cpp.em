@@ -1,4 +1,7 @@
 @# Included from rosidl_generator_java/resource/idl.cpp.em
+// generated from rosidl_generator_java/resource/srv.cpp.em
+// with input from @(package_name):@(interface_path)
+// generated code does not contain a copyright notice
 @{
 import os
 from rosidl_cmake import expand_template
@@ -11,6 +14,7 @@ response_type_name = service.response_message.structure.namespaced_type.name
 
 data = {
     'package_name': package_name,
+    'interface_path': interface_path,
     'output_dir': output_dir,
     'template_basepath': template_basepath,
 }
@@ -83,6 +87,6 @@ JNIEXPORT jlong JNICALL Java_@(underscore_separated_jni_type_name)_getServiceTyp
 JNIEXPORT jlong JNICALL Java_@(underscore_separated_jni_type_name)_getServiceTypeSupport(JNIEnv *, jclass)
 {
   const rosidl_service_type_support_t * ts = ROSIDL_GET_SRV_TYPE_SUPPORT(
-    @(','.join(service_fqn)));
+    @(', '.join(service_fqn)));
   return reinterpret_cast<jlong>(ts);
 }
