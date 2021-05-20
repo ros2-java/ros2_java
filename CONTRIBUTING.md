@@ -22,7 +22,7 @@ Each pull request must satisfy the following requirements before it can be merge
 1. Target the latest developement branch (`main`)
 2. Have one approval from a maintainer
 3. Continuous integration (CI) is building and passing tests
-  - This should be automatically triggered upon opening a pull request
+    - This should be automatically triggered upon opening a pull request
 
 ## Note about license
 
