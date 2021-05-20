@@ -159,3 +159,8 @@ Although the `ros2_java_android.repos` file contains all the repositories for th
           -DCMAKE_FIND_ROOT_PATH="${PWD}/install"
 
 You can find more information about the Android examples at https://github.com/ros2-java/ros2_android_examples
+
+## Contributing
+
+Contributions are more than welcome!
+If you'd like to contribute to the project, please read [CONTRIBUTING](CONTRIBUTING.md) for contributing guidelines.
