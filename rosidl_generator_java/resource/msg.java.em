@@ -80,14 +80,28 @@ public final class @(type_name) implements MessageDefinition {
 
 @[  if isinstance(member.type, AbstractNestedType)]@
 @[    if member.has_annotation('default')]@
-  private java.util.List<@(get_java_type(member.type, use_primitives=False))> @(member.name) = java.util.Arrays.asList(new @(get_java_type(member.type, use_primitives=False))[] @(value_to_java(member.type, member.get_annotation_value('default')['value'])));
+  private @(get_java_type(member.type))[] @(member.name) = new @(get_java_type(member.type))[] @(value_to_java(member.type, member.get_annotation_value('default')['value']));
 @[    else]@
 @[      if isinstance(member.type, Array)]@
-  private java.util.List<@(get_java_type(member.type, use_primitives=False))> @(member.name);
+  private @(get_java_type(member.type))[] @(member.name) = new @(get_java_type(member.type))[@(member.type.size)];
 @[      else]@
-  private java.util.List<@(get_java_type(member.type, use_primitives=False))> @(member.name) = new java.util.ArrayList<@(get_java_type(member.type, use_primitives=False))>();
+  private @(get_java_type(member.type))[] @(member.name) = new @(get_java_type(member.type))[]{};
 @[      end if]@
 @[    end if]@
+
+  public final @(type_name) set@(convert_lower_case_underscore_to_camel_case(member.name))(final @(get_java_type(member.type))[] @(member.name)) {
+@[    if isinstance(member.type, BoundedSequence)]@
+    if(@(member.name).length > @(member.type.maximum_size)) {
+        throw new IllegalArgumentException("Array too big, maximum size allowed: @(member.type.maximum_size)");
+    }
+@[    elif isinstance(member.type, Array)]@
+    if(@(member.name).length != @(member.type.size)) {
+        throw new IllegalArgumentException("Invalid size for fixed array, must be exactly: @(member.type.size)");
+    }
+@[    end if]@
+    this.@(member.name) = @(member.name);
+    return this;
+  }
 
   public final @(type_name) set@(convert_lower_case_underscore_to_camel_case(member.name))(final java.util.List<@(get_java_type(member.type, use_primitives=False))> @(member.name)) {
 @[    if isinstance(member.type, BoundedSequence)]@
@@ -99,22 +113,33 @@ public final class @(type_name) implements MessageDefinition {
         throw new IllegalArgumentException("Invalid size for fixed array, must be exactly: @(member.type.size)");
     }
 @[    end if]@
-    this.@(member.name) = @(member.name);
+@[    if isinstance(member.type.value_type, BasicType)]@
+    @(get_java_type(member.type, use_primitives=False))[] boxed_arr = @(member.name).toArray(new @(get_java_type(member.type, use_primitives=False))[]{});
+    @(get_java_type(member.type))[] unboxed_arr = new @(get_java_type(member.type))[@(member.name).size()];
+    for (int i = 0; i < @(member.name).size(); i++) {
+      unboxed_arr[i] = boxed_arr[i].@(get_java_type(member.type))Value();
+    }
+    this.@(member.name) = unboxed_arr;
+@[    else]@
+    this.@(member.name) = @(member.name).toArray(new @(get_java_type(member.type))[0]);
+@[    end if]@
     return this;
   }
 
-@[    if isinstance(member.type.value_type, (BasicType, AbstractGenericString))]@
-  public final @(type_name) set@(convert_lower_case_underscore_to_camel_case(member.name))(final @(get_java_type(member.type, use_primitives=True))[] @(member.name)) {
-    java.util.List<@(get_java_type(member.type, use_primitives=False))> @(member.name)_tmp = new java.util.ArrayList<@(get_java_type(member.type, use_primitives=False))>();
-    for(@(get_java_type(member.type, use_primitives=True)) @(member.name)_value : @(member.name)) {
-      @(member.name)_tmp.add(@(member.name)_value);
-    }
-    return set@(convert_lower_case_underscore_to_camel_case(member.name))(@(member.name)_tmp);
-  }
-@[    end if]@
-
-  public final java.util.List<@(get_java_type(member.type, use_primitives=False))> get@(convert_lower_case_underscore_to_camel_case(member.name))() {
+  public final @(get_java_type(member.type))[] get@(convert_lower_case_underscore_to_camel_case(member.name))() {
     return this.@(member.name);
+  }
+
+  /**
+   * For better performance, use @@{link @(type_name)#get@(convert_lower_case_underscore_to_camel_case(member.name))} instead.
+   */
+  public final java.util.List<@(get_java_type(member.type, use_primitives=False))> get@(convert_lower_case_underscore_to_camel_case(member.name))AsList() {
+    // TODO(jacobperron): We could cache the List value for subsequent calls
+    java.util.List<@(get_java_type(member.type, use_primitives=False))> list = new java.util.ArrayList<@(get_java_type(member.type, use_primitives=False))>(this.@(member.name).length);
+    for (@(get_java_type(member.type)) element : this.@(member.name)) {
+      list.add(element);
+    }
+    return list;
   }
 @[  else]@
 @[    if member.has_annotation('default')]@

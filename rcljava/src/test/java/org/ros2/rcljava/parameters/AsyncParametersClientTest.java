@@ -15,6 +15,7 @@
 
 package org.ros2.rcljava.parameters;
 
+import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertTrue;
@@ -153,8 +154,8 @@ public class AsyncParametersClientTest {
     parametersClient.listParameters(
         Arrays.asList(new String[] {"foo", "bar"}), 10, new TestConsumer(future));
 
-    assertEquals(Arrays.asList(new String[] {"foo.first", "foo.second"}), future.get().getNames());
-    assertEquals(Arrays.asList(new String[] {"foo"}), future.get().getPrefixes());
+    assertArrayEquals(new String[] {"foo.first", "foo.second"}, future.get().getNames());
+    assertArrayEquals(new String[] {"foo"}, future.get().getPrefixes());
   }
 
   @Test

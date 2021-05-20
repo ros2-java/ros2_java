@@ -480,6 +480,8 @@ public class NodeImpl implements Node {
           new rcl_interfaces.msg.ListParametersResult();
 
       String separator = ".";
+      List<String> resultNames = new ArrayList<String>();
+      List<String> resultPrefixes = new ArrayList<String>();
       for (Map.Entry<String, ParameterVariant> entry : this.parameters.entrySet()) {
         boolean getAll =
             (prefixes.size() == 0)
@@ -500,16 +502,18 @@ public class NodeImpl implements Node {
           }
         }
         if (getAll || prefixMatches) {
-          result.getNames().add(entry.getKey());
+          resultNames.add(entry.getKey());
           int lastSeparator = entry.getKey().lastIndexOf(separator);
           if (-1 != lastSeparator) {
             String prefix = entry.getKey().substring(0, lastSeparator);
-            if (!result.getPrefixes().contains(prefix)) {
-              result.getPrefixes().add(prefix);
+            if (!resultPrefixes.contains(prefix)) {
+              resultPrefixes.add(prefix);
             }
           }
         }
       }
+      result.setNames(resultNames);
+      result.setPrefixes(resultPrefixes);
       return result;
     }
   }
