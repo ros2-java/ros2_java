@@ -21,9 +21,7 @@ import org.ros2.rcljava.interfaces.MessageDefinition;
 import org.ros2.rcljava.interfaces.ServiceDefinition;
 
 public interface Service<T extends ServiceDefinition> extends Disposable {
-  <U extends MessageDefinition> Class<U> getRequestType();
-
-  <U extends MessageDefinition> Class<U> getResponseType();
+  ServiceDefinition getServiceDefinition();
 
   void executeCallback(RMWRequestId rmwRequestId, MessageDefinition request, MessageDefinition response);
 

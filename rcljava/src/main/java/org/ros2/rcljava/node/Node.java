@@ -126,23 +126,24 @@ public interface Node extends Disposable {
   <T extends MessageDefinition> Publisher<T> createPublisher(
       final Class<T> messageType, final String topic);
 
-  <T extends ServiceDefinition> Service<T> createService(final Class<T> serviceType,
+  <T extends ServiceDefinition> Service<T> createService(
+      final Class<T> serviceType,
       final String serviceName,
       final TriConsumer<RMWRequestId, ? extends MessageDefinition, ? extends MessageDefinition>
           callback,
-      final QoSProfile qosProfile) throws NoSuchFieldException, IllegalAccessException;
+      final QoSProfile qosProfile);
 
-  <T extends ServiceDefinition> Service<T> createService(final Class<T> serviceType,
+  <T extends ServiceDefinition> Service<T> createService(
+      final Class<T> serviceType,
       final String serviceName,
       final TriConsumer<RMWRequestId, ? extends MessageDefinition, ? extends MessageDefinition>
-          callback) throws NoSuchFieldException, IllegalAccessException;
+          callback);
 
   <T extends ServiceDefinition> Client<T> createClient(
-      final Class<T> serviceType, final String serviceName, final QoSProfile qosProfile)
-      throws NoSuchFieldException, IllegalAccessException;
+      final Class<T> serviceType, final String serviceName, final QoSProfile qosProfile);
 
-  <T extends ServiceDefinition> Client<T> createClient(final Class<T> serviceType,
-      final String serviceName) throws NoSuchFieldException, IllegalAccessException;
+  <T extends ServiceDefinition> Client<T> createClient(
+      final Class<T> serviceType, final String serviceName);
 
   /**
    * Create an ActionServer&lt;T&gt;.

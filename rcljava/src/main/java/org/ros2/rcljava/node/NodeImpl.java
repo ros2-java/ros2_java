@@ -191,18 +191,8 @@ public class NodeImpl implements Node {
     this.wall_clock = new Clock(ClockType.STEADY_TIME);
     this.timeSource = new TimeSource(this);
     this.timeSource.attachClock(this.clock);
-    try {
-      this.parameterService = nodeOptions.getStartParameterServices() ?
-        new ParameterServiceImpl(this) : null;
-    // TODO(ivanpauno): Modify createService, createClient so they don't declare
-    // NoSuchFieldException and IllegalAccessException checked exceptions.
-    // That only happens if the user passed the wrong Class object, and the exception should
-    // be rethrown as an unchecked IllegalArgumentException.
-    } catch (NoSuchFieldException ex) {
-      throw new IllegalArgumentException(ex.getMessage());
-    } catch (IllegalAccessException ex) {
-      throw new IllegalArgumentException(ex.getMessage());
-    }
+    this.parameterService = nodeOptions.getStartParameterServices() ?
+      new ParameterServiceImpl(this) : null;
   }
 
   /**
@@ -340,30 +330,39 @@ public class NodeImpl implements Node {
       long handle, Class<T> cls, String serviceName, long qosProfileHandle);
 
   public final <T extends ServiceDefinition> Service<T> createService(final Class<T> serviceType,
-      final String serviceName,
-      final TriConsumer<RMWRequestId, ? extends MessageDefinition, ? extends MessageDefinition>
-          callback,
-      final QoSProfile qosProfile) throws NoSuchFieldException, IllegalAccessException {
-    Class<MessageDefinition> requestType = (Class) serviceType.getField("RequestType").get(null);
-
-    Class<MessageDefinition> responseType = (Class) serviceType.getField("ResponseType").get(null);
-
+    final String serviceName,
+    final TriConsumer<RMWRequestId, ? extends MessageDefinition, ? extends MessageDefinition>
+      callback,
+    final QoSProfile qosProfile)
+  {
+    T serviceDefinition;
+    try {
+      serviceDefinition = serviceType.getDeclaredConstructor().newInstance();
+    } catch (ReflectiveOperationException e) {
+      throw new IllegalStateException("Failed to instantiate service definition");
+    }
     long qosProfileHandle = RCLJava.convertQoSProfileToHandle(qosProfile);
     long serviceHandle =
         nativeCreateServiceHandle(this.handle, serviceType, serviceName, qosProfileHandle);
     RCLJava.disposeQoSProfile(qosProfileHandle);
 
-    Service<T> service = new ServiceImpl<T>(new WeakReference<Node>(this), serviceHandle,
-        serviceName, callback, requestType, responseType);
+    Service<T> service = new ServiceImpl<T>(
+      serviceDefinition,
+      new WeakReference<Node>(this),
+      serviceHandle,
+      serviceName,
+      callback);
     this.services.add(service);
 
     return service;
   }
 
-  public <T extends ServiceDefinition> Service<T> createService(final Class<T> serviceType,
-      final String serviceName,
-      final TriConsumer<RMWRequestId, ? extends MessageDefinition, ? extends MessageDefinition>
-          callback) throws NoSuchFieldException, IllegalAccessException {
+  public <T extends ServiceDefinition> Service<T> createService(
+    final Class<T> serviceType,
+    final String serviceName,
+    final TriConsumer<RMWRequestId, ? extends MessageDefinition, ? extends MessageDefinition>
+      callback)
+  {
     return this.<T>createService(serviceType, serviceName, callback, QoSProfile.SERVICES_DEFAULT);
   }
 
@@ -375,26 +374,29 @@ public class NodeImpl implements Node {
   }
 
   public final <T extends ServiceDefinition> Client<T> createClient(
-      final Class<T> serviceType, final String serviceName, final QoSProfile qosProfile)
-      throws NoSuchFieldException, IllegalAccessException {
-    Class<MessageDefinition> requestType = (Class) serviceType.getField("RequestType").get(null);
-
-    Class<MessageDefinition> responseType = (Class) serviceType.getField("ResponseType").get(null);
-
+    final Class<T> serviceType, final String serviceName, final QoSProfile qosProfile)
+  {
     long qosProfileHandle = RCLJava.convertQoSProfileToHandle(qosProfile);
     long clientHandle =
         nativeCreateClientHandle(this.handle, serviceType, serviceName, qosProfileHandle);
     RCLJava.disposeQoSProfile(qosProfileHandle);
 
+    T serviceDefinition;
+    try {
+      serviceDefinition = serviceType.getDeclaredConstructor().newInstance();
+    } catch (ReflectiveOperationException e) {
+      throw new IllegalStateException("Failed to instantiate service definition");
+    }
+
     Client<T> client = new ClientImpl<T>(
-        new WeakReference<Node>(this), clientHandle, serviceName, requestType, responseType);
+        serviceDefinition, new WeakReference<Node>(this), clientHandle, serviceName);
     this.clients.add(client);
 
     return client;
   }
 
   public <T extends ServiceDefinition> Client<T> createClient(final Class<T> serviceType,
-      final String serviceName) throws NoSuchFieldException, IllegalAccessException {
+      final String serviceName) {
     return this.<T>createClient(serviceType, serviceName, QoSProfile.SERVICES_DEFAULT);
   }
 

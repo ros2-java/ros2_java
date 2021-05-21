@@ -61,6 +61,14 @@ public class @(type_name) implements ServiceDefinition {
     }
   }
 
+  public @(type_name)_Request newRequestInstance() {
+    return new @(type_name)_Request();
+  }
+
+  public @(type_name)_Response newResponseInstance() {
+    return new @(type_name)_Response();
+  }
+
   public static native long getServiceTypeSupport();
 
   public static final Class<@(type_name)_Request> RequestType = @(type_name)_Request.class;

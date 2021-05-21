@@ -38,7 +38,7 @@ public class ParameterServiceImpl implements ParameterService {
   Service<rcl_interfaces.srv.ListParameters> listParametersService;
 
   public ParameterServiceImpl(final Node node, final QoSProfile qosProfile)
-      throws NoSuchFieldException, IllegalAccessException {
+  {
     this.node = node;
     this.getParametersService = node.<rcl_interfaces.srv.GetParameters>createService(
         rcl_interfaces.srv.GetParameters.class,
@@ -146,7 +146,7 @@ public class ParameterServiceImpl implements ParameterService {
         qosProfile);
   }
 
-  public ParameterServiceImpl(final Node node) throws NoSuchFieldException, IllegalAccessException {
+  public ParameterServiceImpl(final Node node) {
     this(node, QoSProfile.PARAMETERS);
   }
 }

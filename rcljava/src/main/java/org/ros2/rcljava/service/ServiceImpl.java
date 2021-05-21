@@ -45,28 +45,25 @@ public class ServiceImpl<T extends ServiceDefinition> implements Service<T> {
   private final TriConsumer<RMWRequestId, ? extends MessageDefinition, ? extends MessageDefinition>
       callback;
 
-  private final Class<MessageDefinition> requestType;
-  private final Class<MessageDefinition> responseType;
+  private final ServiceDefinition serviceDefinition;
 
-  public ServiceImpl(final WeakReference<Node> nodeReference, final long handle,
-      final String serviceName,
-      final TriConsumer<RMWRequestId, ? extends MessageDefinition, ? extends MessageDefinition>
-          callback,
-      final Class<MessageDefinition> requestType, final Class<MessageDefinition> responseType) {
+  public ServiceImpl(
+    final ServiceDefinition serviceDefinition,
+    final WeakReference<Node> nodeReference,
+    final long handle,
+    final String serviceName,
+    final TriConsumer<RMWRequestId, ? extends MessageDefinition, ? extends MessageDefinition>
+      callback)
+  {
     this.nodeReference = nodeReference;
     this.handle = handle;
     this.serviceName = serviceName;
     this.callback = callback;
-    this.requestType = requestType;
-    this.responseType = responseType;
+    this.serviceDefinition = serviceDefinition;
   }
 
-  public final Class<MessageDefinition> getRequestType() {
-    return this.requestType;
-  }
-
-  public final Class<MessageDefinition> getResponseType() {
-    return this.responseType;
+  public final ServiceDefinition getServiceDefinition() {
+    return this.serviceDefinition;
   }
 
   /**

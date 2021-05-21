@@ -55,18 +55,23 @@ public class ClientImpl<T extends ServiceDefinition> implements Client<T> {
   private final String serviceName;
   private Map<Long, Map.Entry<Consumer, RCLFuture>> pendingRequests;
 
-  private final Class<MessageDefinition> requestType;
-  private final Class<MessageDefinition> responseType;
+  private final ServiceDefinition serviceDefinition;
 
-  public ClientImpl(final WeakReference<Node> nodeReference, final long handle,
-      final String serviceName, final Class<MessageDefinition> requestType,
-      final Class<MessageDefinition> responseType) {
+  public ClientImpl(
+    final ServiceDefinition serviceDefinition,
+    final WeakReference<Node> nodeReference,
+    final long handle,
+    final String serviceName)
+  {
     this.nodeReference = nodeReference;
     this.handle = handle;
     this.serviceName = serviceName;
-    this.requestType = requestType;
-    this.responseType = responseType;
+    this.serviceDefinition = serviceDefinition;
     this.pendingRequests = new HashMap<Long, Map.Entry<Consumer, RCLFuture>>();
+  }
+
+  public ServiceDefinition getServiceDefinition() {
+    return this.serviceDefinition;
   }
 
   public final <U extends MessageDefinition, V extends MessageDefinition> Future<V>
@@ -111,14 +116,6 @@ public class ClientImpl<T extends ServiceDefinition> implements Client<T> {
   private static native long nativeSendClientRequest(
       long handle, long requestFromJavaConverterHandle, long requestDestructorHandle,
       MessageDefinition requestMessage);
-
-  public final Class<MessageDefinition> getRequestType() {
-    return this.requestType;
-  }
-
-  public final Class<MessageDefinition> getResponseType() {
-    return this.responseType;
-  }
 
   /**
    * Destroy a ROS2 client (rcl_client_t).

@@ -26,9 +26,7 @@ import org.ros2.rcljava.interfaces.ServiceDefinition;
 import org.ros2.rcljava.service.RMWRequestId;
 
 public interface Client<T extends ServiceDefinition> extends Disposable {
-  <U extends MessageDefinition> Class<U> getRequestType();
-
-  <U extends MessageDefinition> Class<U> getResponseType();
+  ServiceDefinition getServiceDefinition();
 
   <U extends MessageDefinition> void handleResponse(RMWRequestId header, U response);
 

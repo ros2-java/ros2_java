@@ -118,18 +118,9 @@ public class BaseExecutor {
     }
 
     if (anyExecutable.service != null) {
-      Class<? extends MessageDefinition> requestType = anyExecutable.service.getRequestType();
-      Class<? extends MessageDefinition> responseType = anyExecutable.service.getResponseType();
-
-      MessageDefinition requestMessage = null;
-      MessageDefinition responseMessage = null;
-
-      try {
-        requestMessage = requestType.getDeclaredConstructor().newInstance();
-        responseMessage = responseType.getDeclaredConstructor().newInstance();
-      } catch (ReflectiveOperationException e) {
-        throw new IllegalStateException("Failed to instantiate service request/response");
-      }
+      ServiceDefinition serviceDefinition = anyExecutable.service.getServiceDefinition();
+      MessageDefinition requestMessage = serviceDefinition.newRequestInstance();
+      MessageDefinition responseMessage = serviceDefinition.newResponseInstance();
 
       if (requestMessage != null && responseMessage != null) {
         long requestFromJavaConverterHandle = requestMessage.getFromJavaConverterInstance();
@@ -140,28 +131,21 @@ public class BaseExecutor {
         long responseDestructorHandle = responseMessage.getDestructorInstance();
 
         RMWRequestId rmwRequestId =
-            nativeTakeRequest(anyExecutable.service.getHandle(), requestFromJavaConverterHandle,
-                requestToJavaConverterHandle, requestDestructorHandle, requestMessage);
+          nativeTakeRequest(anyExecutable.service.getHandle(), requestFromJavaConverterHandle,
+            requestToJavaConverterHandle, requestDestructorHandle, requestMessage);
         if (rmwRequestId != null) {
           anyExecutable.service.executeCallback(rmwRequestId, requestMessage, responseMessage);
-          nativeSendServiceResponse(anyExecutable.service.getHandle(), rmwRequestId,
-              responseFromJavaConverterHandle, responseDestructorHandle, responseMessage);
+          nativeSendServiceResponse(
+            anyExecutable.service.getHandle(), rmwRequestId,
+            responseFromJavaConverterHandle, responseDestructorHandle, responseMessage);
         }
       }
       serviceHandles.remove(anyExecutable.service.getHandle());
     }
 
     if (anyExecutable.client != null) {
-      Class<? extends MessageDefinition> requestType = anyExecutable.client.getRequestType();
-      Class<? extends MessageDefinition> responseType = anyExecutable.client.getResponseType();
-
-      MessageDefinition responseMessage = null;
-
-      try {
-        responseMessage = responseType.getDeclaredConstructor().newInstance();
-      } catch (ReflectiveOperationException ie) {
-        throw new IllegalStateException("Failed to instantiate service response");
-      }
+      ServiceDefinition serviceDefinition = anyExecutable.client.getServiceDefinition();
+      MessageDefinition responseMessage = serviceDefinition.newResponseInstance();
 
       if (responseMessage != null) {
         long responseFromJavaConverterHandle = responseMessage.getFromJavaConverterInstance();
