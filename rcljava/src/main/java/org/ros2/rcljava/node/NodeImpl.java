@@ -44,6 +44,10 @@ import org.ros2.rcljava.parameters.ParameterCallback;
 import org.ros2.rcljava.parameters.ParameterNotDeclaredException;
 import org.ros2.rcljava.parameters.ParameterType;
 import org.ros2.rcljava.parameters.ParameterVariant;
+import org.ros2.rcljava.parameters.client.AsyncParametersClient;
+import org.ros2.rcljava.parameters.client.AsyncParametersClientImpl;
+import org.ros2.rcljava.parameters.client.SyncParametersClient;
+import org.ros2.rcljava.parameters.client.SyncParametersClientImpl;
 import org.ros2.rcljava.parameters.service.ParameterService;
 import org.ros2.rcljava.parameters.service.ParameterServiceImpl;
 import org.ros2.rcljava.publisher.Publisher;
@@ -531,6 +535,14 @@ public class NodeImpl implements Node {
 
   public final String getNamespace() {
     return nativeGetNamespace(this.handle);
+  }
+
+  public AsyncParametersClient createAsyncParametersClient(String nodeName) {
+    return new AsyncParametersClientImpl(this, nodeName);
+  }
+
+  public SyncParametersClient createSyncParametersClient(String nodeName) {
+    return new SyncParametersClientImpl(this, nodeName);
   }
 
   public ParameterVariant declareParameter(ParameterVariant parameter) {

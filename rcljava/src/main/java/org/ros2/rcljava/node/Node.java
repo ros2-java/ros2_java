@@ -39,6 +39,8 @@ import org.ros2.rcljava.interfaces.ServiceDefinition;
 import org.ros2.rcljava.parameters.ParameterCallback;
 import org.ros2.rcljava.parameters.ParameterType;
 import org.ros2.rcljava.parameters.ParameterVariant;
+import org.ros2.rcljava.parameters.client.AsyncParametersClient;
+import org.ros2.rcljava.parameters.client.SyncParametersClient;
 import org.ros2.rcljava.publisher.Publisher;
 import org.ros2.rcljava.qos.QoSProfile;
 import org.ros2.rcljava.service.RMWRequestId;
@@ -263,6 +265,16 @@ public interface Node extends Disposable {
    * @return The namespace of the node.
    */
   String getNamespace();
+
+  /**
+   * Create an asynchronous parameter client.
+   */
+  AsyncParametersClient createAsyncParametersClient(String nodeName);
+
+  /**
+   * Create an synchronous parameter client.
+   */
+  SyncParametersClient createSyncParametersClient(String nodeName);
 
   /**
    * Declare and initialize a parameter, return the effective value.
