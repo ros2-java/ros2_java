@@ -11,7 +11,7 @@ jobs:
         sudo apt-get update -qq
         sudo apt-get install -y default-jdk gradle
     - uses: actions/checkout@v2
-    - uses: ros-tooling/setup-ros@v0.1
+    - uses: ros-tooling/setup-ros@0.2.1
       with:
         required-ros-distributions: dashing
     - uses: ros-tooling/action-ros-ci@v0.2
