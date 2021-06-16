@@ -1,8 +1,8 @@
 repositories:
   ament/ament_java:
     type: git
-    url: https://github.com/ros2-java/ament_java.git
-    version: master
+    url: https://github.com/jacobperron/ament_java.git
+    version: reapply_10
   ros2/common_interfaces:
     type: git
     url: https://github.com/ros2/common_interfaces.git
