@@ -177,6 +177,13 @@ public class NodeImpl implements Node {
   /**
    * {@inheritDoc}
    */
+  public final Clock getClock() {
+    return this.clock;
+  }
+
+  /**
+   * {@inheritDoc}
+   */
   public final <T extends MessageDefinition> Publisher<T> createPublisher(
       final Class<T> messageType, final String topic, final QoSProfile qosProfile) {
     long qosProfileHandle = RCLJava.convertQoSProfileToHandle(qosProfile);

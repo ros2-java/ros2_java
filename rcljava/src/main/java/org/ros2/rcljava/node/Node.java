@@ -33,6 +33,7 @@ import org.ros2.rcljava.publisher.Publisher;
 import org.ros2.rcljava.service.RMWRequestId;
 import org.ros2.rcljava.service.Service;
 import org.ros2.rcljava.subscription.Subscription;
+import org.ros2.rcljava.time.Clock;
 import org.ros2.rcljava.timer.Timer;
 import org.ros2.rcljava.timer.WallTimer;
 
@@ -41,6 +42,11 @@ import org.ros2.rcljava.timer.WallTimer;
  * A Node must be created via @{link RCLJava#createNode(String)}
  */
 public interface Node extends Disposable {
+  /**
+   * @return The nodes @{link Clock}.
+   */
+  Clock getClock();
+
   /**
    * return All the @{link Client}s that have been created by this instance.
    */
