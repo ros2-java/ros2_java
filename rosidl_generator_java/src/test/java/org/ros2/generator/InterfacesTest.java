@@ -21,7 +21,7 @@ import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertTrue;
 
 import java.lang.reflect.Method;
-import java.util.concurrent.Callable;
+import java.lang.Runnable;
 import java.util.Arrays;
 import java.util.List;
 import org.junit.BeforeClass;
@@ -40,9 +40,9 @@ public class InterfacesTest {
     public byte[] byteArrShort = new byte[]{1};
     public List<Byte> byteListShort = Arrays.asList((byte) 1);
     public byte[] charArr = new byte[]{(byte) ' ', (byte) 'a', (byte) 'Z'};
-    public List<Byte> charList = Arrays.asList(new Byte((byte) ' '), new Byte((byte) 'a'), new Byte((byte) 'Z'));
+    public List<Byte> charList = Arrays.asList(Byte.valueOf((byte) ' '), Byte.valueOf((byte) 'a'), Byte.valueOf((byte) 'Z'));
     public byte[] charArrShort = new byte[]{(byte) 'z', (byte) 'A'};
-    public List<Byte> charListShort = Arrays.asList(new Byte((byte) 'z'), new Byte((byte) 'A'));
+    public List<Byte> charListShort = Arrays.asList(Byte.valueOf((byte) 'z'), Byte.valueOf((byte) 'A'));
     public float[] float32Arr = new float[]{0.0f, -1.125f, 1.125f};
     public List<Float> float32List = Arrays.asList(0.0f, -1.125f, 1.125f);
     public float[] float32ArrShort = new float[]{1.125f, -1.125f};
@@ -58,7 +58,7 @@ public class InterfacesTest {
     public byte[] uint8Arr = new byte[]{(byte) 0, (byte) 1, (byte) 255};
     public List<Byte> uint8List = Arrays.asList((byte) 0, (byte) 1, (byte) 255);
     public byte[] uint8ArrShort = new byte[]{(byte) 255, (byte) 1};
-    public List uint8ListShort = Arrays.asList((byte) 255, (byte) 1);
+    public List<Byte> uint8ListShort = Arrays.asList((byte) 255, (byte) 1);
     public short[] int16Arr = new short[]{0, -32768, 32767};
     public List<Short> int16List = Arrays.asList((short) 0, (short) -32768, (short) 32767);
     public short[] int16ArrShort = new short[]{32767, -32768};
@@ -84,9 +84,9 @@ public class InterfacesTest {
     public long[] uint64ArrShort = new long[]{0L, 1L, -1L};
     public List<Long> uint64ListShort = Arrays.asList(0L, 1L, -1L);
     public String[] stringArr = new String[]{"", "min value", "max_value"};
-    public List stringList = Arrays.asList(stringArr);
+    public List<String> stringList = Arrays.asList(stringArr);
     public String[] stringArrShort = new String[]{"max_value", ""};
-    public List stringListShort = Arrays.asList(stringArrShort);
+    public List<String> stringListShort = Arrays.asList(stringArrShort);
     private rosidl_generator_java.msg.BasicTypes basicTypes = new rosidl_generator_java.msg.BasicTypes();
     public rosidl_generator_java.msg.BasicTypes[] basicTypesArr =
         new rosidl_generator_java.msg.BasicTypes[] {basicTypes, basicTypes, basicTypes};
@@ -125,8 +125,8 @@ public class InterfacesTest {
     {
       // Configure log4j. Doing this dynamically so that Android does not complain about missing
       // the log4j JARs, SLF4J uses Android's native logging mechanism instead.
-      Class c = Class.forName("org.apache.log4j.BasicConfigurator");
-      Method m = c.getDeclaredMethod("configure", (Class<?>[]) null);
+      Class<?> c = Class.forName("org.apache.log4j.BasicConfigurator");
+      Method m = c.getDeclaredMethod("configure", (Class[]) null);
       Object o = m.invoke(null, (Object[]) null);
     }
     catch (Exception e)
@@ -139,16 +139,16 @@ public class InterfacesTest {
 
   // TODO(jacobperron): Replace with JUnit's assertThrows method when we switch to JUnit 5
   // See: https://junit.org/junit5/docs/5.0.1/api/org/junit/jupiter/api/Assertions.html
-  private static void assertThrows(Class expectedException, Callable func) {
+  private static void assertThrows(Class expectedException, Runnable func) {
     try {
-      func.call();
+      func.run();
     }
     catch(Exception exception) {
       if (expectedException.isInstance(exception)) {
         return;
       }
     }
-    assertTrue("Callable did not throw the expected exception", false);
+    assertTrue("Runnable did not throw the expected exception", false);
   }
 
   @Test
@@ -293,8 +293,8 @@ public class InterfacesTest {
 
   @Test
   public final void testArrays() {
-    rosidl_generator_java.msg.Arrays arrays = new rosidl_generator_java.msg.Arrays();
-    ListFixtureData fixture = new ListFixtureData();
+    final rosidl_generator_java.msg.Arrays arrays = new rosidl_generator_java.msg.Arrays();
+    final ListFixtureData fixture = new ListFixtureData();
 
     // This value should not change and is asserted at end of test
     arrays.setAlignmentCheck(42);
@@ -304,133 +304,303 @@ public class InterfacesTest {
     assertArrayEquals(fixture.boolArr, arrays.getBoolValues());
     assertEquals(fixture.boolList, arrays.getBoolValuesAsList());
     assertThrows(IllegalArgumentException.class,
-      () -> arrays.setBoolValues(new boolean[]{true, false, true, false}));
+      new Runnable() {
+        @Override
+        public void run() {
+          arrays.setBoolValues(new boolean[]{true, false, true, false});
+        }
+      });
     assertThrows(IllegalArgumentException.class,
-      () -> arrays.setBoolValues(Arrays.asList(true, false, true, false)));
+      new Runnable() {
+        @Override
+        public void run() {
+          arrays.setBoolValues(Arrays.asList(true, false, true, false));
+        }
+      });
     arrays.setByteValues(fixture.byteList);
     assertArrayEquals(fixture.byteArr, arrays.getByteValues());
     assertEquals(fixture.byteList, arrays.getByteValuesAsList());
     assertThrows(IllegalArgumentException.class,
-      () -> arrays.setByteValues(new byte[]{(byte) 1, (byte) 2}));
+      new Runnable() {
+        @Override
+        public void run() {
+          arrays.setByteValues(new byte[]{(byte) 1, (byte) 2});
+        }
+      });
     assertThrows(IllegalArgumentException.class,
-      () -> arrays.setByteValues(Arrays.asList((byte) 1, (byte) 2)));
+      new Runnable() {
+        @Override
+        public void run() {
+          arrays.setByteValues(Arrays.asList((byte) 1, (byte) 2));
+        }
+      });
     arrays.setCharValues(fixture.charList);
     assertArrayEquals(fixture.charArr, arrays.getCharValues());
     assertEquals(fixture.charList, arrays.getCharValuesAsList());
     assertThrows(IllegalArgumentException.class,
-      () -> arrays.setCharValues(new byte[]{(byte) 'a', (byte) 'b', (byte) 'c', (byte) 'd'}));
+      new Runnable() {
+        @Override
+        public void run() {
+          arrays.setCharValues(new byte[]{(byte) 'a', (byte) 'b', (byte) 'c', (byte) 'd'});
+        }
+      });
     assertThrows(IllegalArgumentException.class,
-      () -> arrays.setCharValues(Arrays.asList((byte) 'a', (byte) 'b', (byte) 'c', (byte) 'd')));
+      new Runnable() {
+        @Override
+        public void run() {
+          arrays.setCharValues(Arrays.asList((byte) 'a', (byte) 'b', (byte) 'c', (byte) 'd'));
+        }
+      });
     arrays.setFloat32Values(fixture.float32List);
     assertTrue(Arrays.equals(fixture.float32Arr, arrays.getFloat32Values()));
     assertEquals(fixture.float32List, arrays.getFloat32ValuesAsList());
     assertThrows(IllegalArgumentException.class,
-      () -> arrays.setFloat32Values(new float[]{1.0f, 2.0f}));
+      new Runnable() {
+        @Override
+        public void run() {
+          arrays.setFloat32Values(new float[]{1.0f, 2.0f});
+        }
+      });
     assertThrows(IllegalArgumentException.class,
-      () -> arrays.setFloat32Values(Arrays.asList(1.0f, 2.0f)));
+      new Runnable() {
+        @Override
+        public void run() {
+          arrays.setFloat32Values(Arrays.asList(1.0f, 2.0f));
+        }
+      });
     arrays.setFloat64Values(fixture.float64List);
     assertTrue(Arrays.equals(fixture.float64Arr, arrays.getFloat64Values()));
     assertEquals(fixture.float64List, arrays.getFloat64ValuesAsList());
     assertThrows(IllegalArgumentException.class,
-      () -> arrays.setFloat64Values(new double[]{1.0, 2.0, 3.0, 4.0}));
+      new Runnable() {
+        @Override
+        public void run() {
+          arrays.setFloat64Values(new double[]{1.0, 2.0, 3.0, 4.0});
+        }
+      });
     assertThrows(IllegalArgumentException.class,
-      () -> arrays.setFloat64Values(Arrays.asList(1.0, 2.0, 3.0, 4.0)));
+      new Runnable() {
+        @Override
+        public void run() {
+          arrays.setFloat64Values(Arrays.asList(1.0, 2.0, 3.0, 4.0));
+        }
+      });
     arrays.setInt8Values(fixture.int8List);
     assertArrayEquals(fixture.int8Arr, arrays.getInt8Values());
     assertEquals(fixture.int8List, arrays.getInt8ValuesAsList());
     assertThrows(IllegalArgumentException.class,
-      () ->arrays.setInt8Values(new byte[]{(byte) 1, (byte) 2}));
+      new Runnable() {
+        @Override
+        public void run() {
+          arrays.setInt8Values(new byte[]{(byte) 1, (byte) 2});
+        }
+      });
     assertThrows(IllegalArgumentException.class,
-      () ->arrays.setInt8Values(Arrays.asList((byte) 1, (byte) 2)));
+      new Runnable() {
+        @Override
+        public void run() {
+          arrays.setInt8Values(Arrays.asList((byte) 1, (byte) 2));
+        }
+      });
     arrays.setUint8Values(fixture.uint8List);
     assertArrayEquals(fixture.uint8Arr, arrays.getUint8Values());
     assertEquals(fixture.uint8List, arrays.getUint8ValuesAsList());
     assertThrows(IllegalArgumentException.class,
-      () -> arrays.setUint8Values(new byte[]{(byte) 1, (byte) 2, (byte) 3, (byte) 4}));
+      new Runnable() {
+        @Override
+        public void run() {
+          arrays.setUint8Values(new byte[]{(byte) 1, (byte) 2, (byte) 3, (byte) 4});
+        }
+      });
     assertThrows(IllegalArgumentException.class,
-      () -> arrays.setUint8Values(Arrays.asList((byte) 1, (byte) 2, (byte) 3, (byte) 4)));
+      new Runnable() {
+        @Override
+        public void run() {
+          arrays.setUint8Values(Arrays.asList((byte) 1, (byte) 2, (byte) 3, (byte) 4));
+        }
+      });
     arrays.setInt16Values(fixture.int16List);
     assertTrue(Arrays.equals(fixture.int16Arr, arrays.getInt16Values()));
     assertEquals(fixture.int16List, arrays.getInt16ValuesAsList());
     assertThrows(IllegalArgumentException.class,
-      () -> arrays.setInt16Values(new short[]{(short) 1, (short) 2}));
+      new Runnable() {
+        @Override
+        public void run() {
+          arrays.setInt16Values(new short[]{(short) 1, (short) 2});
+        }
+      });
     assertThrows(IllegalArgumentException.class,
-      () -> arrays.setInt16Values(Arrays.asList((short) 1, (short) 2)));
+      new Runnable() {
+        @Override
+        public void run() {
+          arrays.setInt16Values(Arrays.asList((short) 1, (short) 2));
+        }
+      });
     arrays.setUint16Values(fixture.uint16List);
     assertTrue(Arrays.equals(fixture.uint16Arr, arrays.getUint16Values()));
     assertEquals(fixture.uint16List, arrays.getUint16ValuesAsList());
     assertThrows(IllegalArgumentException.class,
-      () -> arrays.setUint16Values(new short[]{(short) 1, (short) 2, (short) 3, (short) 4}));
+      new Runnable() {
+        @Override
+        public void run() {
+          arrays.setUint16Values(new short[]{(short) 1, (short) 2, (short) 3, (short) 4});
+        }
+      });
     assertThrows(IllegalArgumentException.class,
-      () -> arrays.setUint16Values(Arrays.asList((short) 1, (short) 2, (short) 3, (short) 4)));
+      new Runnable() {
+        @Override
+        public void run() {
+          arrays.setUint16Values(Arrays.asList((short) 1, (short) 2, (short) 3, (short) 4));
+        }
+      });
     arrays.setInt32Values(fixture.int32List);
     assertArrayEquals(fixture.int32Arr, arrays.getInt32Values());
     assertEquals(fixture.int32List, arrays.getInt32ValuesAsList());
     assertThrows(IllegalArgumentException.class,
-      () -> arrays.setInt32Values(new int[]{1, 2}));
+      new Runnable() {
+        @Override
+        public void run() {
+          arrays.setInt32Values(new int[]{1, 2});
+        }
+      });
     assertThrows(IllegalArgumentException.class,
-      () -> arrays.setInt32Values(Arrays.asList(1, 2)));
+      new Runnable() {
+        @Override
+        public void run() {
+          arrays.setInt32Values(Arrays.asList(1, 2));
+        }
+      });
     arrays.setUint32Values(fixture.uint32List);
     assertArrayEquals(fixture.uint32Arr, arrays.getUint32Values());
     assertEquals(fixture.uint32List, arrays.getUint32ValuesAsList());
     assertThrows(IllegalArgumentException.class,
-      () -> arrays.setUint32Values(new int[]{1, 2, 3, 4}));
+      new Runnable() {
+        @Override
+        public void run() {
+          arrays.setUint32Values(new int[]{1, 2, 3, 4});
+        }
+      });
     assertThrows(IllegalArgumentException.class,
-      () -> arrays.setUint32Values(Arrays.asList(1, 2, 3, 4)));
+      new Runnable() {
+        @Override
+        public void run() {
+          arrays.setUint32Values(Arrays.asList(1, 2, 3, 4));
+        }
+      });
     arrays.setInt64Values(fixture.int64List);
     assertArrayEquals(fixture.int64Arr, arrays.getInt64Values());
     assertEquals(fixture.int64List, arrays.getInt64ValuesAsList());
     assertThrows(IllegalArgumentException.class,
-      () -> arrays.setInt64Values(new long[]{1L, 2L}));
+      new Runnable() {
+        @Override
+        public void run() {
+          arrays.setInt64Values(new long[]{1L, 2L});
+        }
+      });
     assertThrows(IllegalArgumentException.class,
-      () -> arrays.setInt64Values(Arrays.asList(1L, 2L)));
+      new Runnable() {
+        @Override
+        public void run() {
+          arrays.setInt64Values(Arrays.asList(1L, 2L));
+        }
+      });
     arrays.setUint64Values(fixture.uint64List);
     assertArrayEquals(fixture.uint64Arr, arrays.getUint64Values());
     assertEquals(fixture.uint64List, arrays.getUint64ValuesAsList());
     assertThrows(IllegalArgumentException.class,
-      () ->arrays.setUint64Values(new long[]{1L, 2L, 3L, 4L}));
+      new Runnable() {
+        @Override
+        public void run() {
+          arrays.setUint64Values(new long[]{1L, 2L, 3L, 4L});
+        }
+      });
     assertThrows(IllegalArgumentException.class,
-      () ->arrays.setUint64Values(Arrays.asList(1L, 2L, 3L, 4L)));
+      new Runnable() {
+        @Override
+        public void run() {
+          arrays.setUint64Values(Arrays.asList(1L, 2L, 3L, 4L));
+        }
+      });
 
     // Test setting/getting fixed length arrays of strings
     arrays.setStringValues(fixture.stringList);
     assertArrayEquals(fixture.stringArr, arrays.getStringValues());
     assertEquals(fixture.stringList, arrays.getStringValuesAsList());
     assertThrows(IllegalArgumentException.class,
-      () -> arrays.setStringValues(new String[]{"too", "few"}));
+      new Runnable() {
+        @Override
+        public void run() {
+          arrays.setStringValues(new String[]{"too", "few"});
+        }
+      });
     assertThrows(IllegalArgumentException.class,
-      () -> arrays.setStringValues(Arrays.asList("too", "few")));
+      new Runnable() {
+        @Override
+        public void run() {
+          arrays.setStringValues(Arrays.asList("too", "few"));
+        }
+      });
 
     // Test setting/getting fixed length arrays of nested types
     arrays.setBasicTypesValues(fixture.basicTypesList);
     assertArrayEquals(fixture.basicTypesArr, arrays.getBasicTypesValues());
     assertEquals(fixture.basicTypesList, arrays.getBasicTypesValuesAsList());
     assertThrows(IllegalArgumentException.class,
-      () -> arrays.setBasicTypesValues(fixture.basicTypesArrShort));
+      new Runnable() {
+        @Override
+        public void run() {
+          arrays.setBasicTypesValues(fixture.basicTypesArrShort);
+        }
+      });
     assertThrows(IllegalArgumentException.class,
-      () -> arrays.setBasicTypesValues(fixture.basicTypesListShort));
+      new Runnable() {
+        @Override
+        public void run() {
+          arrays.setBasicTypesValues(fixture.basicTypesListShort);
+        }
+      });
     arrays.setConstantsValues(fixture.constantsList);
     assertArrayEquals(fixture.constantsArr, arrays.getConstantsValues());
     assertEquals(fixture.constantsList, arrays.getConstantsValuesAsList());
     assertThrows(IllegalArgumentException.class,
-      () -> arrays.setConstantsValues(fixture.constantsArrShort));
+      new Runnable() {
+        @Override
+        public void run() {
+          arrays.setConstantsValues(fixture.constantsArrShort);
+        }
+      });
     assertThrows(IllegalArgumentException.class,
-      () -> arrays.setConstantsValues(fixture.constantsListShort));
+      new Runnable() {
+        @Override
+        public void run() {
+          arrays.setConstantsValues(fixture.constantsListShort);
+        }
+      });
     arrays.setDefaultsValues(fixture.defaultsList);
     assertArrayEquals(fixture.defaultsArr, arrays.getDefaultsValues());
     assertEquals(fixture.defaultsList, arrays.getDefaultsValuesAsList());
     assertThrows(IllegalArgumentException.class,
-      () -> arrays.setDefaultsValues(fixture.defaultsArrShort));
+      new Runnable() {
+        @Override
+        public void run() {
+          arrays.setDefaultsValues(fixture.defaultsArrShort);
+        }
+      });
     assertThrows(IllegalArgumentException.class,
-      () -> arrays.setDefaultsValues(fixture.defaultsListShort));
+      new Runnable() {
+        @Override
+        public void run() {
+          arrays.setDefaultsValues(fixture.defaultsListShort);
+        }
+      });
 
     assertEquals(42, arrays.getAlignmentCheck());
   }
 
   @Test
   public final void testBoundedSequences() {
-    rosidl_generator_java.msg.BoundedSequences bounded_seq = new rosidl_generator_java.msg.BoundedSequences();
-    ListFixtureData fixture = new ListFixtureData();
+    final rosidl_generator_java.msg.BoundedSequences bounded_seq = new rosidl_generator_java.msg.BoundedSequences();
+    final ListFixtureData fixture = new ListFixtureData();
 
     // This value should not change and is asserted at end of test
     bounded_seq.setAlignmentCheck(42);
@@ -443,9 +613,19 @@ public class InterfacesTest {
     assertArrayEquals(fixture.boolArrShort, bounded_seq.getBoolValues());
     assertEquals(fixture.boolListShort, bounded_seq.getBoolValuesAsList());
     assertThrows(IllegalArgumentException.class,
-      () -> bounded_seq.setBoolValues(new boolean[]{true, false, true, false}));
+      new Runnable() {
+        @Override
+        public void run() {
+          bounded_seq.setBoolValues(new boolean[]{true, false, true, false});
+        }
+      });
     assertThrows(IllegalArgumentException.class,
-      () -> bounded_seq.setBoolValues(Arrays.asList(true, false, true, false)));
+      new Runnable() {
+        @Override
+        public void run() {
+          bounded_seq.setBoolValues(Arrays.asList(true, false, true, false));
+        }
+      });
     bounded_seq.setByteValues(fixture.byteList);
     assertArrayEquals(fixture.byteArr, bounded_seq.getByteValues());
     assertEquals(fixture.byteList, bounded_seq.getByteValuesAsList());
@@ -453,9 +633,19 @@ public class InterfacesTest {
     assertArrayEquals(fixture.byteArrShort, bounded_seq.getByteValues());
     assertEquals(fixture.byteListShort, bounded_seq.getByteValuesAsList());
     assertThrows(IllegalArgumentException.class,
-      () -> bounded_seq.setByteValues(new byte[]{(byte) 1, (byte) 2, (byte) 3, (byte) 4}));
+      new Runnable() {
+        @Override
+        public void run() {
+          bounded_seq.setByteValues(new byte[]{(byte) 1, (byte) 2, (byte) 3, (byte) 4});
+        }
+      });
     assertThrows(IllegalArgumentException.class,
-      () -> bounded_seq.setByteValues(Arrays.asList((byte) 1, (byte) 2, (byte) 3, (byte) 4)));
+      new Runnable() {
+        @Override
+        public void run() {
+          bounded_seq.setByteValues(Arrays.asList((byte) 1, (byte) 2, (byte) 3, (byte) 4));
+        }
+      });
     bounded_seq.setCharValues(fixture.charList);
     assertArrayEquals(fixture.charArr, bounded_seq.getCharValues());
     assertEquals(fixture.charList, bounded_seq.getCharValuesAsList());
@@ -463,9 +653,19 @@ public class InterfacesTest {
     assertArrayEquals(fixture.charArrShort, bounded_seq.getCharValues());
     assertEquals(fixture.charListShort, bounded_seq.getCharValuesAsList());
     assertThrows(IllegalArgumentException.class,
-      () -> bounded_seq.setCharValues(new byte[]{(byte) 'a', (byte) 'b', (byte) 'c', (byte) 'd'}));
+      new Runnable() {
+        @Override
+        public void run() {
+          bounded_seq.setCharValues(new byte[]{(byte) 'a', (byte) 'b', (byte) 'c', (byte) 'd'});
+        }
+      });
     assertThrows(IllegalArgumentException.class,
-      () -> bounded_seq.setCharValues(Arrays.asList((byte) 'a', (byte) 'b', (byte) 'c', (byte) 'd')));
+      new Runnable() {
+        @Override
+        public void run() {
+          bounded_seq.setCharValues(Arrays.asList((byte) 'a', (byte) 'b', (byte) 'c', (byte) 'd'));
+        }
+      });
     bounded_seq.setFloat32Values(fixture.float32List);
     assertTrue(Arrays.equals(fixture.float32Arr, bounded_seq.getFloat32Values()));
     assertEquals(fixture.float32List, bounded_seq.getFloat32ValuesAsList());
@@ -473,9 +673,19 @@ public class InterfacesTest {
     assertTrue(Arrays.equals(fixture.float32ArrShort, bounded_seq.getFloat32Values()));
     assertEquals(fixture.float32ListShort, bounded_seq.getFloat32ValuesAsList());
     assertThrows(IllegalArgumentException.class,
-      () -> bounded_seq.setFloat32Values(new float[]{1.0f, 2.0f, 3.0f, 4.0f}));
+      new Runnable() {
+        @Override
+        public void run() {
+          bounded_seq.setFloat32Values(new float[]{1.0f, 2.0f, 3.0f, 4.0f});
+        }
+      });
     assertThrows(IllegalArgumentException.class,
-      () -> bounded_seq.setFloat32Values(Arrays.asList(1.0f, 2.0f, 3.0f, 4.0f)));
+      new Runnable() {
+        @Override
+        public void run() {
+          bounded_seq.setFloat32Values(Arrays.asList(1.0f, 2.0f, 3.0f, 4.0f));
+        }
+      });
     bounded_seq.setFloat64Values(fixture.float64List);
     assertTrue(Arrays.equals(fixture.float64Arr, bounded_seq.getFloat64Values()));
     assertEquals(fixture.float64List, bounded_seq.getFloat64ValuesAsList());
@@ -483,7 +693,12 @@ public class InterfacesTest {
     assertTrue(Arrays.equals(fixture.float64ArrShort, bounded_seq.getFloat64Values()));
     assertEquals(fixture.float64ListShort, bounded_seq.getFloat64ValuesAsList());
     assertThrows(IllegalArgumentException.class,
-      () -> bounded_seq.setFloat64Values(Arrays.asList(1.0, 2.0, 3.0, 4.0)));
+      new Runnable() {
+        @Override
+        public void run() {
+          bounded_seq.setFloat64Values(Arrays.asList(1.0, 2.0, 3.0, 4.0));
+        }
+      });
     bounded_seq.setInt8Values(fixture.int8List);
     assertArrayEquals(fixture.int8Arr, bounded_seq.getInt8Values());
     assertEquals(fixture.int8List, bounded_seq.getInt8ValuesAsList());
@@ -491,9 +706,19 @@ public class InterfacesTest {
     assertArrayEquals(fixture.int8ArrShort, bounded_seq.getInt8Values());
     assertEquals(fixture.int8ListShort, bounded_seq.getInt8ValuesAsList());
     assertThrows(IllegalArgumentException.class,
-      () -> bounded_seq.setInt8Values(new byte[]{(byte) 1, (byte) 2, (byte) 3, (byte) 4}));
+      new Runnable() {
+        @Override
+        public void run() {
+          bounded_seq.setInt8Values(new byte[]{(byte) 1, (byte) 2, (byte) 3, (byte) 4});
+        }
+      });
     assertThrows(IllegalArgumentException.class,
-      () -> bounded_seq.setInt8Values(Arrays.asList((byte) 1, (byte) 2, (byte) 3, (byte) 4)));
+      new Runnable() {
+        @Override
+        public void run() {
+          bounded_seq.setInt8Values(Arrays.asList((byte) 1, (byte) 2, (byte) 3, (byte) 4));
+        }
+      });
     bounded_seq.setUint8Values(fixture.uint8List);
     assertArrayEquals(fixture.uint8Arr, bounded_seq.getUint8Values());
     assertEquals(fixture.uint8List, bounded_seq.getUint8ValuesAsList());
@@ -501,9 +726,19 @@ public class InterfacesTest {
     assertArrayEquals(fixture.uint8ArrShort, bounded_seq.getUint8Values());
     assertEquals(fixture.uint8ListShort, bounded_seq.getUint8ValuesAsList());
     assertThrows(IllegalArgumentException.class,
-      () -> bounded_seq.setUint8Values(new byte[]{(byte) 1, (byte) 2, (byte) 3, (byte) 4}));
+      new Runnable() {
+        @Override
+        public void run() {
+          bounded_seq.setUint8Values(new byte[]{(byte) 1, (byte) 2, (byte) 3, (byte) 4});
+        }
+      });
     assertThrows(IllegalArgumentException.class,
-      () -> bounded_seq.setUint8Values(Arrays.asList((byte) 1, (byte) 2, (byte) 3, (byte) 4)));
+      new Runnable() {
+        @Override
+        public void run() {
+          bounded_seq.setUint8Values(Arrays.asList((byte) 1, (byte) 2, (byte) 3, (byte) 4));
+        }
+      });
     bounded_seq.setInt16Values(fixture.int16List);
     assertTrue(Arrays.equals(fixture.int16Arr, bounded_seq.getInt16Values()));
     assertEquals(fixture.int16List, bounded_seq.getInt16ValuesAsList());
@@ -511,9 +746,19 @@ public class InterfacesTest {
     assertTrue(Arrays.equals(fixture.int16ArrShort, bounded_seq.getInt16Values()));
     assertEquals(fixture.int16ListShort, bounded_seq.getInt16ValuesAsList());
     assertThrows(IllegalArgumentException.class,
-      () -> bounded_seq.setInt16Values(new short[]{(short) 1, (short) 2, (short) 3, (short) 4}));
+      new Runnable() {
+        @Override
+        public void run() {
+          bounded_seq.setInt16Values(new short[]{(short) 1, (short) 2, (short) 3, (short) 4});
+        }
+      });
     assertThrows(IllegalArgumentException.class,
-      () -> bounded_seq.setInt16Values(Arrays.asList((short) 1, (short) 2, (short) 3, (short) 4)));
+      new Runnable() {
+        @Override
+        public void run() {
+          bounded_seq.setInt16Values(Arrays.asList((short) 1, (short) 2, (short) 3, (short) 4));
+        }
+      });
     bounded_seq.setUint16Values(fixture.uint16List);
     assertTrue(Arrays.equals(fixture.uint16Arr, bounded_seq.getUint16Values()));
     assertEquals(fixture.uint16List, bounded_seq.getUint16ValuesAsList());
@@ -521,9 +766,19 @@ public class InterfacesTest {
     assertTrue(Arrays.equals(fixture.uint16ArrShort, bounded_seq.getUint16Values()));
     assertEquals(fixture.uint16ListShort, bounded_seq.getUint16ValuesAsList());
     assertThrows(IllegalArgumentException.class,
-      () -> bounded_seq.setUint16Values(new short[]{(short) 1, (short) 2, (short) 3, (short) 4}));
+      new Runnable() {
+        @Override
+        public void run() {
+          bounded_seq.setUint16Values(new short[]{(short) 1, (short) 2, (short) 3, (short) 4});
+        }
+      });
     assertThrows(IllegalArgumentException.class,
-      () -> bounded_seq.setUint16Values(Arrays.asList((short) 1, (short) 2, (short) 3, (short) 4)));
+      new Runnable() {
+        @Override
+        public void run() {
+          bounded_seq.setUint16Values(Arrays.asList((short) 1, (short) 2, (short) 3, (short) 4));
+        }
+      });
     bounded_seq.setInt32Values(fixture.int32List);
     assertArrayEquals(fixture.int32Arr, bounded_seq.getInt32Values());
     assertEquals(fixture.int32List, bounded_seq.getInt32ValuesAsList());
@@ -531,9 +786,19 @@ public class InterfacesTest {
     assertArrayEquals(fixture.int32ArrShort, bounded_seq.getInt32Values());
     assertEquals(fixture.int32ListShort, bounded_seq.getInt32ValuesAsList());
     assertThrows(IllegalArgumentException.class,
-      () -> bounded_seq.setInt32Values(new int[]{1, 2, 3, 4}));
+      new Runnable() {
+        @Override
+        public void run() {
+          bounded_seq.setInt32Values(new int[]{1, 2, 3, 4});
+        }
+      });
     assertThrows(IllegalArgumentException.class,
-      () -> bounded_seq.setInt32Values(Arrays.asList(1, 2, 3, 4)));
+      new Runnable() {
+        @Override
+        public void run() {
+          bounded_seq.setInt32Values(Arrays.asList(1, 2, 3, 4));
+        }
+      });
     bounded_seq.setUint32Values(fixture.uint32List);
     assertArrayEquals(fixture.uint32Arr, bounded_seq.getUint32Values());
     assertEquals(fixture.uint32List, bounded_seq.getUint32ValuesAsList());
@@ -541,9 +806,19 @@ public class InterfacesTest {
     assertArrayEquals(fixture.uint32ArrShort, bounded_seq.getUint32Values());
     assertEquals(fixture.uint32ListShort, bounded_seq.getUint32ValuesAsList());
     assertThrows(IllegalArgumentException.class,
-      () -> bounded_seq.setUint32Values(new int[]{1, 2, 3, 4}));
+      new Runnable() {
+        @Override
+        public void run() {
+          bounded_seq.setUint32Values(new int[]{1, 2, 3, 4});
+        }
+      });
     assertThrows(IllegalArgumentException.class,
-      () -> bounded_seq.setUint32Values(Arrays.asList(1, 2, 3, 4)));
+      new Runnable() {
+        @Override
+        public void run() {
+          bounded_seq.setUint32Values(Arrays.asList(1, 2, 3, 4));
+        }
+      });
     bounded_seq.setInt64Values(fixture.int64List);
     assertArrayEquals(fixture.int64Arr, bounded_seq.getInt64Values());
     assertEquals(fixture.int64List, bounded_seq.getInt64ValuesAsList());
@@ -551,9 +826,19 @@ public class InterfacesTest {
     assertArrayEquals(fixture.int64ArrShort, bounded_seq.getInt64Values());
     assertEquals(fixture.int64ListShort, bounded_seq.getInt64ValuesAsList());
     assertThrows(IllegalArgumentException.class,
-      () -> bounded_seq.setInt64Values(new long[]{1L, 2L, 3L, 4L}));
+      new Runnable() {
+        @Override
+        public void run() {
+          bounded_seq.setInt64Values(new long[]{1L, 2L, 3L, 4L});
+        }
+      });
     assertThrows(IllegalArgumentException.class,
-      () -> bounded_seq.setInt64Values(Arrays.asList(1L, 2L, 3L, 4L)));
+      new Runnable() {
+        @Override
+        public void run() {
+          bounded_seq.setInt64Values(Arrays.asList(1L, 2L, 3L, 4L));
+        }
+      });
     bounded_seq.setUint64Values(fixture.uint64List);
     assertArrayEquals(fixture.uint64Arr, bounded_seq.getUint64Values());
     assertEquals(fixture.uint64List, bounded_seq.getUint64ValuesAsList());
@@ -561,9 +846,19 @@ public class InterfacesTest {
     assertArrayEquals(fixture.uint64ArrShort, bounded_seq.getUint64Values());
     assertEquals(fixture.uint64ListShort, bounded_seq.getUint64ValuesAsList());
     assertThrows(IllegalArgumentException.class,
-      () -> bounded_seq.setUint64Values(new long[]{1L, 2L, 3L, 4L}));
+      new Runnable() {
+        @Override
+        public void run() {
+          bounded_seq.setUint64Values(new long[]{1L, 2L, 3L, 4L});
+        }
+      });
     assertThrows(IllegalArgumentException.class,
-      () -> bounded_seq.setUint64Values(Arrays.asList(1L, 2L, 3L, 4L)));
+      new Runnable() {
+        @Override
+        public void run() {
+          bounded_seq.setUint64Values(Arrays.asList(1L, 2L, 3L, 4L));
+        }
+      });
 
     // Test setting/getting fixed length bounded_seq of strings
     bounded_seq.setStringValues(fixture.stringList);
@@ -573,9 +868,19 @@ public class InterfacesTest {
     assertArrayEquals(fixture.stringArrShort, bounded_seq.getStringValues());
     assertEquals(fixture.stringListShort, bounded_seq.getStringValuesAsList());
     assertThrows(IllegalArgumentException.class,
-      () -> bounded_seq.setStringValues(new String[]{"too", "many", "values", "!"}));
+      new Runnable() {
+        @Override
+        public void run() {
+          bounded_seq.setStringValues(new String[]{"too", "many", "values", "!"});
+        }
+      });
     assertThrows(IllegalArgumentException.class,
-      () -> bounded_seq.setStringValues(Arrays.asList("too", "many", "values", "!")));
+      new Runnable() {
+        @Override
+        public void run() {
+          bounded_seq.setStringValues(Arrays.asList("too", "many", "values", "!"));
+        }
+      });
 
     // Test setting/getting fixed length bounded_seq of nested types
     bounded_seq.setBasicTypesValues(fixture.basicTypesList);
@@ -585,9 +890,19 @@ public class InterfacesTest {
     assertArrayEquals(fixture.basicTypesArrShort, bounded_seq.getBasicTypesValues());
     assertEquals(fixture.basicTypesListShort, bounded_seq.getBasicTypesValuesAsList());
     assertThrows(IllegalArgumentException.class,
-      () -> bounded_seq.setBasicTypesValues(fixture.basicTypesArrLong));
+      new Runnable() {
+        @Override
+        public void run() {
+          bounded_seq.setBasicTypesValues(fixture.basicTypesArrLong);
+        }
+      });
     assertThrows(IllegalArgumentException.class,
-      () -> bounded_seq.setBasicTypesValues(fixture.basicTypesListLong));
+      new Runnable() {
+        @Override
+        public void run() {
+          bounded_seq.setBasicTypesValues(fixture.basicTypesListLong);
+        }
+      });
     bounded_seq.setConstantsValues(fixture.constantsList);
     assertArrayEquals(fixture.constantsArr, bounded_seq.getConstantsValues());
     assertEquals(fixture.constantsList, bounded_seq.getConstantsValuesAsList());
@@ -595,9 +910,19 @@ public class InterfacesTest {
     assertArrayEquals(fixture.constantsArrShort, bounded_seq.getConstantsValues());
     assertEquals(fixture.constantsListShort, bounded_seq.getConstantsValuesAsList());
     assertThrows(IllegalArgumentException.class,
-      () -> bounded_seq.setConstantsValues(fixture.constantsArrLong));
+      new Runnable() {
+        @Override
+        public void run() {
+          bounded_seq.setConstantsValues(fixture.constantsArrLong);
+        }
+      });
     assertThrows(IllegalArgumentException.class,
-      () -> bounded_seq.setConstantsValues(fixture.constantsListLong));
+      new Runnable() {
+        @Override
+        public void run() {
+          bounded_seq.setConstantsValues(fixture.constantsListLong);
+        }
+      });
     bounded_seq.setDefaultsValues(fixture.defaultsList);
     assertArrayEquals(fixture.defaultsArr, bounded_seq.getDefaultsValues());
     assertEquals(fixture.defaultsList, bounded_seq.getDefaultsValuesAsList());
@@ -605,9 +930,19 @@ public class InterfacesTest {
     assertArrayEquals(fixture.defaultsArrShort, bounded_seq.getDefaultsValues());
     assertEquals(fixture.defaultsListShort, bounded_seq.getDefaultsValuesAsList());
     assertThrows(IllegalArgumentException.class,
-      () -> bounded_seq.setDefaultsValues(fixture.defaultsArrLong));
+      new Runnable() {
+        @Override
+        public void run() {
+          bounded_seq.setDefaultsValues(fixture.defaultsArrLong);
+        }
+      });
     assertThrows(IllegalArgumentException.class,
-      () -> bounded_seq.setDefaultsValues(fixture.defaultsListLong));
+      new Runnable() {
+        @Override
+        public void run() {
+          bounded_seq.setDefaultsValues(fixture.defaultsListLong);
+        }
+      });
 
     assertEquals(42, bounded_seq.getAlignmentCheck());
   }
