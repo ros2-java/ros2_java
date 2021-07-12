@@ -73,13 +73,13 @@ public class RCLFuture<V> implements Future<V> {
 
     while (RCLJava.ok()) {
       if (executor != null) {
-        executor.spinOnce();
+        executor.spinOnce(timeoutNS);
       } else {
         Node node = nodeReference.get();
         if (node == null) {
           return null; // TODO(esteve) do something
         }
-        RCLJava.spinOnce(node);
+        RCLJava.spinOnce(node, timeoutNS);
       }
 
       if (isDone()) {

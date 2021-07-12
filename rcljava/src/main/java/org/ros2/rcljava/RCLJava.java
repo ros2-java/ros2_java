@@ -287,21 +287,60 @@ public final class RCLJava {
     getGlobalExecutor().removeNode(composableNode);
   }
 
-  public static void spinOnce(final Node node) {
+  /**
+   * Execute one callback for a @{link Node}.
+   *
+   * Wait until a callback becomes ready and then execute it.
+   *
+   * @param node The node to spin on.
+   * @param timeout The time to wait for a callback to become ready in nanoseconds.
+   *   If a timeout occurs, then nothing happens and this method returns.
+   */
+  public static void spinOnce(final Node node, long timeout) {
     ComposableNode composableNode = new ComposableNode() {
       public Node getNode() {
         return node;
       }
     };
     getGlobalExecutor().addNode(composableNode);
-    getGlobalExecutor().spinOnce();
+    getGlobalExecutor().spinOnce(timeout);
     getGlobalExecutor().removeNode(composableNode);
   }
 
-  public static void spinOnce(final ComposableNode composableNode) {
+  /**
+   * Execute one callback for a @{link Node}.
+   *
+   * Wait until a callback becomes ready and then execute it.
+   *
+   * @param node The node to spin on.
+   */
+  public static void spinOnce(final Node node) {
+    RCLJava.spinOnce(node, -1);
+  }
+
+  /**
+   * Execute one callback for a @{link ComposableNode}.
+   *
+   * Wait until a callback becomes ready and then execute it.
+   *
+   * @param composableNode The composable node to spin on.
+   * @param timeout The time to wait for a callback to become ready in nanoseconds.
+   *   If a timeout occurs, then nothing happens and this method returns.
+   */
+  public static void spinOnce(final ComposableNode composableNode, long timeout) {
     getGlobalExecutor().addNode(composableNode);
-    getGlobalExecutor().spinOnce();
+    getGlobalExecutor().spinOnce(timeout);
     getGlobalExecutor().removeNode(composableNode);
+  }
+  /**
+   * Execute one callback for a @{link ComposableNode}.
+   *
+   * Wait until a callback becomes ready and then execute it.
+   *
+   * @param composableNode The composable node to spin on.
+   */
+  public static void spinOnce(final ComposableNode composableNode) {
+    RCLJava.spinOnce(composableNode, -1);
   }
 
   public static void spinSome(final Node node) {
