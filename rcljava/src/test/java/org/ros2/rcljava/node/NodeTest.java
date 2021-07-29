@@ -225,7 +225,7 @@ public class NodeTest {
         node.<std_msgs.msg.String>createPublisher(std_msgs.msg.String.class, "test_topic_string");
 
     RCLFuture<std_msgs.msg.String> future =
-        new RCLFuture<std_msgs.msg.String>(new WeakReference<Node>(node));
+        new RCLFuture<std_msgs.msg.String>();
 
     Subscription<std_msgs.msg.String> subscription =
         node.<std_msgs.msg.String>createSubscription(std_msgs.msg.String.class, "test_topic_string",
@@ -255,7 +255,7 @@ public class NodeTest {
             rcljava.msg.BoundedArrayNested.class, "test_topic_bounded_array_nested");
 
     RCLFuture<rcljava.msg.BoundedArrayNested> future =
-        new RCLFuture<rcljava.msg.BoundedArrayNested>(new WeakReference<Node>(node));
+        new RCLFuture<rcljava.msg.BoundedArrayNested>();
 
     Subscription<rcljava.msg.BoundedArrayNested> subscription =
         node.<rcljava.msg.BoundedArrayNested>createSubscription(
@@ -297,7 +297,7 @@ public class NodeTest {
             rcljava.msg.BoundedArrayPrimitives.class, "test_topic_bounded_array_primitives");
 
     RCLFuture<rcljava.msg.BoundedArrayPrimitives> future =
-        new RCLFuture<rcljava.msg.BoundedArrayPrimitives>(new WeakReference<Node>(node));
+        new RCLFuture<rcljava.msg.BoundedArrayPrimitives>();
 
     Subscription<rcljava.msg.BoundedArrayPrimitives> subscription =
         node.<rcljava.msg.BoundedArrayPrimitives>createSubscription(
@@ -370,7 +370,7 @@ public class NodeTest {
         rcljava.msg.Builtins.class, "test_topic_builtins");
 
     RCLFuture<rcljava.msg.Builtins> future =
-        new RCLFuture<rcljava.msg.Builtins>(new WeakReference<Node>(node));
+        new RCLFuture<rcljava.msg.Builtins>();
 
     Subscription<rcljava.msg.Builtins> subscription =
         node.<rcljava.msg.Builtins>createSubscription(rcljava.msg.Builtins.class,
@@ -417,7 +417,7 @@ public class NodeTest {
             rcljava.msg.DynamicArrayNested.class, "test_topic_dynamic_array_nested");
 
     RCLFuture<rcljava.msg.DynamicArrayNested> future =
-        new RCLFuture<rcljava.msg.DynamicArrayNested>(new WeakReference<Node>(node));
+        new RCLFuture<rcljava.msg.DynamicArrayNested>();
 
     Subscription<rcljava.msg.DynamicArrayNested> subscription =
         node.<rcljava.msg.DynamicArrayNested>createSubscription(
@@ -459,7 +459,7 @@ public class NodeTest {
             rcljava.msg.DynamicArrayPrimitives.class, "test_topic_dynamic_array_primitives");
 
     RCLFuture<rcljava.msg.DynamicArrayPrimitives> future =
-        new RCLFuture<rcljava.msg.DynamicArrayPrimitives>(new WeakReference<Node>(node));
+        new RCLFuture<rcljava.msg.DynamicArrayPrimitives>();
 
     Subscription<rcljava.msg.DynamicArrayPrimitives> subscription =
         node.<rcljava.msg.DynamicArrayPrimitives>createSubscription(
@@ -532,7 +532,7 @@ public class NodeTest {
         node.<rcljava.msg.Empty>createPublisher(rcljava.msg.Empty.class, "test_topic_empty");
 
     RCLFuture<rcljava.msg.Empty> future =
-        new RCLFuture<rcljava.msg.Empty>(new WeakReference<Node>(node));
+        new RCLFuture<rcljava.msg.Empty>();
 
     Subscription<rcljava.msg.Empty> subscription = node.<rcljava.msg.Empty>createSubscription(
         rcljava.msg.Empty.class, "test_topic_empty", new TestConsumer<rcljava.msg.Empty>(future));
@@ -560,7 +560,7 @@ public class NodeTest {
             rcljava.msg.FieldsWithSameType.class, "test_topic_fields_with_same_type");
 
     RCLFuture<rcljava.msg.FieldsWithSameType> future =
-        new RCLFuture<rcljava.msg.FieldsWithSameType>(new WeakReference<Node>(node));
+        new RCLFuture<rcljava.msg.FieldsWithSameType>();
 
     Subscription<rcljava.msg.FieldsWithSameType> subscription =
         node.<rcljava.msg.FieldsWithSameType>createSubscription(
@@ -604,7 +604,7 @@ public class NodeTest {
         node.<rcljava.msg.Nested>createPublisher(rcljava.msg.Nested.class, "test_topic_nested");
 
     RCLFuture<rcljava.msg.Nested> future =
-        new RCLFuture<rcljava.msg.Nested>(new WeakReference<Node>(node));
+        new RCLFuture<rcljava.msg.Nested>();
 
     Subscription<rcljava.msg.Nested> subscription =
         node.<rcljava.msg.Nested>createSubscription(rcljava.msg.Nested.class, "test_topic_nested",
@@ -639,7 +639,7 @@ public class NodeTest {
         rcljava.msg.Primitives.class, "test_topic_primitives");
 
     RCLFuture<rcljava.msg.Primitives> future =
-        new RCLFuture<rcljava.msg.Primitives>(new WeakReference<Node>(node));
+        new RCLFuture<rcljava.msg.Primitives>();
 
     Subscription<rcljava.msg.Primitives> subscription =
         node.<rcljava.msg.Primitives>createSubscription(rcljava.msg.Primitives.class,
@@ -670,7 +670,7 @@ public class NodeTest {
             rcljava.msg.StaticArrayNested.class, "test_topic_static_array_nested");
 
     RCLFuture<rcljava.msg.StaticArrayNested> future =
-        new RCLFuture<rcljava.msg.StaticArrayNested>(new WeakReference<Node>(node));
+        new RCLFuture<rcljava.msg.StaticArrayNested>();
 
     Subscription<rcljava.msg.StaticArrayNested> subscription =
         node.<rcljava.msg.StaticArrayNested>createSubscription(rcljava.msg.StaticArrayNested.class,
@@ -725,7 +725,7 @@ public class NodeTest {
             rcljava.msg.StaticArrayPrimitives.class, "test_topic_static_array_primitives");
 
     RCLFuture<rcljava.msg.StaticArrayPrimitives> future =
-        new RCLFuture<rcljava.msg.StaticArrayPrimitives>(new WeakReference<Node>(node));
+        new RCLFuture<rcljava.msg.StaticArrayPrimitives>();
 
     Subscription<rcljava.msg.StaticArrayPrimitives> subscription =
         node.<rcljava.msg.StaticArrayPrimitives>createSubscription(
@@ -799,7 +799,7 @@ public class NodeTest {
         node.<rcljava.msg.UInt32>createPublisher(rcljava.msg.UInt32.class, "test_topic_uint32");
 
     RCLFuture<rcljava.msg.UInt32> future =
-        new RCLFuture<rcljava.msg.UInt32>(new WeakReference<Node>(node));
+        new RCLFuture<rcljava.msg.UInt32>();
 
     Subscription<rcljava.msg.UInt32> subscription =
         node.<rcljava.msg.UInt32>createSubscription(rcljava.msg.UInt32.class, "test_topic_uint32",
@@ -833,13 +833,13 @@ public class NodeTest {
     Publisher<rcljava.msg.UInt32> publisher = publisherNode.<rcljava.msg.UInt32>createPublisher(
         rcljava.msg.UInt32.class, "test_topic_multiple");
 
-    RCLFuture<rcljava.msg.UInt32> futureOne = new RCLFuture<rcljava.msg.UInt32>(executor);
+    RCLFuture<rcljava.msg.UInt32> futureOne = new RCLFuture<rcljava.msg.UInt32>();
 
     Subscription<rcljava.msg.UInt32> subscriptionOne =
         subscriptionNodeOne.<rcljava.msg.UInt32>createSubscription(rcljava.msg.UInt32.class,
             "test_topic_multiple", new TestConsumer<rcljava.msg.UInt32>(futureOne));
 
-    RCLFuture<rcljava.msg.UInt32> futureTwo = new RCLFuture<rcljava.msg.UInt32>(executor);
+    RCLFuture<rcljava.msg.UInt32> futureTwo = new RCLFuture<rcljava.msg.UInt32>();
 
     Subscription<rcljava.msg.UInt32> subscriptionTwo =
         subscriptionNodeTwo.<rcljava.msg.UInt32>createSubscription(rcljava.msg.UInt32.class,

@@ -87,7 +87,7 @@ public class ClientImpl<T extends ServiceDefinition> implements Client<T> {
       long sequenceNumber = nativeSendClientRequest(
           handle, request.getFromJavaConverterInstance(),
           request.getDestructorInstance(), request);
-      RCLFuture<V> future = new RCLFuture<V>(this.nodeReference);
+      RCLFuture<V> future = new RCLFuture<V>();
 
       Map.Entry<Consumer, RCLFuture> entry =
           new AbstractMap.SimpleEntry<Consumer, RCLFuture>(callback, future);

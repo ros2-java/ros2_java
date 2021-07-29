@@ -19,6 +19,7 @@ import java.util.List;
 import java.util.concurrent.Future;
 
 import org.ros2.rcljava.consumers.Consumer;
+import org.ros2.rcljava.node.Node;
 import org.ros2.rcljava.parameters.ParameterType;
 import org.ros2.rcljava.parameters.ParameterVariant;
 
@@ -59,4 +60,6 @@ public interface AsyncParametersClient {
   public Future<List<rcl_interfaces.msg.ParameterDescriptor>> describeParameters(
       final List<String> names,
       final Consumer<Future<List<rcl_interfaces.msg.ParameterDescriptor>>> callback);
+
+  public Node getNode();
 }

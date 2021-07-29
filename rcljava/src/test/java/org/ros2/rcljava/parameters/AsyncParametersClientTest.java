@@ -34,6 +34,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
 
 import org.ros2.rcljava.RCLJava;
 import org.ros2.rcljava.concurrent.RCLFuture;
@@ -113,19 +114,18 @@ public class AsyncParametersClientTest {
         new ParameterVariant("foo.second", 42), new ParameterVariant("foobar", true)});
 
     RCLFuture<List<rcl_interfaces.msg.SetParametersResult>> future =
-        new RCLFuture<List<rcl_interfaces.msg.SetParametersResult>>(
-            new WeakReference<Node>(this.node));
+        new RCLFuture<List<rcl_interfaces.msg.SetParametersResult>>();
     parametersClient.setParameters(parameters, new TestConsumer(future));
 
-    List<String> parameterNames =
-        Arrays.asList(new String[] {"foo", "bar", "baz", "foo.first", "foo.second", "foobar"});
-
+    RCLJava.spinUntilComplete(node, future);
     List<rcl_interfaces.msg.SetParametersResult> setParametersResults = future.get();
     assertEquals(6, setParametersResults.size());
     for (rcl_interfaces.msg.SetParametersResult result : setParametersResults) {
       assertEquals(true, result.getSuccessful());
     }
 
+    List<String> parameterNames =
+      Arrays.asList(new String[] {"foo", "bar", "baz", "foo.first", "foo.second", "foobar"});
     List<ParameterVariant> results = node.getParameters(parameterNames);
     assertEquals(parameters, results);
   }
@@ -142,10 +142,10 @@ public class AsyncParametersClientTest {
     List<String> parameterNames =
         Arrays.asList(new String[] {"foo", "bar", "baz", "foo.first", "foo.second", "foobar"});
 
-    RCLFuture<List<ParameterVariant>> future =
-        new RCLFuture<List<ParameterVariant>>(new WeakReference<Node>(this.node));
+    RCLFuture<List<ParameterVariant>> future = new RCLFuture<List<ParameterVariant>>();
     parametersClient.getParameters(parameterNames, new TestConsumer(future));
 
+    RCLJava.spinUntilComplete(node, future);
     assertEquals(parameters, future.get());
   }
 
@@ -159,10 +159,11 @@ public class AsyncParametersClientTest {
     node.setParameters(parameters);
 
     RCLFuture<rcl_interfaces.msg.ListParametersResult> future =
-        new RCLFuture<rcl_interfaces.msg.ListParametersResult>(new WeakReference<Node>(this.node));
+        new RCLFuture<rcl_interfaces.msg.ListParametersResult>();
     parametersClient.listParameters(
         Arrays.asList(new String[] {"foo", "bar"}), 10, new TestConsumer(future));
 
+    RCLJava.spinUntilComplete(node, future);
     assertArrayEquals(new String[] {"foo.first", "foo.second"}, future.get().getNames());
     assertArrayEquals(new String[] {"foo"}, future.get().getPrefixes());
   }
@@ -177,8 +178,7 @@ public class AsyncParametersClientTest {
     node.setParameters(parameters);
 
     RCLFuture<List<rcl_interfaces.msg.ParameterDescriptor>> future =
-        new RCLFuture<List<rcl_interfaces.msg.ParameterDescriptor>>(
-            new WeakReference<Node>(this.node));
+        new RCLFuture<List<rcl_interfaces.msg.ParameterDescriptor>>();
     parametersClient.describeParameters(
         Arrays.asList(new String[] {"foo", "bar"}), new TestConsumer(future));
 
@@ -188,6 +188,7 @@ public class AsyncParametersClientTest {
                 rcl_interfaces.msg.ParameterType.PARAMETER_INTEGER),
             new rcl_interfaces.msg.ParameterDescriptor().setName("bar").setType(
                 rcl_interfaces.msg.ParameterType.PARAMETER_STRING)});
+    RCLJava.spinUntilComplete(node, future);
     assertEquals(expected, future.get());
   }
 }

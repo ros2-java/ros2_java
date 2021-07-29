@@ -15,6 +15,8 @@
 
 package org.ros2.rcljava.executors;
 
+import java.util.concurrent.Future;
+
 import org.ros2.rcljava.RCLJava;
 import org.ros2.rcljava.node.ComposableNode;
 import org.ros2.rcljava.executors.BaseExecutor;
@@ -36,6 +38,14 @@ public class SingleThreadedExecutor implements Executor {
 
   public void spinOnce(long timeout) {
     this.baseExecutor.spinOnce(timeout);
+  }
+
+  public void spinUntilComplete(Future future, long timeoutNs) {
+    this.baseExecutor.spinUntilComplete(future, timeoutNs);
+  }
+
+  public void spinUntilComplete(Future future) {
+    this.baseExecutor.spinUntilComplete(future, -1);
   }
 
   public void spinSome() {

@@ -22,6 +22,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Map;
 import java.util.concurrent.ConcurrentSkipListMap;
+import java.util.concurrent.Future;
 import java.util.concurrent.LinkedBlockingQueue;
 
 import org.ros2.rcljava.client.Client;
@@ -358,6 +359,34 @@ public final class RCLJava {
     getGlobalExecutor().addNode(composableNode);
     getGlobalExecutor().spinSome();
     getGlobalExecutor().removeNode(composableNode);
+  }
+
+  public static void spinUntilComplete(final Node node, final Future future, long timeoutNs) {
+    ComposableNode composableNode = new ComposableNode() {
+      public Node getNode() {
+        return node;
+      }
+    };
+    RCLJava.spinUntilComplete(composableNode, future, timeoutNs);
+  }
+
+  public static void spinUntilComplete(final Node node, final Future future)
+  {
+    RCLJava.spinUntilComplete(node, future, -1);
+  }
+
+  public static void spinUntilComplete(
+    final ComposableNode node, final Future future, long timeoutNs)
+  {
+    getGlobalExecutor().addNode(node);
+    getGlobalExecutor().spinUntilComplete(future, timeoutNs);
+    getGlobalExecutor().removeNode(node);
+  }
+
+  public static void spinUntilComplete(
+    final ComposableNode node, final Future future)
+  {
+    RCLJava.spinUntilComplete(node, future, -1);
   }
 
   public static synchronized void shutdown() {

@@ -23,6 +23,7 @@ import java.util.List;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 
+import org.ros2.rcljava.RCLJava;
 import org.ros2.rcljava.client.Client;
 import org.ros2.rcljava.concurrent.RCLFuture;
 import org.ros2.rcljava.consumers.Consumer;
@@ -33,24 +34,6 @@ import org.ros2.rcljava.parameters.ParameterType;
 import org.ros2.rcljava.parameters.ParameterVariant;
 
 public class SyncParametersClientImpl implements SyncParametersClient {
-  private static class ConsumerHelper<T> implements Consumer<Future<T>> {
-    private RCLFuture<T> resultFuture;
-
-    public void accept(final Future<T> future) {
-      T result = null;
-      try {
-        result = future.get();
-      } catch (Exception e) {
-        // TODO(esteve): do something
-      }
-      this.resultFuture.set(result);
-    }
-
-    public ConsumerHelper(RCLFuture<T> resultFuture) {
-      this.resultFuture = resultFuture;
-    }
-  }
-
   private Executor executor;
 
   public AsyncParametersClient asyncParametersClient;
@@ -107,79 +90,54 @@ public class SyncParametersClientImpl implements SyncParametersClient {
     this(executor, node, "", QoSProfile.PARAMETERS);
   }
 
+  private <T> T spinUntilComplete(Future<T> future)
+    throws InterruptedException, ExecutionException
+  {
+    if (executor != null) {
+      executor.spinUntilComplete(future);
+    } else {
+      RCLJava.spinUntilComplete(this.asyncParametersClient.getNode(), future);
+    }
+    return future.get();
+  }
+
   public List<ParameterVariant> getParameters(final List<String> names)
       throws InterruptedException, ExecutionException {
-    if (executor != null) {
-      RCLFuture<List<ParameterVariant>> future = new RCLFuture<List<ParameterVariant>>(executor);
-      asyncParametersClient.getParameters(
-          names, new ConsumerHelper<List<ParameterVariant>>(future));
-      return future.get();
-    } else {
-      return asyncParametersClient.getParameters(names, null).get();
-    }
+    Future<List<ParameterVariant>> future = asyncParametersClient.getParameters(names, null);
+    return spinUntilComplete(future);
   }
 
   public List<ParameterType> getParameterTypes(final List<String> names)
       throws InterruptedException, ExecutionException {
-    if (executor != null) {
-      RCLFuture<List<ParameterType>> future = new RCLFuture<List<ParameterType>>(executor);
-      asyncParametersClient.getParameterTypes(
-          names, new ConsumerHelper<List<ParameterType>>(future));
-      return future.get();
-    } else {
-      return asyncParametersClient.getParameterTypes(names, null).get();
-    }
+    Future<List<ParameterType>> future = asyncParametersClient.getParameterTypes(names, null);
+    return spinUntilComplete(future);
   }
 
   public List<rcl_interfaces.msg.SetParametersResult> setParameters(
       final List<ParameterVariant> parameters) throws InterruptedException, ExecutionException {
-    if (executor != null) {
-      RCLFuture<List<rcl_interfaces.msg.SetParametersResult>> future =
-          new RCLFuture<List<rcl_interfaces.msg.SetParametersResult>>(executor);
-      asyncParametersClient.setParameters(
-          parameters, new ConsumerHelper<List<rcl_interfaces.msg.SetParametersResult>>(future));
-      return future.get();
-    } else {
-      return asyncParametersClient.setParameters(parameters, null).get();
-    }
+    Future<List<rcl_interfaces.msg.SetParametersResult>> future = asyncParametersClient.setParameters(
+      parameters, null);
+    return spinUntilComplete(future);
   }
 
   public rcl_interfaces.msg.SetParametersResult setParametersAtomically(
       final List<ParameterVariant> parameters) throws InterruptedException, ExecutionException {
-    if (executor != null) {
-      RCLFuture<rcl_interfaces.msg.SetParametersResult> future =
-          new RCLFuture<rcl_interfaces.msg.SetParametersResult>(executor);
-      asyncParametersClient.setParametersAtomically(
-          parameters, new ConsumerHelper<rcl_interfaces.msg.SetParametersResult>(future));
-      return future.get();
-    } else {
-      return asyncParametersClient.setParametersAtomically(parameters, null).get();
-    }
+    Future<rcl_interfaces.msg.SetParametersResult> future = asyncParametersClient.setParametersAtomically(
+      parameters, null);
+    return spinUntilComplete(future);
   }
 
   public rcl_interfaces.msg.ListParametersResult listParameters(
       final List<String> prefixes, long depth) throws InterruptedException, ExecutionException {
-    if (executor != null) {
-      RCLFuture<rcl_interfaces.msg.ListParametersResult> future =
-          new RCLFuture<rcl_interfaces.msg.ListParametersResult>(executor);
-      asyncParametersClient.listParameters(
-          prefixes, depth, new ConsumerHelper<rcl_interfaces.msg.ListParametersResult>(future));
-      return future.get();
-    } else {
-      return asyncParametersClient.listParameters(prefixes, depth, null).get();
-    }
+    Future<rcl_interfaces.msg.ListParametersResult> future = asyncParametersClient.listParameters(
+      prefixes, depth, null);
+    return spinUntilComplete(future);
   }
 
   public List<rcl_interfaces.msg.ParameterDescriptor> describeParameters(final List<String> names)
       throws InterruptedException, ExecutionException {
-    if (executor != null) {
-      RCLFuture<List<rcl_interfaces.msg.ParameterDescriptor>> future =
-          new RCLFuture<List<rcl_interfaces.msg.ParameterDescriptor>>(executor);
-      asyncParametersClient.describeParameters(
-          names, new ConsumerHelper<List<rcl_interfaces.msg.ParameterDescriptor>>(future));
-      return future.get();
-    } else {
-      return asyncParametersClient.describeParameters(names, null).get();
-    }
+    Future<List<rcl_interfaces.msg.ParameterDescriptor>> future = asyncParametersClient.describeParameters(
+      names, null);
+    return spinUntilComplete(future);
   }
 }

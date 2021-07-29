@@ -139,19 +139,9 @@ public class ActionServerTest {
     Future<test_msgs.action.Fibonacci_SendGoal_Response> future =
       this.mockActionClient.sendGoalClient.asyncSendRequest(request);
 
-    test_msgs.action.Fibonacci_SendGoal_Response response = null;
     long startTime = System.nanoTime();
-    while (RCLJava.ok() && !future.isDone()) {
-      this.executor.spinOnce(1);
-      response = future.get(100, TimeUnit.MILLISECONDS);
-
-      // Check for timeout
-      long duration = System.nanoTime() - startTime;
-      if (TimeUnit.NANOSECONDS.toSeconds(duration) >= 5) {
-        break;
-      }
-    }
-    return response;
+    this.executor.spinUntilComplete(future, TimeUnit.SECONDS.toNanos(5));
+    return future.get();
   }
 
   @Test
@@ -211,15 +201,7 @@ public class ActionServerTest {
 
     // Wait for cancel response
     long startTime = System.nanoTime();
-    while (RCLJava.ok() && !cancelResponseFuture.isDone()) {
-      this.executor.spinOnce(100000000);  // timeout of 100 milliseconds
-
-      // Check for timeout
-      long duration = System.nanoTime() - startTime;
-      if (TimeUnit.NANOSECONDS.toSeconds(duration) >= 5) {
-        break;
-      }
-    }
+    this.executor.spinUntilComplete(cancelResponseFuture, TimeUnit.SECONDS.toNanos(5));
 
     assertEquals(true, cancelResponseFuture.isDone());
     action_msgs.srv.CancelGoal_Response cancelResponse = cancelResponseFuture.get();

@@ -15,6 +15,7 @@
 
 package org.ros2.rcljava.executors;
 
+import java.lang.Math;
 import java.lang.SuppressWarnings;
 import java.util.AbstractMap;
 import java.util.ArrayList;
@@ -24,6 +25,7 @@ import java.util.Map;
 import java.util.Collection;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.Future;
 import java.util.concurrent.LinkedBlockingQueue;
 
 
@@ -437,6 +439,30 @@ public class BaseExecutor {
     }
     // spun too long
     return false;
+  }
+
+  public void spinUntilComplete(Future future, long maxDurationNs) {
+    long startNs = System.nanoTime();
+    // only use a blocking call to waitForWork when maxDurationNs < 0
+    long waitTimeout = -1;
+    if (maxDurationNs > 0) {
+      // We cannot be waiting for work forever, if not we're not going to respect the passed timeout.
+      // We can neither do a non-blocking call to waitForWork(), because if the future has not yet
+      // been completed it will result in a busy loop.
+      // Use an arbitrary timeout to relax cpu usage.
+      waitTimeout = Math.min(maxDurationNs / 10, 10000000 /* 1ms*/);
+    }
+    while (RCLJava.ok() && (maxDurationNs  < 0 || maxDurationNotElapsed(maxDurationNs, startNs))) {
+      waitForWork(waitTimeout);
+      AnyExecutable anyExecutable = getNextExecutable();
+      while (anyExecutable != null) {
+        executeAnyExecutable(anyExecutable);
+        if (future.isDone()) {
+          return;
+        }
+        anyExecutable = getNextExecutable();
+      }
+    }
   }
 
   private void spinSomeImpl(long maxDurationNs, boolean exhaustive) {

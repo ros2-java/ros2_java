@@ -104,8 +104,7 @@ public class AsyncParametersClientImpl implements AsyncParametersClient {
 
   public Future<List<ParameterVariant>> getParameters(
       final List<String> names, final Consumer<Future<List<ParameterVariant>>> callback) {
-    final RCLFuture<List<ParameterVariant>> futureResult =
-        new RCLFuture<List<ParameterVariant>>(new WeakReference<Node>(this.node));
+    final RCLFuture<List<ParameterVariant>> futureResult = new RCLFuture<List<ParameterVariant>>();
     final rcl_interfaces.srv.GetParameters_Request request =
         new rcl_interfaces.srv.GetParameters_Request();
     request.setNames(names);
@@ -141,8 +140,7 @@ public class AsyncParametersClientImpl implements AsyncParametersClient {
 
   public Future<List<ParameterType>> getParameterTypes(
       final List<String> names, final Consumer<Future<List<ParameterType>>> callback) {
-    final RCLFuture<List<ParameterType>> futureResult =
-        new RCLFuture<List<ParameterType>>(new WeakReference<Node>(this.node));
+    final RCLFuture<List<ParameterType>> futureResult = new RCLFuture<List<ParameterType>>();
     final rcl_interfaces.srv.GetParameterTypes_Request request =
         new rcl_interfaces.srv.GetParameterTypes_Request();
     request.setNames(names);
@@ -178,8 +176,7 @@ public class AsyncParametersClientImpl implements AsyncParametersClient {
       final List<ParameterVariant> parameters,
       final Consumer<Future<List<rcl_interfaces.msg.SetParametersResult>>> callback) {
     final RCLFuture<List<rcl_interfaces.msg.SetParametersResult>> futureResult =
-        new RCLFuture<List<rcl_interfaces.msg.SetParametersResult>>(
-            new WeakReference<Node>(this.node));
+        new RCLFuture<List<rcl_interfaces.msg.SetParametersResult>>();
     final rcl_interfaces.srv.SetParameters_Request request =
         new rcl_interfaces.srv.SetParameters_Request();
     List<rcl_interfaces.msg.Parameter> requestParameters =
@@ -188,7 +185,6 @@ public class AsyncParametersClientImpl implements AsyncParametersClient {
       requestParameters.add(parameterVariant.toParameter());
     }
     request.setParameters(requestParameters);
-
     setParametersClient.asyncSendRequest(
         request, new Consumer<Future<rcl_interfaces.srv.SetParameters_Response>>() {
           public void accept(final Future<rcl_interfaces.srv.SetParameters_Response> future) {
@@ -216,7 +212,7 @@ public class AsyncParametersClientImpl implements AsyncParametersClient {
       final List<ParameterVariant> parameters,
       final Consumer<Future<rcl_interfaces.msg.SetParametersResult>> callback) {
     final RCLFuture<rcl_interfaces.msg.SetParametersResult> futureResult =
-        new RCLFuture<rcl_interfaces.msg.SetParametersResult>(new WeakReference<Node>(this.node));
+        new RCLFuture<rcl_interfaces.msg.SetParametersResult>();
     final rcl_interfaces.srv.SetParametersAtomically_Request request =
         new rcl_interfaces.srv.SetParametersAtomically_Request();
     List<rcl_interfaces.msg.Parameter> requestParameters =
@@ -253,7 +249,7 @@ public class AsyncParametersClientImpl implements AsyncParametersClient {
   public Future<rcl_interfaces.msg.ListParametersResult> listParameters(final List<String> prefixes,
       long depth, final Consumer<Future<rcl_interfaces.msg.ListParametersResult>> callback) {
     final RCLFuture<rcl_interfaces.msg.ListParametersResult> futureResult =
-        new RCLFuture<rcl_interfaces.msg.ListParametersResult>(new WeakReference<Node>(this.node));
+        new RCLFuture<rcl_interfaces.msg.ListParametersResult>();
     final rcl_interfaces.srv.ListParameters_Request request =
         new rcl_interfaces.srv.ListParameters_Request();
     request.setPrefixes(prefixes);
@@ -286,8 +282,7 @@ public class AsyncParametersClientImpl implements AsyncParametersClient {
       final List<String> names,
       final Consumer<Future<List<rcl_interfaces.msg.ParameterDescriptor>>> callback) {
     final RCLFuture<List<rcl_interfaces.msg.ParameterDescriptor>> futureResult =
-        new RCLFuture<List<rcl_interfaces.msg.ParameterDescriptor>>(
-            new WeakReference<Node>(this.node));
+        new RCLFuture<List<rcl_interfaces.msg.ParameterDescriptor>>();
     final rcl_interfaces.srv.DescribeParameters_Request request =
         new rcl_interfaces.srv.DescribeParameters_Request();
     request.setNames(names);
@@ -308,5 +303,9 @@ public class AsyncParametersClientImpl implements AsyncParametersClient {
           }
         });
     return futureResult;
+  }
+
+  public Node getNode() {
+    return this.node;
   }
 }

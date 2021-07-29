@@ -15,6 +15,7 @@
 
 package org.ros2.rcljava.concurrent;
 
+import java.lang.Deprecated;
 import java.lang.ref.WeakReference;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
@@ -22,73 +23,50 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
 import org.ros2.rcljava.RCLJava;
-import org.ros2.rcljava.executors.Executor;
 import org.ros2.rcljava.node.Node;
 
 public class RCLFuture<V> implements Future<V> {
   private WeakReference<Node> nodeReference;
   private boolean done = false;
   private V value = null;
-  private Executor executor = null;
 
-  public RCLFuture(final WeakReference<Node> nodeReference) {
-    this.nodeReference = nodeReference;
-  }
+  public RCLFuture() {}
 
-  public RCLFuture(final Executor executor) {
-    this.executor = executor;
-  }
-
-  public final V get() throws InterruptedException, ExecutionException {
+  public final synchronized V get() throws InterruptedException, ExecutionException {
     if(this.value != null) {
       return this.value;
     }
     while (RCLJava.ok() && !isDone()) {
-      if (executor != null) {
-        executor.spinOnce();
-      } else {
-        Node node = nodeReference.get();
-        if (node == null) {
-          return null; // TODO(esteve) do something
-        }
-        RCLJava.spinOnce(node);
-      }
+      this.wait();
     }
     return this.value;
   }
 
-  public final V get(final long timeout, final TimeUnit unit)
+  public final synchronized V get(final long timeout, final TimeUnit unit)
       throws InterruptedException, ExecutionException, TimeoutException {
     if (isDone()) {
       return value;
     }
 
-    long endTime = TimeUnit.NANOSECONDS.convert(System.currentTimeMillis(), TimeUnit.MILLISECONDS);
-
-    long timeoutNS = TimeUnit.NANOSECONDS.convert(timeout, unit);
+    long endTime = System.nanoTime();
+    long timeoutNS = unit.toNanos(timeout);
 
     if (timeoutNS > 0) {
       endTime += timeoutNS;
     }
 
     while (RCLJava.ok()) {
-      if (executor != null) {
-        executor.spinOnce(timeoutNS);
-      } else {
-        Node node = nodeReference.get();
-        if (node == null) {
-          return null; // TODO(esteve) do something
-        }
-        RCLJava.spinOnce(node, timeoutNS);
-      }
+      this.wait(TimeUnit.NANOSECONDS.toMillis(timeoutNS), (int) (timeoutNS % 1000000l));
 
       if (isDone()) {
         return value;
       }
 
-      long now = TimeUnit.NANOSECONDS.convert(System.currentTimeMillis(), TimeUnit.MILLISECONDS);
+      long now = System.nanoTime();
       if (now >= endTime) {
         throw new TimeoutException();
+      } else {
+        timeoutNS = endTime - now;
       }
     }
     throw new InterruptedException();
@@ -109,5 +87,6 @@ public class RCLFuture<V> implements Future<V> {
   public final synchronized void set(final V value) {
     this.value = value;
     done = true;
+    this.notify();
   }
 }

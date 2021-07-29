@@ -15,6 +15,8 @@
 
 package org.ros2.rcljava.executors;
 
+import java.util.concurrent.Future;
+
 import org.ros2.rcljava.node.ComposableNode;
 
 public interface Executor {
@@ -25,6 +27,10 @@ public interface Executor {
   public void spinOnce();
 
   public void spinOnce(long timeout);
+
+  public void spinUntilComplete(Future future, long maxDurationNs);
+
+  public void spinUntilComplete(Future future);
 
   public void spinSome();
 

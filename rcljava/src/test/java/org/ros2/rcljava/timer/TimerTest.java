@@ -87,7 +87,7 @@ public class TimerTest {
     int max_iterations = 4;
 
     Node node = RCLJava.createNode("test_timer_node");
-    RCLFuture<Boolean> future = new RCLFuture<Boolean>(new WeakReference<Node>(node));
+    RCLFuture<Boolean> future = new RCLFuture<Boolean>();
     TimerCallback timerCallback = new TimerCallback(future, max_iterations);
     Timer timer = node.createWallTimer(250, TimeUnit.MILLISECONDS, timerCallback);
     assertNotEquals(0, timer.getHandle());
@@ -95,6 +95,7 @@ public class TimerTest {
     assertEquals(
         TimeUnit.NANOSECONDS.convert(250, TimeUnit.MILLISECONDS), timer.getTimerPeriodNS());
 
+    RCLJava.spinUntilComplete(node, future);
     boolean result = future.get(3, TimeUnit.SECONDS);
     assertTrue(result);
     assertEquals(4, timerCallback.getCounter());
@@ -109,7 +110,7 @@ public class TimerTest {
     int max_iterations = 4;
 
     Node node = RCLJava.createNode("test_timer_node");
-    RCLFuture<Boolean> future = new RCLFuture<Boolean>(new WeakReference<Node>(node));
+    RCLFuture<Boolean> future = new RCLFuture<Boolean>();
     TimerCallback timerCallback = new TimerCallback(future, max_iterations);
     Timer timer = node.createTimer(250, TimeUnit.MILLISECONDS, timerCallback);
     assertNotEquals(0, timer.getHandle());
@@ -117,6 +118,7 @@ public class TimerTest {
     assertEquals(
         TimeUnit.NANOSECONDS.convert(250, TimeUnit.MILLISECONDS), timer.getTimerPeriodNS());
 
+    RCLJava.spinUntilComplete(node, future);
     boolean result = future.get(3, TimeUnit.SECONDS);
     assertTrue(result);
     assertEquals(4, timerCallback.getCounter());

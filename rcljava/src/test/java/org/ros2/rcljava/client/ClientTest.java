@@ -37,6 +37,7 @@ import java.util.concurrent.TimeUnit;
 import org.ros2.rcljava.RCLJava;
 import org.ros2.rcljava.concurrent.RCLFuture;
 import org.ros2.rcljava.consumers.TriConsumer;
+import org.ros2.rcljava.executors.Executor;
 import org.ros2.rcljava.node.Node;
 import org.ros2.rcljava.service.RMWRequestId;
 import org.ros2.rcljava.service.Service;
@@ -97,7 +98,7 @@ public class ClientTest {
   @Test
   public final void testAdd() throws Exception {
     RCLFuture<rcljava.srv.AddTwoInts_Response> consumerFuture =
-        new RCLFuture<rcljava.srv.AddTwoInts_Response>(new WeakReference<Node>(node));
+        new RCLFuture<rcljava.srv.AddTwoInts_Response>();
 
     TestClientConsumer clientConsumer = new TestClientConsumer(consumerFuture);
 
@@ -115,7 +116,8 @@ public class ClientTest {
 
     Future<rcljava.srv.AddTwoInts_Response> responseFuture = client.asyncSendRequest(request);
 
-    rcljava.srv.AddTwoInts_Response response = responseFuture.get(10, TimeUnit.SECONDS);
+    RCLJava.spinUntilComplete(node, responseFuture, TimeUnit.SECONDS.toNanos(10));
+    rcljava.srv.AddTwoInts_Response response = responseFuture.get();
 
     // Check that the message was received by the service
     assertTrue(consumerFuture.isDone());
