@@ -16,6 +16,7 @@
 package org.ros2.rcljava.client;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertTrue;
 
@@ -136,5 +137,30 @@ public class ClientTest {
     service.dispose();
     assertEquals(0, service.getHandle());
     assertEquals(0, node.getServices().size());
+  }
+
+  @Test
+  public final void testRemovePendingRequest() throws Exception {
+    RCLFuture<rcljava.srv.AddTwoInts_Response> consumerFuture =
+        new RCLFuture<rcljava.srv.AddTwoInts_Response>();
+
+    TestClientConsumer clientConsumer = new TestClientConsumer(consumerFuture);
+
+    Service<rcljava.srv.AddTwoInts> service = node.<rcljava.srv.AddTwoInts>createService(
+        rcljava.srv.AddTwoInts.class, "add_two_ints", clientConsumer);
+
+    rcljava.srv.AddTwoInts_Request request = new rcljava.srv.AddTwoInts_Request();
+    request.setA(2);
+    request.setB(3);
+
+    Client<rcljava.srv.AddTwoInts> client =
+        node.<rcljava.srv.AddTwoInts>createClient(rcljava.srv.AddTwoInts.class, "add_two_ints");
+
+    assertTrue(client.waitForService(Duration.ofSeconds(10)));
+
+    ResponseFuture<rcljava.srv.AddTwoInts_Response> responseFuture = client.asyncSendRequest(request);
+
+    assertTrue(client.removePendingRequest(responseFuture));
+    assertFalse(client.removePendingRequest(responseFuture));
   }
 }

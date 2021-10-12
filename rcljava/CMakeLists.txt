@@ -145,6 +145,7 @@ set(${PROJECT_NAME}_sources
   "src/main/java/org/ros2/rcljava/action/GoalStatus.java"
   "src/main/java/org/ros2/rcljava/client/Client.java"
   "src/main/java/org/ros2/rcljava/client/ClientImpl.java"
+  "src/main/java/org/ros2/rcljava/client/ResponseFuture.java"
   "src/main/java/org/ros2/rcljava/concurrent/Callback.java"
   "src/main/java/org/ros2/rcljava/concurrent/RCLFuture.java"
   "src/main/java/org/ros2/rcljava/contexts/Context.java"

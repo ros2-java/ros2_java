@@ -30,11 +30,13 @@ public interface Client<T extends ServiceDefinition> extends Disposable {
 
   <U extends MessageDefinition> void handleResponse(RMWRequestId header, U response);
 
-  <U extends MessageDefinition, V extends MessageDefinition> Future<V> asyncSendRequest(
+  <U extends MessageDefinition, V extends MessageDefinition> ResponseFuture<V> asyncSendRequest(
       final U request);
 
-  <U extends MessageDefinition, V extends MessageDefinition> Future<V> asyncSendRequest(
+  <U extends MessageDefinition, V extends MessageDefinition> ResponseFuture<V> asyncSendRequest(
       final U request, final Consumer<Future<V>> callback);
+  
+  <V extends MessageDefinition> boolean removePendingRequest(ResponseFuture<V> future);
 
   /**
    * Check if the service server is available.
