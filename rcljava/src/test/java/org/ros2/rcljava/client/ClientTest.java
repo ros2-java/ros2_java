@@ -37,6 +37,7 @@ import java.util.concurrent.TimeUnit;
 
 import org.ros2.rcljava.RCLJava;
 import org.ros2.rcljava.concurrent.RCLFuture;
+import org.ros2.rcljava.consumers.Consumer;
 import org.ros2.rcljava.consumers.TriConsumer;
 import org.ros2.rcljava.executors.Executor;
 import org.ros2.rcljava.node.Node;
@@ -162,5 +163,37 @@ public class ClientTest {
 
     assertTrue(client.removePendingRequest(responseFuture));
     assertFalse(client.removePendingRequest(responseFuture));
+  }
+
+  @Test
+  public final void testPrunePendingRequestsOlderThan() throws Exception {
+    RCLFuture<rcljava.srv.AddTwoInts_Response> consumerFuture =
+        new RCLFuture<rcljava.srv.AddTwoInts_Response>();
+
+    TestClientConsumer clientConsumer = new TestClientConsumer(consumerFuture);
+
+    Service<rcljava.srv.AddTwoInts> service = node.<rcljava.srv.AddTwoInts>createService(
+        rcljava.srv.AddTwoInts.class, "add_two_ints", clientConsumer);
+
+    rcljava.srv.AddTwoInts_Request request = new rcljava.srv.AddTwoInts_Request();
+    request.setA(2);
+    request.setB(3);
+
+    Client<rcljava.srv.AddTwoInts> client =
+        node.<rcljava.srv.AddTwoInts>createClient(
+          rcljava.srv.AddTwoInts.class, "add_two_ints");
+
+    assertTrue(client.waitForService(Duration.ofSeconds(10)));
+
+    long oldNanoTime = System.nanoTime();
+    ResponseFuture<rcljava.srv.AddTwoInts_Response> responseFuture = client.asyncSendRequest(
+        request,
+        new Consumer<Future<rcljava.srv.AddTwoInts_Response>>() {
+            public final void accept(final Future<rcljava.srv.AddTwoInts_Response> futureResponse) {}
+        });
+
+    assertEquals(0, client.prunePendingRequestsOlderThan(oldNanoTime));
+    assertEquals(1, client.prunePendingRequestsOlderThan(System.nanoTime()));
+    assertEquals(0, client.prunePendingRequestsOlderThan(System.nanoTime()));
   }
 }

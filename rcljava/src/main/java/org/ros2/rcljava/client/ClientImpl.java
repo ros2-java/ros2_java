@@ -22,6 +22,7 @@ import java.lang.InterruptedException;
 import java.lang.Long;
 import java.util.AbstractMap;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
@@ -52,7 +53,25 @@ public class ClientImpl<T extends ServiceDefinition> implements Client<T> {
   private final WeakReference<Node> nodeReference;
   private long handle;
   private final String serviceName;
-  private Map<Long, Map.Entry<Consumer, ResponseFuture>> pendingRequests;
+
+  private class PendingRequest
+  {
+    public Consumer callback;
+    public ResponseFuture future;
+    public long requestTimestamp;
+
+    public PendingRequest(
+      final Consumer callback,
+      final ResponseFuture future,
+      final long requestTimestamp)
+    {
+      this.callback = callback;
+      this.future = future;
+      this.requestTimestamp = requestTimestamp;
+    }
+  }
+
+  private Map<Long, PendingRequest> pendingRequests;
 
   private final ServiceDefinition serviceDefinition;
 
@@ -66,7 +85,7 @@ public class ClientImpl<T extends ServiceDefinition> implements Client<T> {
     this.handle = handle;
     this.serviceName = serviceName;
     this.serviceDefinition = serviceDefinition;
-    this.pendingRequests = new HashMap<Long, Map.Entry<Consumer, ResponseFuture>>();
+    this.pendingRequests = new HashMap<Long, PendingRequest>();
   }
 
   public ServiceDefinition getServiceDefinition() {
@@ -88,8 +107,7 @@ public class ClientImpl<T extends ServiceDefinition> implements Client<T> {
           request.getDestructorInstance(), request);
       ResponseFuture<V> future = new ResponseFuture<V>(sequenceNumber);
 
-      Map.Entry<Consumer, ResponseFuture> entry =
-          new AbstractMap.SimpleEntry<Consumer, ResponseFuture>(callback, future);
+      PendingRequest entry = new PendingRequest(callback, future, System.nanoTime());
       pendingRequests.put(sequenceNumber, entry);
       return future;
     }
@@ -98,9 +116,33 @@ public class ClientImpl<T extends ServiceDefinition> implements Client<T> {
   public final <V extends MessageDefinition> boolean
   removePendingRequest(ResponseFuture<V> future) {
     synchronized (pendingRequests) {
-      Map.Entry<Consumer, ResponseFuture> entry = pendingRequests.remove(
+      PendingRequest entry = pendingRequests.remove(
         future.getRequestSequenceNumber());
       return entry != null;
+    }
+  }
+
+  public final long
+  prunePendingRequests() {
+    synchronized (pendingRequests) {
+      long size = pendingRequests.size();
+      pendingRequests.clear();
+      return size;
+    }
+  }
+
+  public final long
+  prunePendingRequestsOlderThan(long nanoTime) {
+    synchronized (pendingRequests) {
+      Iterator<Map.Entry<Long, PendingRequest>> iter = pendingRequests.entrySet().iterator();
+      long removed = 0;
+      while(iter.hasNext()) {
+        if(iter.next().getValue().requestTimestamp < nanoTime) {
+          iter.remove();
+          ++removed;
+        }
+      }
+      return removed;
     }
   }
 
@@ -108,10 +150,10 @@ public class ClientImpl<T extends ServiceDefinition> implements Client<T> {
       final RMWRequestId header, final U response) {
     synchronized (pendingRequests) {
       long sequenceNumber = header.sequenceNumber;
-      Map.Entry<Consumer, ResponseFuture> entry = pendingRequests.remove(sequenceNumber);
+      PendingRequest entry = pendingRequests.remove(sequenceNumber);
       if (entry != null) {
-        Consumer<Future> callback = entry.getKey();
-        ResponseFuture<U> future = entry.getValue();
+        Consumer<Future> callback = entry.callback;
+        ResponseFuture<U> future = entry.future;
         future.set(response);
         callback.accept(future);
         return;

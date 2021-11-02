@@ -39,6 +39,20 @@ public interface Client<T extends ServiceDefinition> extends Disposable {
   <V extends MessageDefinition> boolean removePendingRequest(ResponseFuture<V> future);
 
   /**
+   * Remove old pending requests that this client has done.
+   * Future responses to removed requests will be ignored.
+   */
+  long prunePendingRequests();
+
+  /**
+   * Remove old pending requests that where done before the specified time point.
+   * Future responses to removed requests will be ignored.
+   *
+   * @param nanoTime requests done before this timepoint will be removed.
+   */
+  long prunePendingRequestsOlderThan(long nanoTime);
+
+  /**
    * Check if the service server is available.
    *
    * @return true if the client can talk to the service, false otherwise.
