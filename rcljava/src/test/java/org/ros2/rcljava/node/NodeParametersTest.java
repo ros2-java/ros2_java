@@ -30,6 +30,7 @@ import org.ros2.rcljava.parameters.ParameterCallback;
 import org.ros2.rcljava.parameters.ParameterType;
 import org.ros2.rcljava.parameters.ParameterVariant;
 
+import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;

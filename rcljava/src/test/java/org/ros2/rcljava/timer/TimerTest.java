@@ -21,6 +21,7 @@ import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.assertFalse;
 
 import java.lang.ref.WeakReference;
+import java.lang.reflect.Method;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 

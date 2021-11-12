@@ -18,6 +18,8 @@ package org.ros2.rcljava;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.assertFalse;
 
+import java.lang.reflect.Method;
+
 import org.junit.BeforeClass;
 import org.junit.Test;
 

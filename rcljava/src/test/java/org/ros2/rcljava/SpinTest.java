@@ -18,6 +18,7 @@ package org.ros2.rcljava;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotEquals;
 
+import java.lang.reflect.Method;
 import java.util.concurrent.TimeUnit;
 
 import org.junit.AfterClass;
