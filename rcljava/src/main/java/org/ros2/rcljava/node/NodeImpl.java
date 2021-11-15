@@ -879,7 +879,7 @@ public class NodeImpl implements Node {
   }
 
   public final Collection<NodeNameInfo> getNodeNames() {
-    ArrayList<NodeNameInfo> nodeNames = new ArrayList();
+    ArrayList<NodeNameInfo> nodeNames = new ArrayList<NodeNameInfo>();
     nativeGetNodeNames(this.handle, nodeNames);
     return nodeNames;
   }
@@ -887,7 +887,7 @@ public class NodeImpl implements Node {
   private native static final void nativeGetNodeNames(long handle, ArrayList<NodeNameInfo> nodeNames);
 
   public final Collection<NameAndTypes> getTopicNamesAndTypes() {
-    Collection<NameAndTypes> namesAndTypes = new ArrayList();
+    Collection<NameAndTypes> namesAndTypes = new ArrayList<NameAndTypes>();
     nativeGetTopicNamesAndTypes(this.handle, namesAndTypes);
     return namesAndTypes;
   }
@@ -896,7 +896,7 @@ public class NodeImpl implements Node {
     long handle, Collection<NameAndTypes> namesAndTypes);
 
   public final Collection<NameAndTypes> getServiceNamesAndTypes() {
-    Collection<NameAndTypes> namesAndTypes = new ArrayList();
+    Collection<NameAndTypes> namesAndTypes = new ArrayList<NameAndTypes>();
     nativeGetServiceNamesAndTypes(this.handle, namesAndTypes);
     return namesAndTypes;
   }
@@ -905,7 +905,7 @@ public class NodeImpl implements Node {
     long handle, Collection<NameAndTypes> namesAndTypes);
 
   public final Collection<EndpointInfo> getPublishersInfo(final String topicName) {
-    ArrayList<EndpointInfo> returnValue = new ArrayList();
+    ArrayList<EndpointInfo> returnValue = new ArrayList<EndpointInfo>();
     nativeGetPublishersInfo(this.handle, topicName, returnValue);
     return returnValue;
   }
@@ -914,7 +914,7 @@ public class NodeImpl implements Node {
     final long handle, final String topicName, ArrayList<EndpointInfo> endpointInfo);
 
   public final Collection<EndpointInfo> getSubscriptionsInfo(final String topicName) {
-    ArrayList<EndpointInfo> returnValue = new ArrayList();
+    ArrayList<EndpointInfo> returnValue = new ArrayList<EndpointInfo>();
     nativeGetSubscriptionsInfo(this.handle, topicName, returnValue);
     return returnValue;
   }
@@ -925,7 +925,7 @@ public class NodeImpl implements Node {
   public final Collection<NameAndTypes> getPublisherNamesAndTypesByNode(
     String nodeName, String nodeNamespace)
   {
-    Collection<NameAndTypes> namesAndTypes = new ArrayList();
+    Collection<NameAndTypes> namesAndTypes = new ArrayList<NameAndTypes>();
     nativeGetPublisherNamesAndTypesByNode(this.handle, nodeName, nodeNamespace, namesAndTypes);
     return namesAndTypes;
   }
@@ -936,7 +936,7 @@ public class NodeImpl implements Node {
   public final Collection<NameAndTypes> getSubscriptionNamesAndTypesByNode(
     String nodeName, String nodeNamespace)
   {
-    Collection<NameAndTypes> namesAndTypes = new ArrayList();
+    Collection<NameAndTypes> namesAndTypes = new ArrayList<NameAndTypes>();
     nativeGetSubscriptionNamesAndTypesByNode(this.handle, nodeName, nodeNamespace, namesAndTypes);
     return namesAndTypes;
   }
@@ -947,7 +947,7 @@ public class NodeImpl implements Node {
   public final Collection<NameAndTypes> getServiceNamesAndTypesByNode(
     String nodeName, String nodeNamespace)
   {
-    Collection<NameAndTypes> namesAndTypes = new ArrayList();
+    Collection<NameAndTypes> namesAndTypes = new ArrayList<NameAndTypes>();
     nativeGetServiceNamesAndTypesByNode(this.handle, nodeName, nodeNamespace, namesAndTypes);
     return namesAndTypes;
   }
@@ -958,7 +958,7 @@ public class NodeImpl implements Node {
   public final Collection<NameAndTypes> getClientNamesAndTypesByNode(
     String nodeName, String nodeNamespace)
   {
-    Collection<NameAndTypes> namesAndTypes = new ArrayList();
+    Collection<NameAndTypes> namesAndTypes = new ArrayList<NameAndTypes>();
     nativeGetClientNamesAndTypesByNode(this.handle, nodeName, nodeNamespace, namesAndTypes);
     return namesAndTypes;
   }

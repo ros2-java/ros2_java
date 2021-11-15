@@ -129,8 +129,8 @@ public class SubscriptionImpl<T extends MessageDefinition> implements Subscripti
   public final
   <T extends SubscriptionEventStatus> EventHandler<T, Subscription>
   createEventHandler(Supplier<T> factory, Consumer<T> callback) {
-    final WeakReference<Collection<EventHandler>> weakEventHandlers = new WeakReference(
-      this.eventHandlers);
+    final WeakReference<Collection<EventHandler>> weakEventHandlers =
+      new WeakReference<Collection<EventHandler>>(this.eventHandlers);
     Consumer<EventHandler> disposeCallback = new Consumer<EventHandler>() {
       public void accept(EventHandler eventHandler) {
         Collection<EventHandler> eventHandlers = weakEventHandlers.get();
@@ -141,8 +141,9 @@ public class SubscriptionImpl<T extends MessageDefinition> implements Subscripti
     };
     T status = factory.get();
     long eventHandle = nativeCreateEvent(this.handle, status.getSubscriptionEventType());
-    EventHandler<T, Subscription> eventHandler = new EventHandlerImpl(
-      new WeakReference<Subscription>(this), eventHandle, factory, callback, disposeCallback);
+    EventHandler<T, Subscription> eventHandler =
+      new EventHandlerImpl<T, Subscription>(
+        new WeakReference<Subscription>(this), eventHandle, factory, callback, disposeCallback);
     this.eventHandlers.add(eventHandler);
     return eventHandler;
   }

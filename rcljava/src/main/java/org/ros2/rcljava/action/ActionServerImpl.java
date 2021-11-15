@@ -16,6 +16,7 @@
 package org.ros2.rcljava.action;
 
 import java.lang.ref.WeakReference;
+import java.lang.SuppressWarnings;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -171,6 +172,8 @@ public class ActionServerImpl<T extends ActionDefinition> implements ActionServe
     /**
      * {@inheritDoc}
      */
+    // TODO(ivanpauno): Improve generated code API so we don't need this.
+    @SuppressWarnings("unchecked")
     public synchronized void publishFeedback(FeedbackDefinition<T> feedback) {
       Class<? extends FeedbackMessageDefinition> feedbackMessageType =
         ActionServerImpl.this.actionTypeInstance.getFeedbackMessageType();
@@ -202,7 +205,7 @@ public class ActionServerImpl<T extends ActionDefinition> implements ActionServe
 
     private synchronized final void toTerminalState(byte status, ResultDefinition<T> result) {
       nativeUpdateGoalState(this.handle, status);
-      ResultResponseDefinition<T> resultResponse = ActionServerImpl.this.createResultResponse();
+      ResultResponseDefinition<T> resultResponse = ActionServerImpl.this.createResultResponseUnchecked();
       resultResponse.setGoalStatus(status);
       resultResponse.setResult(result);
       ActionServerImpl.this.sendResult(goalInfo.getGoalId().getUuidAsList(), resultResponse);
@@ -337,6 +340,12 @@ public class ActionServerImpl<T extends ActionDefinition> implements ActionServe
     return false;
   }
 
+  @SuppressWarnings("unchecked")
+  private GoalCallback.GoalResponse
+  handleGoalUnchecked(GoalRequestDefinition<T> requestMessage) {
+    return this.goalCallback.handleGoal(requestMessage);
+  }
+
   private ActionServerGoalHandle<T> executeGoalRequest(
     RMWRequestId rmwRequestId,
     GoalRequestDefinition<T> requestMessage,
@@ -358,7 +367,7 @@ public class ActionServerImpl<T extends ActionDefinition> implements ActionServe
     }
 
     // Call user callback
-    GoalCallback.GoalResponse response = this.goalCallback.handleGoal(requestMessage);
+    GoalCallback.GoalResponse response = this.handleGoalUnchecked(requestMessage);
 
     boolean accepted = GoalCallback.GoalResponse.ACCEPT_AND_DEFER == response
       || GoalCallback.GoalResponse.ACCEPT_AND_EXECUTE == response;
@@ -542,17 +551,6 @@ public class ActionServerImpl<T extends ActionDefinition> implements ActionServe
     return goalInfo;
   }
 
-  private ResultResponseDefinition<T> createResultResponse() {
-    ResultResponseDefinition<T> resultResponse;
-    try {
-      resultResponse =
-        this.actionTypeInstance.getGetResultResponseType().getDeclaredConstructor().newInstance();
-    } catch (ReflectiveOperationException ex) {
-      throw new IllegalStateException("Failed to instantiate provided action type: ", ex);
-    }
-    return resultResponse;
-  }
-
   // This will store the result, so it can be sent to future result requests, and 
   // will also send a result response to all requests that were already made.
   private void sendResult(List<Byte> goalUuid, ResultResponseDefinition<T> resultResponse) {
@@ -571,23 +569,61 @@ public class ActionServerImpl<T extends ActionDefinition> implements ActionServe
     }
   }
 
+  // TODO(ivanpauno): Improve generated code API so we don't need this.
+  @SuppressWarnings("unchecked")
+  private ResultRequestDefinition<T> createResultRequestUnchecked() {
+    ResultRequestDefinition<T> resultRequest;
+    try {
+      resultRequest =
+        this.actionTypeInstance.getGetResultRequestType().getDeclaredConstructor().newInstance();
+    } catch (ReflectiveOperationException ex) {
+      throw new IllegalStateException("Failed to instantiate provided action type: ", ex);
+    }
+    return resultRequest;
+  }
+
+  // TODO(ivanpauno): Improve generated code API so we don't need this.
+  @SuppressWarnings("unchecked")
+  private ResultResponseDefinition<T> createResultResponseUnchecked() {
+    ResultResponseDefinition<T> resultResponse;
+    try {
+      resultResponse =
+        this.actionTypeInstance.getGetResultResponseType().getDeclaredConstructor().newInstance();
+    } catch (ReflectiveOperationException ex) {
+      throw new IllegalStateException("Failed to instantiate provided action type: ", ex);
+    }
+    return resultResponse;
+  }
+
+  // TODO(ivanpauno): Improve generated code API so we don't need this.
+  @SuppressWarnings("unchecked")
+  private GoalRequestDefinition<T> newRequestUnchecked() {
+    Class<? extends GoalRequestDefinition> requestType = this.actionTypeInstance.getSendGoalRequestType();
+    try {
+      return requestType.getDeclaredConstructor().newInstance();
+    } catch (ReflectiveOperationException ex) {
+      throw new IllegalStateException("Failed to instantiate request: ", ex);
+    }
+  }
+
+  // TODO(ivanpauno): Improve generated code API so we don't need this.
+  @SuppressWarnings("unchecked")
+  private GoalResponseDefinition<T> newResponseUnchecked() {
+    Class<? extends GoalResponseDefinition> responseType = this.actionTypeInstance.getSendGoalResponseType();
+    try {
+      return responseType.getDeclaredConstructor().newInstance();
+    } catch (ReflectiveOperationException ex) {
+      throw new IllegalStateException("Failed to instantiate responce: ", ex);
+    }
+  }
+
   /**
    * {@inheritDoc}
    */
   public void execute() {
     if (this.isGoalRequestReady()) {
-      Class<? extends GoalRequestDefinition> requestType = this.actionTypeInstance.getSendGoalRequestType();
-      Class<? extends GoalResponseDefinition> responseType = this.actionTypeInstance.getSendGoalResponseType();
-
-      GoalRequestDefinition<T> requestMessage = null;
-      GoalResponseDefinition<T> responseMessage = null;
-
-      try {
-        requestMessage = requestType.getDeclaredConstructor().newInstance();
-        responseMessage = responseType.getDeclaredConstructor().newInstance();
-      } catch (ReflectiveOperationException ex) {
-        throw new IllegalStateException("Failed to instantiate request or responce: ", ex);
-      }
+      GoalRequestDefinition<T> requestMessage = newRequestUnchecked();
+      GoalResponseDefinition<T> responseMessage = newResponseUnchecked();
 
       if (requestMessage != null && responseMessage != null) {
         long requestFromJavaConverterHandle = requestMessage.getFromJavaConverterInstance();
@@ -643,14 +679,7 @@ public class ActionServerImpl<T extends ActionDefinition> implements ActionServe
     }
 
     if (this.isResultRequestReady()) {
-      Class<? extends ResultRequestDefinition> requestType = this.actionTypeInstance.getGetResultRequestType();
-
-      ResultRequestDefinition<T> requestMessage = null;
-      try {
-        requestMessage = requestType.getDeclaredConstructor().newInstance();
-      } catch (ReflectiveOperationException ex) {
-        throw new IllegalArgumentException("Failed to instantiate action result request: ", ex);
-      }
+      ResultRequestDefinition<T> requestMessage = createResultRequestUnchecked();
 
       if (requestMessage != null) {
         long requestFromJavaConverterHandle = requestMessage.getFromJavaConverterInstance();
@@ -672,7 +701,7 @@ public class ActionServerImpl<T extends ActionDefinition> implements ActionServe
 
         ResultResponseDefinition<T> resultResponse = null;
         if (!goalExists) {
-          resultResponse = this.createResultResponse();
+          resultResponse = this.createResultResponseUnchecked();
           resultResponse.setGoalStatus(action_msgs.msg.GoalStatus.STATUS_UNKNOWN);
         } else {
           resultResponse = this.goalResults.get(goalUuid);
@@ -682,7 +711,7 @@ public class ActionServerImpl<T extends ActionDefinition> implements ActionServe
           List<RMWRequestId> requestIds = null;
           requestIds = this.goalRequests.get(goalUuid);
           if (requestIds == null) {
-            requestIds = new ArrayList();
+            requestIds = new ArrayList<RMWRequestId>();
             this.goalRequests.put(goalUuid, requestIds);
           }
           requestIds.add(rmwRequestId);

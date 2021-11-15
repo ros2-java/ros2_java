@@ -117,8 +117,8 @@ public class PublisherImpl<T extends MessageDefinition> implements Publisher<T> 
   public final
   <T extends PublisherEventStatus> EventHandler<T, Publisher>
   createEventHandler(Supplier<T> factory, Consumer<T> callback) {
-    final WeakReference<Collection<EventHandler>> weakEventHandlers = new WeakReference(
-      this.eventHandlers);
+    final WeakReference<Collection<EventHandler>> weakEventHandlers =
+      new WeakReference<Collection<EventHandler>>(this.eventHandlers);
     Consumer<EventHandler> disposeCallback = new Consumer<EventHandler>() {
       public void accept(EventHandler eventHandler) {
         Collection<EventHandler> eventHandlers = weakEventHandlers.get();
@@ -129,7 +129,7 @@ public class PublisherImpl<T extends MessageDefinition> implements Publisher<T> 
     };
     T status = factory.get();
     long eventHandle = nativeCreateEvent(this.handle, status.getPublisherEventType());
-    EventHandler<T, Publisher> eventHandler = new EventHandlerImpl(
+    EventHandler<T, Publisher> eventHandler = new EventHandlerImpl<T, Publisher>(
       new WeakReference<Publisher>(this), eventHandle, factory, callback, disposeCallback);
     this.eventHandlers.add(eventHandler);
     return eventHandler;

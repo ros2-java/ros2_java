@@ -15,6 +15,8 @@
 
 package org.ros2.rcljava.time;
 
+import java.lang.SuppressWarnings;
+
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.assertFalse;
 
@@ -162,6 +164,8 @@ public class TimeSourceTest {
     assertTrue(timeSource.getRosTimeIsActive());
   }
 
+  // there's no generic parameter type information at runtime, so we cannot write any(Consumer<T>.class)
+  @SuppressWarnings("unchecked")
   @Test
   public final void testSetRosTimeIsActiveWithNode() {
     when(mockedNode.getParameter("use_sim_time")).thenReturn(new ParameterVariant("use_sim_time", false));
