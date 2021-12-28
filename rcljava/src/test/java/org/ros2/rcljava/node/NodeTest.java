@@ -86,7 +86,7 @@ public class NodeTest {
 
   @BeforeClass
   public static void setupOnce() throws Exception {
-    RCLJava.rclJavaInit();
+    // Just to quiet down warnings
     try
     {
       // Configure log4j. Doing this dynamically so that Android does not complain about missing
@@ -99,6 +99,8 @@ public class NodeTest {
     {
       e.printStackTrace();
     }
+
+    RCLJava.rclJavaInit();
   }
 
   public class TestConsumer<T> implements Consumer<T> {

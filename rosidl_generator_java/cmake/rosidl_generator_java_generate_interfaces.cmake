@@ -15,6 +15,7 @@
 find_package(ament_cmake_export_jars REQUIRED)
 find_package(ament_cmake_export_jni_libraries REQUIRED)
 find_package(rosidl_generator_c REQUIRED)
+find_package(rosidl_typesupport_c REQUIRED)
 find_package(rmw_implementation_cmake REQUIRED)
 find_package(rmw REQUIRED)
 find_package(rcljava_common REQUIRED)
@@ -71,8 +72,12 @@ foreach(_abs_idl_file ${rosidl_generate_interfaces_ABS_IDL_FILES})
       "${_output_path}/${_parent_folder}/${_idl_name}_Response.java"
     )
     foreach(_typesupport_impl ${_typesupport_impls})
-      list(APPEND _generated_extension_${_typesupport_impl}_files "${_output_path}/${_parent_folder}/${_idl_name}_Request.ep.${_typesupport_impl}.cpp")
-      list(APPEND _generated_extension_${_typesupport_impl}_files "${_output_path}/${_parent_folder}/${_idl_name}_Response.ep.${_typesupport_impl}.cpp")
+      list(APPEND _generated_extension_${_typesupport_impl}_files
+        "${_output_path}/${_parent_folder}/${_idl_name}_Request.ep.${_typesupport_impl}.cpp"
+      )
+      list(APPEND _generated_extension_${_typesupport_impl}_files
+        "${_output_path}/${_parent_folder}/${_idl_name}_Response.ep.${_typesupport_impl}.cpp"
+      )
     endforeach()
   endif()
   # Actions generate extra files
@@ -89,20 +94,24 @@ foreach(_abs_idl_file ${rosidl_generate_interfaces_ABS_IDL_FILES})
       "${_output_path}/${_parent_folder}/${_idl_name}_GetResult_Response.java"
     )
     foreach(_typesupport_impl ${_typesupport_impls})
-      list(APPEND _generated_extension_${_typesupport_impl}_files "${_output_path}/${_parent_folder}/${_idl_name}_Goal.ep.${_typesupport_impl}.cpp")
-      list(APPEND _generated_extension_${_typesupport_impl}_files "${_output_path}/${_parent_folder}/${_idl_name}_Result.ep.${_typesupport_impl}.cpp")
-      list(APPEND _generated_extension_${_typesupport_impl}_files "${_output_path}/${_parent_folder}/${_idl_name}_Feedback.ep.${_typesupport_impl}.cpp")
-      list(APPEND _generated_extension_${_typesupport_impl}_files "${_output_path}/${_parent_folder}/${_idl_name}_SendGoal.ep.${_typesupport_impl}.cpp")
-      list(APPEND _generated_extension_${_typesupport_impl}_files "${_output_path}/${_parent_folder}/${_idl_name}_SendGoal_Request.ep.${_typesupport_impl}.cpp")
-      list(APPEND _generated_extension_${_typesupport_impl}_files "${_output_path}/${_parent_folder}/${_idl_name}_SendGoal_Response.ep.${_typesupport_impl}.cpp")
-      list(APPEND _generated_extension_${_typesupport_impl}_files "${_output_path}/${_parent_folder}/${_idl_name}_GetResult.ep.${_typesupport_impl}.cpp")
-      list(APPEND _generated_extension_${_typesupport_impl}_files "${_output_path}/${_parent_folder}/${_idl_name}_GetResult_Request.ep.${_typesupport_impl}.cpp")
-      list(APPEND _generated_extension_${_typesupport_impl}_files "${_output_path}/${_parent_folder}/${_idl_name}_GetResult_Response.ep.${_typesupport_impl}.cpp")
+      list(APPEND _generated_extension_${_typesupport_impl}_files
+        "${_output_path}/${_parent_folder}/${_idl_name}_Goal.ep.${_typesupport_impl}.cpp"
+        "${_output_path}/${_parent_folder}/${_idl_name}_Result.ep.${_typesupport_impl}.cpp"
+        "${_output_path}/${_parent_folder}/${_idl_name}_Feedback.ep.${_typesupport_impl}.cpp"
+        "${_output_path}/${_parent_folder}/${_idl_name}_SendGoal.ep.${_typesupport_impl}.cpp"
+        "${_output_path}/${_parent_folder}/${_idl_name}_SendGoal_Request.ep.${_typesupport_impl}.cpp"
+        "${_output_path}/${_parent_folder}/${_idl_name}_SendGoal_Response.ep.${_typesupport_impl}.cpp"
+        "${_output_path}/${_parent_folder}/${_idl_name}_GetResult.ep.${_typesupport_impl}.cpp"
+        "${_output_path}/${_parent_folder}/${_idl_name}_GetResult_Request.ep.${_typesupport_impl}.cpp"
+        "${_output_path}/${_parent_folder}/${_idl_name}_GetResult_Response.ep.${_typesupport_impl}.cpp"
+      )
     endforeach()
   endif()
 
   foreach(_typesupport_impl ${_typesupport_impls})
-    list(APPEND _generated_extension_${_typesupport_impl}_files "${_output_path}/${_parent_folder}/${_idl_name}.ep.${_typesupport_impl}.cpp")
+    list(APPEND _generated_extension_${_typesupport_impl}_files
+      "${_output_path}/${_parent_folder}/${_idl_name}.ep.${_typesupport_impl}.cpp"
+    )
   endforeach()
 endforeach()
 
@@ -244,6 +253,7 @@ foreach(_generated_cpp_file ${_generated_extension_files})
   target_link_libraries(
     ${_library_name}
     ${PROJECT_NAME}__${_typesupport_impl}
+    ${rosidl_generate_interfaces_TARGET}__rosidl_generator_c
     ${_extension_link_flags}
   )
   rosidl_target_interfaces(${_library_name}

@@ -1,27 +1,64 @@
 name: CI
 
-on: [push, pull_request]
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+    types: [opened, reopened, synchronize]
+
+
 
 jobs:
   build_and_test:
-    runs-on: ubuntu-18.04
+    runs-on: ubuntu-20.04
     steps:
     - name: Install Java
       run: |
         sudo apt-get update -qq
         sudo apt-get install -y default-jdk gradle
     - uses: actions/checkout@v2
-    - uses: ros-tooling/setup-ros@0.2.1
+    - uses: ros-tooling/setup-ros@v0.2
       with:
-        required-ros-distributions: dashing
+        required-ros-distributions: galactic
     - uses: ros-tooling/action-ros-ci@v0.2
       with:
         package-name: rosidl_generator_java rcljava_common rcljava
-        target-ros2-distro: dashing
+        target-ros2-distro: galactic
         vcs-repo-file-url: ${{ github.workspace }}/ros2_java_desktop.repos
 
   build_android:
-    runs-on: ubuntu-18.04
+    runs-on: ubuntu-20.04
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - colcon_meta: |
+              {
+                "names": {
+                  "rcl": {
+                    "cmake-args": [ "-DBUILD_TESTING=OFF" ]
+                  },
+                  "rcl_yaml_param_parser": {
+                    "cmake-args": [ "-DBUILD_TESTING=OFF" ]
+                  },
+                  "rclcpp": {
+                    "cmake-args": [ "-DBUILD_TESTING=OFF" ]
+                  },
+                  "rclcpp_action": {
+                    "cmake-args": [ "-DBUILD_TESTING=OFF" ]
+                  },
+                  "rclcpp_lifecycle": {
+                    "cmake-args": [ "-DBUILD_TESTING=OFF" ]
+                  },
+                  "rcutils": {
+                    "cmake-args": [ "-DBUILD_TESTING=OFF" ]
+                  },
+                  "rosidl_typesupport_c": {
+                    "cmake-args": [ "-DBUILD_TESTING=OFF" ]
+                  },
+                }
+              }
     steps:
     - name: Install Java
       run: |
@@ -43,20 +80,25 @@ jobs:
         sudo apt-get update && sudo apt-get install -y python3-colcon-common-extensions python3-vcstool python3-lark-parser python3-dev
     - name: Install colcon extensions for Gradle
       run: |
-        sudo pip3 install git+git://github.com/colcon/colcon-gradle.git
-        sudo pip3 install git+git://github.com/colcon/colcon-ros-gradle.git
+        sudo pip3 install git+https://github.com/colcon/colcon-gradle.git
+        sudo pip3 install git+https://github.com/colcon/colcon-ros-gradle.git
     - name: Install Android NDK
       run: |
         curl -LO https://dl.google.com/android/repository/android-ndk-r21d-linux-x86_64.zip
         unzip android-ndk-r21d-linux-x86_64.zip
+    - name: Install QEMU emulation binaries
+      run: |
+        sudo apt-get update && sudo apt-get install -y qemu-user
     - name: Setup workspace with VCS repo file
       run: |
         mkdir -p ros2_java_ws/src
         cd ros2_java_ws
         curl -sL file://${{ github.workspace }}/ros2_java_android.repos | vcs import src
         # Use checked out version of ros2_java
-        rm -rf src/ros2_java/ros2_java
-        ln --symbolic ${{ github.workspace }} src/ros2_java
+        rm -rf src/ros2-java/ros2_java
+        ln --symbolic ${{ github.workspace }} src/ros2-java
+    - name: Create colcon defaults file
+      run: printf "${{matrix.colcon_meta}}" > ${{ github.workspace }}/colcon.meta
     - name: Build ros2_java for Android
       run: |
         export PYTHON3_EXEC="$( which python3 )"
@@ -69,9 +111,11 @@ jobs:
 
         cd ros2_java_ws
         colcon build \
-          --packages-ignore cyclonedds rcl_logging_log4cxx rosidl_generator_py \
+          --packages-ignore cyclonedds rcl_logging_spdlog rcl_logging_log4cxx rosidl_generator_py \
           --packages-up-to rcljava \
+          --metas ${{ github.workspace }}/colcon.meta \
           --cmake-args \
+          -DRCL_LOGGING_IMPLEMENTATION=rcl_logging_noop \
           -DPYTHON_EXECUTABLE=${PYTHON3_EXEC} \
           -DPYTHON_LIBRARY=${PYTHON3_LIBRARY} \
           -DPYTHON_INCLUDE_DIR=${PYTHON3_INCLUDE_DIR} \
@@ -82,6 +126,9 @@ jobs:
           -DANDROID_STL=c++_shared \
           -DANDROID_ABI=${ANDROID_ABI} \
           -DANDROID_NDK=${ANDROID_NDK} \
+          -DANDROID=ON \
+          -DTHIRDPARTY_android-ifaddrs=FORCE \
           -DTHIRDPARTY=ON \
           -DCOMPILE_EXAMPLES=OFF \
-          -DCMAKE_FIND_ROOT_PATH="${PWD}/install"
+          -DCMAKE_FIND_ROOT_PATH="${PWD}/install" \
+          -DCMAKE_CROSSCOMPILING_EMULATOR="/usr/bin/qemu-arm"

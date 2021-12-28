@@ -12,19 +12,14 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-macro(accumulate_typesupports)
-  set(_typesupport_impl_tmp "")
-  get_rmw_typesupport(_typesupport_impl_tmp ${rmw_implementation} LANGUAGE "C")
-  list(APPEND _typesupport_impls_tmp ${_typesupport_impl_tmp})
-endmacro()
-
 macro(rosidl_generator_java_get_typesupports TYPESUPPORT_IMPLS)
   set(${TYPESUPPORT_IMPLS} "")
-  set(_typesupport_impls_tmp "")
-  set(_typesupport_impls_tmp_unique "")
-  call_for_each_rmw_implementation(accumulate_typesupports)
-
-  foreach(_typesupport_impl ${_typesupport_impls_tmp})
-    list_append_unique(${TYPESUPPORT_IMPLS} ${_typesupport_impl})
+  ament_index_get_resources(${TYPESUPPORT_IMPLS} "rosidl_typesupport_c")
+  list(APPEND ${TYPESUPPORT_IMPLS} "rosidl_typesupport_c")
+  foreach(_typesupport ${${TYPESUPPORT_IMPLS}})
+    find_package(${_typesupport} QUIET)
+    if(NOT ${_typesupport}_FOUND)
+      list(REMOVE_ITEM ${TYPESUPPORT_IMPLS} "${_typesupport}")
+    endif()
   endforeach()
 endmacro()

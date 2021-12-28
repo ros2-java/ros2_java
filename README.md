@@ -4,7 +4,7 @@
 
 | Target                                    | Status        |
 |-------------------------------------------|---------------|
-| **ROS Dashing - Ubuntu Bionic (OpenJDK)** | ![Build Status](https://github.com/ros2-java/ros2_java/workflows/CI/badge.svg?branch=dashing) |
+| **ROS Galactic - Ubuntu Focal (OpenJDK)** | ![Build Status](https://github.com/ros2-java/ros2_java/workflows/CI/badge.svg?branch=main) |
 
 ## Introduction
 
@@ -86,13 +86,13 @@ Make sure you have Gradle 3.2 (or later) installed.
 
 1. Source your ROS 2 installation, for example:
 
-        source /opt/ros/dashing/setup.bash
+        source /opt/ros/galactic/setup.bash
 
 1. Download the ROS 2 Java repositories into a workspace:
 
         mkdir -p ros2_java_ws/src
         cd ros2_java_ws
-        curl -skL https://raw.githubusercontent.com/ros2-java/ros2_java/dashing/ros2_java_desktop.repos | vcs import src
+        curl -skL https://raw.githubusercontent.com/ros2-java/ros2_java/main/ros2_java_desktop.repos | vcs import src
 
 1. **Linux only** Install ROS dependencies:
 
@@ -127,7 +127,7 @@ Although the `ros2_java_android.repos` file contains all the repositories for th
 
         mkdir -p $HOME/ros2_android_ws/src
         cd $HOME/ros2_android_ws
-        curl https://raw.githubusercontent.com/ros2-java/ros2_java/dashing/ros2_java_android.repos | vcs import src
+        curl https://raw.githubusercontent.com/ros2-java/ros2_java/main/ros2_java_android.repos | vcs import src
 
 1. Set Android build configuration:
 

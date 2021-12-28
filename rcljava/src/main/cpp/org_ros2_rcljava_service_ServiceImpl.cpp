@@ -22,7 +22,7 @@
 #include "rcl/node.h"
 #include "rcl/rcl.h"
 #include "rmw/rmw.h"
-#include "rosidl_generator_c/message_type_support_struct.h"
+#include "rosidl_runtime_c/message_type_support_struct.h"
 
 #include "rcljava_common/exceptions.hpp"
 #include "rcljava_common/signatures.hpp"

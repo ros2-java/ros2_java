@@ -88,7 +88,7 @@ expand_template(
 
 #include <cstdint>
 
-#include "rosidl_generator_c/action_type_support_struct.h"
+#include "rosidl_runtime_c/action_type_support_struct.h"
 
 #include "@(idl_structure_type_to_c_include_prefix(action.namespaced_type)).h"
 

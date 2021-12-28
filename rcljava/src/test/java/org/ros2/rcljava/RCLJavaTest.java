@@ -18,9 +18,29 @@ package org.ros2.rcljava;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.assertFalse;
 
+import java.lang.reflect.Method;
+
+import org.junit.BeforeClass;
 import org.junit.Test;
 
 public class RCLJavaTest {
+  @BeforeClass
+  public static void setupOnce() throws Exception {
+    // Just to quiet down warnings
+    try
+    {
+      // Configure log4j. Doing this dynamically so that Android does not complain about missing
+      // the log4j JARs, SLF4J uses Android's native logging mechanism instead.
+      Class c = Class.forName("org.apache.log4j.BasicConfigurator");
+      Method m = c.getDeclaredMethod("configure", (Class<?>[]) null);
+      Object o = m.invoke(null, (Object[]) null);
+    }
+    catch (Exception e)
+    {
+      e.printStackTrace();
+    }
+  }
+
   @Test
   public final void testInitShutdown() {
     assertFalse(RCLJava.ok());

@@ -17,6 +17,7 @@ package org.ros2.rcljava.client;
 
 import java.time.Duration;
 import java.lang.ref.WeakReference;
+import java.lang.IllegalStateException;
 import java.lang.InterruptedException;
 import java.lang.Long;
 import java.util.AbstractMap;
@@ -52,7 +53,6 @@ public class ClientImpl<T extends ServiceDefinition> implements Client<T> {
   private final WeakReference<Node> nodeReference;
   private long handle;
   private final String serviceName;
-  private long sequenceNumber = 0;
   private Map<Long, Map.Entry<Consumer, RCLFuture>> pendingRequests;
 
   private final Class<MessageDefinition> requestType;
@@ -79,8 +79,8 @@ public class ClientImpl<T extends ServiceDefinition> implements Client<T> {
   public final <U extends MessageDefinition, V extends MessageDefinition> Future<V>
   asyncSendRequest(final U request, final Consumer<Future<V>> callback) {
     synchronized (pendingRequests) {
-      sequenceNumber++;
-      nativeSendClientRequest(handle, sequenceNumber, request.getFromJavaConverterInstance(),
+      long sequenceNumber = nativeSendClientRequest(
+          handle, request.getFromJavaConverterInstance(),
           request.getToJavaConverterInstance(), request.getDestructorInstance(), request);
       RCLFuture<V> future = new RCLFuture<V>(this.nodeReference);
 
@@ -96,15 +96,20 @@ public class ClientImpl<T extends ServiceDefinition> implements Client<T> {
     synchronized (pendingRequests) {
       long sequenceNumber = header.sequenceNumber;
       Map.Entry<Consumer, RCLFuture> entry = pendingRequests.remove(sequenceNumber);
-      Consumer<Future> callback = entry.getKey();
-      RCLFuture<U> future = entry.getValue();
-      future.set(response);
-      callback.accept(future);
+      if (entry != null) {
+        Consumer<Future> callback = entry.getKey();
+        RCLFuture<U> future = entry.getValue();
+        future.set(response);
+        callback.accept(future);
+        return;
+      }
+      throw new IllegalStateException(
+          "No request made with the given sequence number: " + sequenceNumber);
     }
   }
 
-  private static native void nativeSendClientRequest(long handle, long sequenceNumber,
-      long requestFromJavaConverterHandle, long requestToJavaConverterHandle,
+  private static native long nativeSendClientRequest(
+      long handle, long requestFromJavaConverterHandle, long requestToJavaConverterHandle,
       long requestDestructorHandle, MessageDefinition requestMessage);
 
   public final Class<MessageDefinition> getRequestType() {

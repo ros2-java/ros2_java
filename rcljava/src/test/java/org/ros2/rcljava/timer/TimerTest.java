@@ -21,9 +21,11 @@ import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.assertFalse;
 
 import java.lang.ref.WeakReference;
+import java.lang.reflect.Method;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 
+import org.junit.BeforeClass;
 import org.junit.Test;
 
 import org.ros2.rcljava.RCLJava;
@@ -52,6 +54,23 @@ public class TimerTest {
 
     public int getCounter() {
       return this.counter;
+    }
+  }
+
+  @BeforeClass
+  public static void setupOnce() throws Exception {
+    // Just to quiet down warnings
+    try
+    {
+      // Configure log4j. Doing this dynamically so that Android does not complain about missing
+      // the log4j JARs, SLF4J uses Android's native logging mechanism instead.
+      Class c = Class.forName("org.apache.log4j.BasicConfigurator");
+      Method m = c.getDeclaredMethod("configure", (Class<?>[]) null);
+      Object o = m.invoke(null, (Object[]) null);
+    }
+    catch (Exception e)
+    {
+      e.printStackTrace();
     }
   }
 

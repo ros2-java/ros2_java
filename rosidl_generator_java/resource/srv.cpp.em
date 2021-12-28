@@ -38,7 +38,7 @@ expand_template(
 
 #include <cstdint>
 
-#include "rosidl_generator_c/service_type_support_struct.h"
+#include "rosidl_runtime_c/service_type_support_struct.h"
 
 @{
 include_prefix = idl_structure_type_to_c_include_prefix(service.namespaced_type)

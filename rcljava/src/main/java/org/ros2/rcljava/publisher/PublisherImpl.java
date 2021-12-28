@@ -16,10 +16,17 @@
 package org.ros2.rcljava.publisher;
 
 import java.lang.ref.WeakReference;
+import java.util.Collection;
+import java.util.concurrent.LinkedBlockingQueue;
+import java.util.function.Supplier;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import org.ros2.rcljava.consumers.Consumer;
+import org.ros2.rcljava.events.EventHandler;
+import org.ros2.rcljava.events.EventHandlerImpl;
+import org.ros2.rcljava.events.PublisherEventStatus;
 import org.ros2.rcljava.RCLJava;
 import org.ros2.rcljava.common.JNIUtils;
 import org.ros2.rcljava.interfaces.MessageDefinition;
@@ -53,6 +60,8 @@ public class PublisherImpl<T extends MessageDefinition> implements Publisher<T> 
    */
   private final String topic;
 
+  private final Collection<EventHandler> eventHandlers;
+
   /**
    * Constructor.
    *
@@ -67,6 +76,7 @@ public class PublisherImpl<T extends MessageDefinition> implements Publisher<T> 
     this.nodeReference = nodeReference;
     this.handle = handle;
     this.topic = topic;
+    this.eventHandlers = new LinkedBlockingQueue<EventHandler>();
   }
 
   /**
@@ -102,6 +112,45 @@ public class PublisherImpl<T extends MessageDefinition> implements Publisher<T> 
   }
 
   /**
+   * {@inheritDoc}
+   */
+  public final
+  <T extends PublisherEventStatus> EventHandler<T, Publisher>
+  createEventHandler(Supplier<T> factory, Consumer<T> callback) {
+    T status = factory.get();
+    long eventHandle = nativeCreateEvent(this.handle, status.getPublisherEventType());
+    EventHandler<T, Publisher> eventHandler = new EventHandlerImpl(
+      new WeakReference<Publisher>(this), eventHandle, factory, callback);
+    this.eventHandlers.add(eventHandler);
+    return eventHandler;
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  public final
+  <T extends PublisherEventStatus> void removeEventHandler(
+    EventHandler<T, Publisher> eventHandler)
+  {
+    if (!this.eventHandlers.remove(eventHandler)) {
+      throw new IllegalArgumentException("The passed eventHandler wasn't created by this publisher");
+    }
+    eventHandler.dispose();
+  }
+
+  /**
+   * Create a publisher event (rcl_event_t).
+   *
+   * The ownership of the created event handle will immediately be transferred to an
+   * @{link EventHandlerImpl}, that will be responsible of disposing it.
+   *
+   * @param handle A pointer to the underlying ROS2 publisher structure.
+   *     Must not be zero.
+   * @param eventType The rcl event type.
+   */
+  private static native long nativeCreateEvent(long handle, int eventType);
+
+  /**
    * Destroy a ROS2 publisher (rcl_publisher_t).
    *
    * @param nodeHandle A pointer to the underlying ROS2 node structure that
@@ -115,6 +164,10 @@ public class PublisherImpl<T extends MessageDefinition> implements Publisher<T> 
    * {@inheritDoc}
    */
   public final void dispose() {
+    for (EventHandler eventHandler : this.eventHandlers) {
+      eventHandler.dispose();
+    }
+    this.eventHandlers.clear();
     Node node = this.nodeReference.get();
     if (node != null) {
       node.removePublisher(this);

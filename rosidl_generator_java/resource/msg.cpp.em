@@ -43,20 +43,20 @@ for member in message.structure.members:
         cache[array_list_normalized_type] = array_list_jni_type
         type_ = type_.value_type
         if isinstance(type_, BasicType):
-            member_includes.add('rosidl_generator_c/primitives_sequence.h')
-            member_includes.add('rosidl_generator_c/primitives_sequence_functions.h')
+            member_includes.add('rosidl_runtime_c/primitives_sequence.h')
+            member_includes.add('rosidl_runtime_c/primitives_sequence_functions.h')
 
     # We do not cache strings because java.lang.String behaves differently
     if not isinstance(type_, AbstractGenericString):
         cache[get_normalized_type(type_)] = get_jni_type(type_)
 
     if isinstance(type_, AbstractString):
-        member_includes.add('rosidl_generator_c/string.h')
-        member_includes.add('rosidl_generator_c/string_functions.h')
+        member_includes.add('rosidl_runtime_c/string.h')
+        member_includes.add('rosidl_runtime_c/string_functions.h')
 
     if isinstance(type_, AbstractWString):
-        member_includes.add('rosidl_generator_c/u16string.h')
-        member_includes.add('rosidl_generator_c/u16string_functions.h')
+        member_includes.add('rosidl_runtime_c/u16string.h')
+        member_includes.add('rosidl_runtime_c/u16string_functions.h')
 
     if isinstance(type_, NamespacedType):
         namespaced_types.add(get_jni_type(type_))
@@ -110,7 +110,7 @@ elif message_c_include_prefix.endswith('__get_result'):
 #include <cstdint>
 #include <string>
 
-#include "rosidl_generator_c/message_type_support_struct.h"
+#include "rosidl_runtime_c/message_type_support_struct.h"
 
 #include "rcljava_common/exceptions.hpp"
 #include "rcljava_common/signatures.hpp"
@@ -232,16 +232,16 @@ normalized_type = get_normalized_type(member.type)
     jmethodID _jlist_@(member.name)_size_mid = env->GetMethodID(_j@(list_normalized_type)_class_global, "size", "()I");
     jint _jlist_@(member.name)_size = env->CallIntMethod(_jlist_@(member.name)_object, _jlist_@(member.name)_size_mid);
 @[      if isinstance(member.type.value_type, AbstractString)]@
-    if (!rosidl_generator_c__String__Sequence__init(&(ros_message->@(member.name)), _jlist_@(member.name)_size)) {
+    if (!rosidl_runtime_c__String__Sequence__init(&(ros_message->@(member.name)), _jlist_@(member.name)_size)) {
       rcljava_throw_exception(env, "java/lang/IllegalStateException", "unable to create String__Array ros_message");
     }
 @[      elif isinstance(member.type.value_type, AbstractWString)]@
-    if (!rosidl_generator_c__U16String__Sequence__init(&(ros_message->@(member.name)), _jlist_@(member.name)_size)) {
+    if (!rosidl_runtime_c__U16String__Sequence__init(&(ros_message->@(member.name)), _jlist_@(member.name)_size)) {
       rcljava_throw_exception(env, "java/lang/IllegalStateException", "unable to create U16String__Array ros_message");
     }
 @[      else]@
 @[        if isinstance(member.type.value_type, BasicType)]@
-    if (!rosidl_generator_c__@(member.type.value_type.typename)__Sequence__init(&(ros_message->@(member.name)), _jlist_@(member.name)_size)) {
+    if (!rosidl_runtime_c__@(member.type.value_type.typename)__Sequence__init(&(ros_message->@(member.name)), _jlist_@(member.name)_size)) {
       rcljava_throw_exception(env, "java/lang/IllegalStateException", "unable to create @(member.type.value_type)__Array ros_message");
     }
 @[        else]@
@@ -264,7 +264,7 @@ normalized_type = get_normalized_type(member.type)
       jstring _jfield_@(member.name)_value = static_cast<jstring>(element);
       if (_jfield_@(member.name)_value != nullptr) {
         const char * _str@(member.name) = env->GetStringUTFChars(_jfield_@(member.name)_value, 0);
-        rosidl_generator_c__String__assign(
+        rosidl_runtime_c__String__assign(
           &_dest_@(member.name)[i], _str@(member.name));
         env->ReleaseStringUTFChars(_jfield_@(member.name)_value, _str@(member.name));
       }
@@ -272,7 +272,7 @@ normalized_type = get_normalized_type(member.type)
       jstring _jfield_@(member.name)_value = static_cast<jstring>(element);
       if (_jfield_@(member.name)_value != nullptr) {
         const jchar * _str@(member.name) = env->GetStringChars(_jfield_@(member.name)_value, 0);
-        rosidl_generator_c__U16String__assign(
+        rosidl_runtime_c__U16String__assign(
           &_dest_@(member.name)[i], _str@(member.name));
         env->ReleaseStringChars(_jfield_@(member.name)_value, _str@(member.name));
       }
@@ -295,12 +295,12 @@ call_method_name = 'Call%sMethod' % get_java_type(member.type.value_type, use_pr
   if (_jvalue@(member.name) != nullptr) {
 @[      if isinstance(member.type, AbstractString)]@
     const char * _str@(member.name) = env->GetStringUTFChars(_jvalue@(member.name), 0);
-    rosidl_generator_c__String__assign(
+    rosidl_runtime_c__String__assign(
       &ros_message->@(member.name), _str@(member.name));
     env->ReleaseStringUTFChars(_jvalue@(member.name), _str@(member.name));
 @[      else]@
     const jchar * _str@(member.name) = env->GetStringChars(_jvalue@(member.name), 0);
-    rosidl_generator_c__U16String__assign(
+    rosidl_runtime_c__U16String__assign(
       &ros_message->@(member.name), _str@(member.name));
     env->ReleaseStringChars(_jvalue@(member.name), _str@(member.name));
 @[      end if]@

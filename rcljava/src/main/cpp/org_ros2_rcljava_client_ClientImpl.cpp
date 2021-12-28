@@ -23,7 +23,7 @@
 #include "rcl/node.h"
 #include "rcl/rcl.h"
 #include "rmw/rmw.h"
-#include "rosidl_generator_c/message_type_support_struct.h"
+#include "rosidl_runtime_c/message_type_support_struct.h"
 
 #include "rcljava_common/exceptions.hpp"
 #include "rcljava_common/signatures.hpp"
@@ -34,9 +34,9 @@ using rcljava_common::exceptions::rcljava_throw_rclexception;
 using rcljava_common::signatures::convert_from_java_signature;
 using rcljava_common::signatures::destroy_ros_message_signature;
 
-JNIEXPORT void JNICALL
+JNIEXPORT jlong JNICALL
 Java_org_ros2_rcljava_client_ClientImpl_nativeSendClientRequest(
-  JNIEnv * env, jclass, jlong client_handle, jlong sequence_number,
+  JNIEnv * env, jclass, jlong client_handle,
   jlong jrequest_from_java_converter_handle, jlong jrequest_to_java_converter_handle,
   jlong jrequest_destructor_handle, jobject jrequest_msg)
 {
@@ -53,6 +53,7 @@ Java_org_ros2_rcljava_client_ClientImpl_nativeSendClientRequest(
 
   void * request_msg = convert_from_java(jrequest_msg, nullptr);
 
+  int64_t sequence_number;
   rcl_ret_t ret = rcl_send_request(client, request_msg, &sequence_number);
 
   destroy_ros_message_signature destroy_ros_message =
@@ -65,6 +66,7 @@ Java_org_ros2_rcljava_client_ClientImpl_nativeSendClientRequest(
     rcl_reset_error();
     rcljava_throw_rclexception(env, ret, msg);
   }
+  return static_cast<jlong>(sequence_number);
 }
 
 JNIEXPORT void JNICALL

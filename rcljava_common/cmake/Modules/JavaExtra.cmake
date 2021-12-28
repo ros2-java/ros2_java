@@ -106,11 +106,11 @@ function(ament_add_junit_tests TARGET_NAME)
   set(${TARGET_NAME}_jar_dependencies "${JUNIT_JAR}${SEPARATOR}${HAMCREST_JAR}")
 
   add_jar("${TARGET_NAME}_jar"
-    "${_source_files}"
+    SOURCES "${_source_files}"
     OUTPUT_NAME
     "${TARGET_NAME}"
     INCLUDE_JARS
-    "${ARG_INCLUDE_JARS}"
+    ${ARG_INCLUDE_JARS}
     "${JUNIT_JAR}"
     "${HAMCREST_JAR}"
   )

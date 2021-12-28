@@ -22,7 +22,7 @@
 #include "rcl/node.h"
 #include "rcl/rcl.h"
 #include "rmw/rmw.h"
-#include "rosidl_generator_c/message_type_support_struct.h"
+#include "rosidl_runtime_c/message_type_support_struct.h"
 
 #include "rcljava_common/exceptions.hpp"
 #include "rcljava_common/signatures.hpp"
@@ -30,6 +30,20 @@
 #include "org_ros2_rcljava_node_NodeImpl.h"
 
 using rcljava_common::exceptions::rcljava_throw_rclexception;
+
+JNIEXPORT jstring JNICALL
+Java_org_ros2_rcljava_node_NodeImpl_nativeGetName(
+  JNIEnv * env, jclass, jlong node_handle)
+{
+  return env->NewStringUTF(rcl_node_get_name(reinterpret_cast<rcl_node_t *>(node_handle)));
+}
+
+JNIEXPORT jstring JNICALL
+Java_org_ros2_rcljava_node_NodeImpl_nativeGetNamespace(
+  JNIEnv * env, jclass, jlong node_handle)
+{
+  return env->NewStringUTF(rcl_node_get_namespace(reinterpret_cast<rcl_node_t *>(node_handle)));
+}
 
 JNIEXPORT jlong JNICALL
 Java_org_ros2_rcljava_node_NodeImpl_nativeCreatePublisherHandle(

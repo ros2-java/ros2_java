@@ -18,6 +18,7 @@ package org.ros2.rcljava;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Map;
 import java.util.concurrent.ConcurrentSkipListMap;
@@ -33,6 +34,7 @@ import org.ros2.rcljava.interfaces.ServiceDefinition;
 import org.ros2.rcljava.node.ComposableNode;
 import org.ros2.rcljava.node.Node;
 import org.ros2.rcljava.node.NodeImpl;
+import org.ros2.rcljava.node.NodeOptions;
 import org.ros2.rcljava.publisher.Publisher;
 import org.ros2.rcljava.qos.QoSProfile;
 import org.ros2.rcljava.service.RMWRequestId;
@@ -160,7 +162,7 @@ public final class RCLJava {
    * @param contextHandle Pointer to a context (rcl_context_t) with which to associated the node.
    * @return A pointer to the underlying ROS2 node structure.
    */
-  private static native long nativeCreateNodeHandle(String nodeName, String namespace, long contextHandle);
+  private static native long nativeCreateNodeHandle(String nodeName, String namespace, long contextHandle, ArrayList<String> arguments, boolean useGlobalArguments, boolean enableRosout);
 
   /**
    * @return The identifier of the currently active RMW implementation via the
@@ -217,7 +219,7 @@ public final class RCLJava {
    *     structure.
    */
   public static Node createNode(final String nodeName) {
-    return createNode(nodeName, "", RCLJava.getDefaultContext());
+    return createNode(nodeName, "", RCLJava.getDefaultContext(), new NodeOptions());
   }
 
   /**
@@ -229,8 +231,12 @@ public final class RCLJava {
    *     structure.
    */
   public static Node createNode(final String nodeName, final String namespace, final Context context) {
-    long nodeHandle = nativeCreateNodeHandle(nodeName, namespace, context.getHandle());
-    Node node = new NodeImpl(nodeHandle, nodeName, context);
+    return createNode(nodeName, namespace, context, new NodeOptions());
+  }
+
+  public static Node createNode(final String nodeName, final String namespace, final Context context, final NodeOptions options) {
+    long nodeHandle = nativeCreateNodeHandle(nodeName, namespace, context.getHandle(), options.getCliArgs(), options.getUseGlobalArguments(), options.getEnableRosout());
+    Node node = new NodeImpl(nodeHandle, context, options.getAllowUndeclaredParameters());
     nodes.add(node);
     return node;
   }
@@ -295,18 +301,22 @@ public final class RCLJava {
   }
 
   public static long convertQoSProfileToHandle(final QoSProfile qosProfile) {
-    int history = qosProfile.getHistory().getValue();
-    int depth = qosProfile.getDepth();
-    int reliability = qosProfile.getReliability().getValue();
-    int durability = qosProfile.getDurability().getValue();
-    boolean avoidROSNamespaceConventions = qosProfile.getAvoidROSNamespaceConventions();
-
     return nativeConvertQoSProfileToHandle(
-        history, depth, reliability, durability, avoidROSNamespaceConventions);
+      qosProfile.getHistory().getValue(),
+      qosProfile.getDepth(),
+      qosProfile.getReliability().getValue(),
+      qosProfile.getDurability().getValue(),
+      qosProfile.getDeadline().getSeconds(), qosProfile.getDeadline().getNano(),
+      qosProfile.getLifespan().getSeconds(), qosProfile.getLifespan().getNano(),
+      qosProfile.getLiveliness().getValue(), qosProfile.getLivelinessLeaseDuration().getSeconds(),
+      qosProfile.getLivelinessLeaseDuration().getNano(),
+      qosProfile.getAvoidROSNamespaceConventions());
   }
 
-  private static native long nativeConvertQoSProfileToHandle(int history, int depth,
-      int reliability, int durability, boolean avoidROSNamespaceConventions);
+  private static native long nativeConvertQoSProfileToHandle(
+    int history, int depth, int reliability, int durability, long deadlineSec, int deadlineNanos,
+    long lifespanSec, int lifespanNanos, int liveliness, long livelinessLeaseSec,
+    int livelinessLeaseNanos, boolean avoidROSNamespaceConventions);
 
   public static void disposeQoSProfile(final long qosProfileHandle) {
     nativeDisposeQoSProfile(qosProfileHandle);

@@ -20,6 +20,7 @@
 #include <string>
 
 #include "rcl/error_handling.h"
+#include "rcl/event.h"
 #include "rcl/node.h"
 #include "rcl/rcl.h"
 #include "rmw/rmw.h"
@@ -29,6 +30,7 @@
 
 #include "org_ros2_rcljava_publisher_PublisherImpl.h"
 
+using rcljava_common::exceptions::rcljava_throw_exception;
 using rcljava_common::exceptions::rcljava_throw_rclexception;
 using rcljava_common::signatures::convert_from_java_signature;
 using rcljava_common::signatures::destroy_ros_message_signature;
@@ -89,4 +91,32 @@ Java_org_ros2_rcljava_publisher_PublisherImpl_nativeDispose(
     rcl_reset_error();
     rcljava_throw_rclexception(env, ret, msg);
   }
+}
+
+JNIEXPORT jlong JNICALL
+Java_org_ros2_rcljava_publisher_PublisherImpl_nativeCreateEvent(
+  JNIEnv * env, jclass, jlong publisher_handle, jint event_type)
+{
+  auto * publisher = reinterpret_cast<rcl_publisher_t *>(publisher_handle);
+  if (!publisher) {
+    rcljava_throw_exception(
+      env, "java/lang/IllegalArgumentException", "passed rcl_publisher_t handle is NULL");
+    return 0;
+  }
+  auto * event = static_cast<rcl_event_t *>(malloc(sizeof(rcl_event_t)));
+  if (!event) {
+    rcljava_throw_exception(env, "java/lang/OutOfMemoryError", "failed to allocate rcl_event_t");
+    return 0;
+  }
+  *event = rcl_get_zero_initialized_event();
+  rcl_ret_t ret = rcl_publisher_event_init(
+    event, publisher, static_cast<rcl_publisher_event_type_t>(event_type));
+  if (RCL_RET_OK != ret) {
+    std::string msg = "Failed to create event: " + std::string(rcl_get_error_string().str);
+    rcl_reset_error();
+    rcljava_throw_rclexception(env, ret, msg);
+    free(event);
+    return 0;
+  }
+  return reinterpret_cast<jlong>(event);
 }

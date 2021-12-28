@@ -2,144 +2,172 @@ repositories:
   ament/ament_cmake:
     type: git
     url: https://github.com/ament/ament_cmake.git
-    version: dashing
+    version: galactic
   ament/ament_index:
     type: git
     url: https://github.com/ament/ament_index.git
-    version: dashing
+    version: galactic
   ament/ament_lint:
     type: git
     url: https://github.com/ament/ament_lint.git
-    version: dashing
+    version: galactic
   ament/ament_package:
     type: git
     url: https://github.com/ament/ament_package.git
-    version: dashing
+    version: galactic
+  ament/google_benchmark_vendor:
+    type: git
+    url: https://github.com/ament/google_benchmark_vendor.git
+    version: main
   ament/googletest:
     type: git
     url: https://github.com/ament/googletest.git
-    version: dashing
+    version: galactic
   ament/uncrustify_vendor:
     type: git
     url: https://github.com/ament/uncrustify_vendor.git
-    version: dashing
-  ament/ament_java:
-    type: git
-    url: https://github.com/ros2-java/ament_java.git
-    version: main
+    version: galactic
   eProsima/Fast-CDR:
     type: git
     url: https://github.com/eProsima/Fast-CDR.git
-    version: v1.0.11
+    version: v1.0.20
   eProsima/Fast-DDS:
     type: git
     url: https://github.com/eProsima/Fast-DDS.git
-    version: v1.8.2
+    version: 2.3.x
+  eProsima/foonathan_memory_vendor:
+    type: git
+    url: https://github.com/eProsima/foonathan_memory_vendor.git
+    version: master
   osrf/osrf_pycommon:
     type: git
     url: https://github.com/osrf/osrf_pycommon.git
-    version: dashing
+    version: master
   osrf/osrf_testing_tools_cpp:
     type: git
-    url: https://github.com/ros2-java/osrf_testing_tools_cpp.git
-    version: dashing-android
+    url: https://github.com/osrf/osrf_testing_tools_cpp.git
+    version: master
+  ros-tooling/libstatistics_collector:
+    type: git
+    url: https://github.com/ros-tooling/libstatistics_collector.git
+    version: master
+  ros-tracing/ros2_tracing:
+    type: git
+    url: https://gitlab.com/ros-tracing/ros2_tracing.git
+    version: master
   ros2/ament_cmake_ros:
     type: git
     url: https://github.com/ros2/ament_cmake_ros.git
-    version: dashing
+    version: galactic
   ros2/common_interfaces:
     type: git
     url: https://github.com/ros2/common_interfaces.git
-    version: dashing
+    version: galactic
   ros2/example_interfaces:
     type: git
     url: https://github.com/ros2/example_interfaces.git
-    version: dashing
+    version: galactic
   ros2/launch:
     type: git
     url: https://github.com/ros2/launch.git
-    version: dashing
-  ros2/poco_vendor:
+    version: galactic
+  ros2/libyaml_vendor:
     type: git
-    url: https://github.com/ros2/poco_vendor.git
-    version: dashing
+    url: https://github.com/ros2/libyaml_vendor.git
+    version: galactic
+  ros2/performance_test_fixture:
+    type: git
+    url: https://github.com/ros2/performance_test_fixture.git
+    version: main
+  ros2/python_cmake_module:
+    type: git
+    url: https://github.com/ros2/python_cmake_module.git
+    version: galactic
   ros2/rcl:
     type: git
     url: https://github.com/ros2/rcl.git
-    version: dashing
+    version: galactic
   ros2/rcl_interfaces:
     type: git
     url: https://github.com/ros2/rcl_interfaces.git
-    version: dashing
+    version: galactic
   ros2/rcl_logging:
     type: git
     url: https://github.com/ros2/rcl_logging.git
-    version: dashing
+    version: galactic
   ros2/rcpputils:
     type: git
     url: https://github.com/ros2/rcpputils.git
-    version: dashing
+    version: galactic
   ros2/rcutils:
     type: git
     url: https://github.com/ros2/rcutils.git
-    version: dashing
+    version: galactic
   ros2/rmw:
     type: git
     url: https://github.com/ros2/rmw.git
-    version: dashing
+    version: galactic
+  ros2/rmw_dds_common:
+    type: git
+    url: https://github.com/ros2/rmw_dds_common.git
+    version: galactic
   ros2/rmw_fastrtps:
     type: git
     url: https://github.com/ros2/rmw_fastrtps.git
-    version: dashing
+    version: galactic
   ros2/rmw_implementation:
     type: git
     url: https://github.com/ros2/rmw_implementation.git
-    version: dashing
+    version: galactic
   ros2/rosidl:
     type: git
     url: https://github.com/ros2/rosidl.git
-    version: dashing
+    version: galactic
   ros2/rosidl_dds:
     type: git
     url: https://github.com/ros2/rosidl_dds.git
-    version: dashing
+    version: galactic
   ros2/rosidl_defaults:
     type: git
     url: https://github.com/ros2/rosidl_defaults.git
-    version: dashing
+    version: galactic
   ros2/rosidl_python:
     type: git
     url: https://github.com/ros2/rosidl_python.git
-    version: dashing
+    version: galactic
   ros2/rosidl_typesupport:
     type: git
     url: https://github.com/ros2/rosidl_typesupport.git
-    version: dashing
+    version: galactic
   ros2/rosidl_typesupport_fastrtps:
     type: git
     url: https://github.com/ros2/rosidl_typesupport_fastrtps.git
-    version: dashing
+    version: galactic
+  ros2/rpyutils:
+    type: git
+    url: https://github.com/ros2/rpyutils.git
+    version: galactic
   ros2/test_interface_files:
     type: git
     url: https://github.com/ros2/test_interface_files.git
-    version: dashing
-  ros2/tinydir_vendor:
-    type: git
-    url: https://github.com/ros2/tinydir_vendor.git
-    version: dashing
+    version: galactic
   ros2/unique_identifier_msgs:
     type: git
     url: https://github.com/ros2/unique_identifier_msgs.git
-    version: dashing
-  ros2_java/ros2_java:
+    version: galactic
+  ros2-java/ament_java:
     type: git
-    url: https://github.com/ros2-java/ros2_java
-    version: dashing
-  ros2_java/ros2_android:
+    url: https://github.com/ros2-java/ament_java.git
+    version: main
+  ros2-java/ros2_java:
+    type: git
+    url: https://github.com/ros2-java/ros2_java.git
+    version: main
+  ros2-java/ros2_android:
     type: git
     url: https://github.com/ros2-java/ros2_android.git
-    version: master
-  ros2_java/ros2_android_examples:
+    version: main
+  ros2-java/ros2_android_examples:
     type: git
-    url: https://github.com/ros2-java/ros2_android_examples
-    version: master
+    url: https://github.com/ros2-java/ros2_android_examples.git
+    version: main
