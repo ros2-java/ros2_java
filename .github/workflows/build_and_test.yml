@@ -60,7 +60,7 @@ jobs:
                 }
               }
     # Simplify the name, so we don't see the full colcon_meta file there.
-    name: build_android
+    name: Build Android
     steps:
     - name: Install Java
       run: |
