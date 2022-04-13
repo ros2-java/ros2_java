@@ -6,6 +6,7 @@ find_package(ament_cmake REQUIRED)
 find_package(ament_cmake_export_jars REQUIRED)
 find_package(ament_cmake_export_jni_libraries REQUIRED)
 find_package(builtin_interfaces REQUIRED)
+find_package(rcpputils REQUIRED)
 find_package(rcl REQUIRED)
 find_package(rcl_interfaces REQUIRED)
 find_package(rcljava_common REQUIRED)
@@ -104,10 +105,11 @@ foreach(_jni_source ${${PROJECT_NAME}_jni_sources})
   endif()
 
   ament_target_dependencies(${_target_name}
+    "builtin_interfaces"
     "rcl"
     "rcljava_common"
-    "builtin_interfaces"
     "rcl_interfaces"
+    "rcpputils"
   )
 
   target_include_directories(${_target_name}
