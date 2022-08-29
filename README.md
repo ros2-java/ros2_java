@@ -141,7 +141,7 @@ Although the `ros2_java_android.repos` file contains all the repositories for th
 1. Build (skipping packages that we don't need or can't cross-compile):
 
         colcon build \
-          --packages-ignore cyclonedds rcl_logging_log4cxx rosidl_generator_py \
+          --packages-ignore cyclonedds rcl_logging_log4cxx rcl_logging_spdlog rosidl_generator_py \
           --packages-up-to rcljava \
           --cmake-args \
           -DPYTHON_EXECUTABLE=${PYTHON3_EXEC} \
@@ -156,7 +156,11 @@ Although the `ros2_java_android.repos` file contains all the repositories for th
           -DANDROID_NDK=${ANDROID_NDK} \
           -DTHIRDPARTY=ON \
           -DCOMPILE_EXAMPLES=OFF \
-          -DCMAKE_FIND_ROOT_PATH="${PWD}/install"
+          -DCMAKE_FIND_ROOT_PATH="${PWD}/install" \
+          -DANDROID=ON \
+          -DBUILD_TESTING=OFF \
+          -DRCL_LOGGING_IMPLEMENTATION=rcl_logging_noop \
+          -DTHIRDPARTY_android-ifaddrs=FORCE
 
 You can find more information about the Android examples at https://github.com/ros2-java/ros2_android_examples
 
