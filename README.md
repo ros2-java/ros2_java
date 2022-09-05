@@ -79,8 +79,7 @@ Make sure you have Gradle 3.2 (or later) installed.
 
 1. Install Gradle extensions for colcon:
 
-        python3 -m pip install -U git+https://github.com/colcon/colcon-gradle
-        python3 -m pip install --no-deps -U git+https://github.com/colcon/colcon-ros-gradle
+        python3 -m pip install -U colcon-gradle colcon-ros-gradle
 
 ### Download and Build ROS 2 Java for Desktop
 
